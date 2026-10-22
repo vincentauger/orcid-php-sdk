@@ -22,14 +22,18 @@ it('reads the person section through the Member API', function (): void {
 
     $person = $this->getMemberApiClient()->withMockClient($mockClient)->record($this->orcidId())->person();
 
-    expect($person->name)->not->toBeNull()
-        ->and($person->name?->displayName())->toBeString()
+    // The sandbox record has a biography, a website, a country, keywords and a limited email.
+    // If you re-record against a record without them, relax these assertions.
+    expect($person->name?->displayName())->toBeString()
+        ->and($person->biography)->toBeString()
+        ->and($person->researcherUrls)->not->toBeEmpty()
+        ->and($person->countries)->not->toBeEmpty()
+        ->and($person->keywords)->not->toBeEmpty()
         ->and($person->lastModifiedAt)->toBeInstanceOf(DateTimeImmutable::class);
 
-    // /read-limited gives access to the emails the person shared with trusted parties
-    foreach ($person->emails as $email) {
-        expect($email->email)->not->toBe('');
-    }
+    // /read-limited also returns limited items, like the email
+    expect($person->emails)->not->toBeEmpty()
+        ->and($person->emails[0]->visibility)->toBe('limited');
 });
 
 it('reads the person section through the Public API without a token', function (): void {
@@ -37,7 +41,10 @@ it('reads the person section through the Public API without a token', function (
 
     $person = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId())->person();
 
-    expect($person->name)->not->toBeNull();
+    // public items only: the limited email is not returned
+    expect($person->name)->not->toBeNull()
+        ->and($person->keywords)->not->toBeEmpty()
+        ->and($person->emails)->toBeEmpty();
 });
 
 it('summarises the activities of a record', function (): void {
