@@ -1,0 +1,27 @@
+{
+    "statusCode": 403,
+    "headers": {
+        "Date": "Thu, 22 Oct 2026 19:20:03 GMT",
+        "Content-Type": "application\/json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Set-Cookie": [
+            "AWSALB=jTf29YUQpE74ps62xpPwomGNSkanWgSvVwZ8ORuVvpyJNJi6nGWyVmIrkMg423Vga1PFfemG0dSf5tdG2cvo4IDukJcHn9sOfj2yGGcIrKvk9gvRWNZo+JedKXg+; Expires=Thu, 29 Oct 2026 19:20:03 GMT; Path=\/",
+            "AWSALBCORS=jTf29YUQpE74ps62xpPwomGNSkanWgSvVwZ8ORuVvpyJNJi6nGWyVmIrkMg423Vga1PFfemG0dSf5tdG2cvo4IDukJcHn9sOfj2yGGcIrKvk9gvRWNZo+JedKXg+; Expires=Thu, 29 Oct 2026 19:20:03 GMT; Path=\/; SameSite=None; Secure",
+            "__cf_bm=GAy3aa8QRtFohIDi5wh7aY4CD8M2FaiAmV9ROlcjqG8-1792696803.562023-1.0.1.1-Rhq.qMBteexsJQVaSKCM22y_AVsJnBNeokHAMhYA6z5MDRvLAAXA7GzgWTs9Qve5JgDnG8d..3r3u3Oq7hzgQqZv3bCIl38lLnomVkgq8PvO.8oGRo2T37K5TrOvY.FT; HttpOnly; SameSite=None; Secure; Path=\/; Domain=sandbox.orcid.org; Expires=Thu, 22 Oct 2026 19:50:03 GMT"
+        ],
+        "Server": "cloudflare",
+        "access-control-allow-credentials": "true",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a4eadb6e3a08f2bc-YYZ"
+    },
+    "data": "{\"error\":\"access_denied\",\"error-description\":\"access_token is invalid\"}",
+    "context": []
+}

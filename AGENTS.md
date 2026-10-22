@@ -54,8 +54,15 @@ Run these commands before committing:
 
 ### Fixtures
 
-- Record fixtures with `new Tests\Fixtures\OrcidFixture('name')` in a `MockClient`, never plain
-  `MockResponse::fixture()`: it removes ORCID iDs (→ `0000-0002-1825-0097`), tokens and personal data.
+- Follow the DataCite SDK pattern: each typed request is tested with
+  `new MockClient([SomeRequest::class => new OrcidFixture('folder/name')])`. With a `.env`, a missing fixture is
+  recorded from the sandbox on the first run; afterwards it is replayed.
+- Use `OrcidFixture`, never plain `MockResponse::fixture()`: it is the same Saloon fixture, plus removal of ORCID
+  iDs (→ `0000-0002-1825-0097`), client ids, tokens and personal data.
+- Requests that depend on each other's results (e.g. get a token, then revoke it) must be re-recorded together:
+  delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
+- Hand-written `MockResponse::make()` is only for responses the sandbox can't produce on demand (a fresh
+  authorization code, an `openid` token); say so in a comment.
 - Without a `.env` file, missing fixtures throw instead of calling ORCID, so CI never reaches the API.
 - With a `.env` file, tests refuse to run unless `ORCID_ENVIRONMENT=sandbox`.
 - Always review a newly recorded fixture before committing it.
@@ -84,6 +91,10 @@ Evidence: `tests/Fixtures/Saloon/a1/`.
 - **Errors have two body shapes:**
   - ORCID errors: `{"response-code", "developer-message", "user-message", "error-code", "more-info"}`
   - OAuth errors (bad or revoked token): `{"error": "invalid_token", "error_description"}`, 401 (`e8`)
+- **OAuth** (`tests/Fixtures/Saloon/oauth/`): client credentials tokens have **no refresh token**
+  (`client-credentials`); revoke returns 200 with an empty body (`revoke`); `/oauth/userinfo` needs an `openid`
+  token, otherwise 403 `access_denied` with the description under `error-description` (hyphen,
+  `userinfo-without-openid`).
 - **403 is ambiguous; use `error-code`:**
   - 9010: the client is not the source of the item (PUT and DELETE, `e7-*`). The token is fine.
   - 9038: the token lacks the required scope (`e9`, a `/read-public` token trying to POST). Its

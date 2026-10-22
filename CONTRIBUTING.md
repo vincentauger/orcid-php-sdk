@@ -59,7 +59,7 @@ bin/sandbox-token.sh
 ```
 
 The script prints an authorization URL. Open it while signed in to the sandbox as your test record, authorize,
-then paste back the URL you were redirected to. It writes `ORCID_ACCESS_TOKEN` and `ORCID_ORCID_ID` to `.env`.
+then paste back the URL you were redirected to. It writes `ORCID_ACCESS_TOKEN`, `ORCID_REFRESH_TOKEN` and `ORCID_ORCID_ID` to `.env`.
 It needs `curl` and `jq`.
 
 ### Recording

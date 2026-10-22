@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Saloon\Exceptions\Request\RequestException;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\PendingRequest;
 use VincentAuger\OrcidSdk\Data\OrcidToken;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
+use VincentAuger\OrcidSdk\Exceptions\OrcidValidationException;
 use VincentAuger\OrcidSdk\Orcid;
 use VincentAuger\OrcidSdk\OrcidOAuth;
 use VincentAuger\OrcidSdk\Requests\OAuth\ExchangeAuthorizationCode;
@@ -115,8 +115,15 @@ it('throws when the token endpoint rejects the request', function (): void {
         'error_description' => 'Invalid authorization code: Q70Y3A',
     ], 400)]);
 
-    new OrcidOAuth('APP-1', 'secret')->withMockClient($mockClient)->exchangeCode('Q70Y3A', 'https://example.org/callback');
-})->throws(RequestException::class);
+    try {
+        new OrcidOAuth('APP-1', 'secret')->withMockClient($mockClient)->exchangeCode('Q70Y3A', 'https://example.org/callback');
+        $this->fail('Expected an exception');
+    } catch (OrcidValidationException $exception) {
+        expect($exception->oauthError)->toBe('invalid_grant')
+            ->and($exception->getMessage())->toBe('ORCID request failed with status 400: Invalid authorization code: Q70Y3A')
+            ->and($exception->isRetryable())->toBeFalse();
+    }
+});
 
 it('refuses to send token requests through another connector', function (): void {
     $mockClient = new MockClient([RequestClientCredentialsToken::class => MockResponse::make()]);

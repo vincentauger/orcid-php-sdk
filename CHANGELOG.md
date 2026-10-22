@@ -12,3 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Orcid` connector for the Public and Member APIs (v3.0), with production and sandbox environments
 - `OrcidOAuth` connector for the OAuth endpoints: `authorizationUrl()`, `exchangeCode()`, `clientCredentials()`
 - `OrcidToken` and `Scope`
+- `OrcidOAuth::refresh()`, `revoke()` and `userInfo()` (`UserInfo`)
+- Typed exceptions (`OrcidException` and subclasses) with `isRetryable()`; `sendOrFail()` on both connectors
+- `RequiresMemberApi` / `RequiresScopes` request contracts, checked before sending; optional token `scopes` on `Orcid::member()`

@@ -7,9 +7,15 @@ namespace VincentAuger\OrcidSdk;
 use Saloon\Contracts\Authenticator;
 use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
+use Saloon\Http\PendingRequest;
 use Saloon\Traits\Plugins\HasTimeout;
+use VincentAuger\OrcidSdk\Concerns\ThrowsOrcidExceptions;
+use VincentAuger\OrcidSdk\Contracts\RequiresMemberApi;
+use VincentAuger\OrcidSdk\Contracts\RequiresScopes;
 use VincentAuger\OrcidSdk\Enums\ApiAccess;
 use VincentAuger\OrcidSdk\Enums\Environment;
+use VincentAuger\OrcidSdk\Enums\Scope;
+use VincentAuger\OrcidSdk\Exceptions\MissingScopeException;
 
 /**
  * ORCID record API connector (Public or Member API).
@@ -27,15 +33,22 @@ use VincentAuger\OrcidSdk\Enums\Environment;
 final class Orcid extends Connector
 {
     use HasTimeout;
+    use ThrowsOrcidExceptions;
 
     protected int $connectTimeout = 10;
 
     protected int $requestTimeout = 30;
 
+    /**
+     * @param  Scope[]|null  $scopes  The token's scopes, if known (e.g. stored with the token). When given,
+     *                                requests needing a scope the token lacks throw MissingScopeException
+     *                                before anything is sent.
+     */
     public function __construct(
         public readonly ApiAccess $access = ApiAccess::Public,
         private readonly ?string $accessToken = null,
         public readonly Environment $environment = Environment::Production,
+        public readonly ?array $scopes = null,
     ) {
         if ($this->access === ApiAccess::Member && $this->accessToken === null) {
             throw new \InvalidArgumentException('An access token is required for member API access');
@@ -45,10 +58,12 @@ final class Orcid extends Connector
     /**
      * Member API client using a token obtained through the 3-legged OAuth flow
      * (or a client credentials token for member-only 2-legged scopes).
+     *
+     * @param  Scope[]|null  $scopes  The token's scopes, if known; see the constructor
      */
-    public static function member(string $accessToken, Environment $environment = Environment::Production): self
+    public static function member(string $accessToken, Environment $environment = Environment::Production, ?array $scopes = null): self
     {
-        return new self(ApiAccess::Member, $accessToken, $environment);
+        return new self(ApiAccess::Member, $accessToken, $environment, $scopes);
     }
 
     /**
@@ -58,6 +73,30 @@ final class Orcid extends Connector
     public static function public(?string $accessToken = null, Environment $environment = Environment::Production): self
     {
         return new self(ApiAccess::Public, $accessToken, $environment);
+    }
+
+    /**
+     * Refuse requests this client cannot make, before anything is sent
+     */
+    public function boot(PendingRequest $pendingRequest): void
+    {
+        $request = $pendingRequest->getRequest();
+
+        if ($request instanceof RequiresMemberApi && $this->access !== ApiAccess::Member) {
+            throw new \LogicException(sprintf('%s requires the Member API: use Orcid::member()', $request::class));
+        }
+
+        if ($request instanceof RequiresScopes && $this->scopes !== null) {
+            $missing = array_udiff($request->requiredScopes(), $this->scopes, static fn (Scope $a, Scope $b): int => strcmp($a->value, $b->value));
+
+            if ($missing !== []) {
+                throw new MissingScopeException(sprintf(
+                    '%s requires the %s scope(s), which this token does not have',
+                    $request::class,
+                    Scope::encode($missing),
+                ));
+            }
+        }
     }
 
     public function resolveBaseUrl(): string

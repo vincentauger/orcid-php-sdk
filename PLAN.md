@@ -22,10 +22,11 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
     because webhook endpoints are not versioned.
   - [x] `OrcidOAuth`: `authorizationUrl()` (only builds the URL), `exchangeCode()`, `clientCredentials()`;
     client id/secret are added per request (`SendsClientCredentials`), never as a connector body
-  - [ ] `OrcidOAuth`: `refresh(revokeOld)`, `revoke()`, `userInfo()`
+  - [x] `OrcidOAuth`: `refresh(revokeOld)`, `revoke()`, `userInfo()`
   - [x] `OrcidToken` readonly class: `accessToken`, `refreshToken`, `expiresIn`, `scopes`, `orcid`, `name`
   - [x] `Scope` enum (`encode`/`decode`/`completeAccess`; unknown scopes ignored when decoding)
-  - [ ] `RequiresMemberAuth`; optional `scopes:` on `Orcid::member()` + `RequiresScope` → `MissingScopeException`
+  - [x] `Contracts\RequiresMemberApi` and `Contracts\RequiresScopes`, checked in `Orcid::boot()`; optional
+    `scopes:` on `Orcid::member()` → `MissingScopeException` before anything is sent
 - [ ] **A3. How calls are organised** — Saloon resources grouped by record:
   `$orcid->record($id)->person()->get()`, `->activities()->summary()`,
   `->affiliations()->get|create|update|delete(AffiliationType, …)`. Convenience methods return typed results
@@ -38,16 +39,21 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
   Blank or whitespace-only strings (ORCID rejects them, 400 / 9047): optional fields become `null`;
   required fields (organization name, city, country, ROR identifier) throw `InvalidArgumentException`.
   Enums: `PeerReviewRole`, `PeerReviewType`.
-- [ ] **A5. Exceptions** (until then, `OrcidOAuth` methods throw Saloon's `RequestException`) — `OrcidException` (RuntimeException) → `OrcidRequestException` (parsed error
+- [x] **A5. Exceptions** — `OrcidException` (RuntimeException) → `OrcidRequestException` (parsed error
   body + `Response`; reads both ORCID error bodies and OAuth `{error, error_description}` bodies) →
   `Auth` (**401 only**: bad, revoked or expired token), `Forbidden` (403, with `errorCode`, `isNotSource()` for 9010
   and `isMissingScope()` for 9038), `NotFound`, `Validation`, `Conflict`, `RateLimit`, `Server`; plus `Connection`
-  (wraps `FatalRequestException`). `isRetryable()` is true for 429, 5xx and connection errors.
+  (wraps `FatalRequestException`). `isRetryable()` is true for 429, 5xx and connection errors. Connectors return
+  them from `getRequestException()`, so `$response->throw()` raises them too; convenience methods use
+  `sendOrFail()`, and `send()` still returns the raw response.
 - [ ] **A6. Tests and docs** — fixture-based tests in CI, `live` Pest group against the sandbox (only runs
   when credentials are present), README with examples.
   - [x] `bin/sandbox-token.sh`: one-off shell script that gets a 3-legged sandbox
     token for the test record and writes it to `.env`
-  - [x] `exchangeCode()` / `clientCredentials()` tested with ORCID's documented token responses
+  - [x] Recorded: client credentials, revoke, userinfo without `openid`. Mocked from ORCID's docs:
+    `exchangeCode()` (needs a fresh browser code), `refresh()` (not worth recording: tokens last ~20 years),
+    successful `userInfo()` (needs an `openid` token)
+  - [ ] Re-record the A1 evidence through the typed affiliation requests (A3/A4), then drop the `a1/` fixtures
 - [ ] **Release `0.1.0`** on Packagist.
 - [ ] **Later 0.x: webhooks** (premium members only, not used by OSP) — `Scope::Webhook` (obtained via
   `clientCredentials()`), `$orcid->record($id)->webhooks()->register($callbackUrl)` / `->unregister()`:

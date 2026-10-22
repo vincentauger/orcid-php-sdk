@@ -82,8 +82,9 @@ final class OrcidFixture extends Fixture
             return $recordedResponse;
         }
 
-        // the OAuth token response returns the owner's name at the top level
-        if (array_key_exists('access_token', $body) && is_string($body['name'] ?? null)) {
+        // OAuth token and userinfo responses return the owner's name as a top-level string
+        // (on records, the top-level `name` is an object handled by redactPersonalData)
+        if (is_string($body['name'] ?? null)) {
             $body['name'] = self::REDACTED;
         }
 

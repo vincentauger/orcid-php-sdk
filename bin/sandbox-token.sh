@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # One-off dev helper: get a 3-legged ORCID *sandbox* token for your test record
-# and save it in .env (ORCID_ACCESS_TOKEN, ORCID_ORCID_ID). Not shipped with the package.
+# and save it in .env (ORCID_ACCESS_TOKEN, ORCID_REFRESH_TOKEN, ORCID_ORCID_ID). Not shipped with the package.
 #
 # Usage: bin/sandbox-token.sh
 #
@@ -85,13 +85,14 @@ RESPONSE="$(curl -sS -X POST "$OAUTH_URL/oauth/token" \
     --data-urlencode "code=$CODE" \
     --data-urlencode "redirect_uri=$REDIRECT_URI")"
 
-FIELDS="$(token_fields access_token orcid scope <<< "$RESPONSE")"
-{ read -r ACCESS_TOKEN; read -r ORCID_ID; read -r GRANTED_SCOPES; } <<< "$FIELDS"
+FIELDS="$(token_fields access_token refresh_token orcid scope <<< "$RESPONSE")"
+{ read -r ACCESS_TOKEN; read -r REFRESH_TOKEN; read -r ORCID_ID; read -r GRANTED_SCOPES; } <<< "$FIELDS"
 
 env_set ORCID_ACCESS_TOKEN "$ACCESS_TOKEN"
+env_set ORCID_REFRESH_TOKEN "$REFRESH_TOKEN"
 env_set ORCID_ORCID_ID "$ORCID_ID"
 
 echo
-echo "Saved ORCID_ACCESS_TOKEN and ORCID_ORCID_ID ($ORCID_ID) to .env"
+echo "Saved ORCID_ACCESS_TOKEN, ORCID_REFRESH_TOKEN and ORCID_ORCID_ID ($ORCID_ID) to .env"
 echo "Granted scopes: $GRANTED_SCOPES"
 

@@ -6,11 +6,16 @@ namespace VincentAuger\OrcidSdk;
 
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\HasTimeout;
+use VincentAuger\OrcidSdk\Concerns\ThrowsOrcidExceptions;
 use VincentAuger\OrcidSdk\Data\OrcidToken;
+use VincentAuger\OrcidSdk\Data\UserInfo;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Requests\OAuth\ExchangeAuthorizationCode;
+use VincentAuger\OrcidSdk\Requests\OAuth\GetUserInfo;
+use VincentAuger\OrcidSdk\Requests\OAuth\RefreshToken;
 use VincentAuger\OrcidSdk\Requests\OAuth\RequestClientCredentialsToken;
+use VincentAuger\OrcidSdk\Requests\OAuth\RevokeToken;
 
 /**
  * ORCID OAuth connector (orcid.org / sandbox.orcid.org).
@@ -22,6 +27,7 @@ use VincentAuger\OrcidSdk\Requests\OAuth\RequestClientCredentialsToken;
 final class OrcidOAuth extends Connector
 {
     use HasTimeout;
+    use ThrowsOrcidExceptions;
 
     protected int $connectTimeout = 10;
 
@@ -76,7 +82,7 @@ final class OrcidOAuth extends Connector
     {
         $request = new ExchangeAuthorizationCode($code, $redirectUri);
 
-        return $request->createDtoFromResponse($this->send($request)->throw());
+        return $request->createDtoFromResponse($this->sendOrFail($request));
     }
 
     /**
@@ -88,7 +94,40 @@ final class OrcidOAuth extends Connector
     {
         $request = new RequestClientCredentialsToken($scopes);
 
-        return $request->createDtoFromResponse($this->send($request)->throw());
+        return $request->createDtoFromResponse($this->sendOrFail($request));
+    }
+
+    /**
+     * Get a new token from a refresh token, e.g. to narrow its scopes or rotate it.
+     *
+     * @param  Scope[]|null  $scopes  Same or fewer scopes than the original token; null keeps them all
+     * @param  bool  $revokeOld  Revoke the original access token once the new one is issued
+     * @param  int|null  $expiresIn  Lifetime of the new token in seconds; at most the original's remaining lifetime
+     */
+    public function refresh(string $refreshToken, ?array $scopes = null, bool $revokeOld = false, ?int $expiresIn = null): OrcidToken
+    {
+        $request = new RefreshToken($refreshToken, $scopes, $revokeOld, $expiresIn);
+
+        return $request->createDtoFromResponse($this->sendOrFail($request));
+    }
+
+    /**
+     * Revoke an access token (and its refresh token), e.g. when a user disconnects their ORCID record
+     */
+    public function revoke(string $token): void
+    {
+        $this->sendOrFail(new RevokeToken($token));
+    }
+
+    /**
+     * OpenID Connect user info for a token (authenticate or implicit flows):
+     * who granted it, without needing a call to the record API
+     */
+    public function userInfo(string $accessToken): UserInfo
+    {
+        $request = new GetUserInfo($accessToken);
+
+        return $request->createDtoFromResponse($this->sendOrFail($request));
     }
 
     /**
