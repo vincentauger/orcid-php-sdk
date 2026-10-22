@@ -1,0 +1,25 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Thu, 22 Oct 2026 18:36:52 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "1226",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a4ea9c2df9c7ebb5-YYZ"
+    },
+    "data": "{\"created-date\":{\"value\":1792694211225},\"last-modified-date\":{\"value\":1792694212896},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"Redacted\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"put-code\":128429,\"path\":null,\"department-name\":\"orcid-php-sdk A1 E1\",\"role-title\":null,\"start-date\":{\"year\":{\"value\":\"2021\"},\"month\":{\"value\":\"01\"},\"day\":{\"value\":\"05\"}},\"end-date\":null,\"organization\":{\"name\":\"Fisheries and Oceans Canada\",\"address\":{\"city\":\"Ottawa\",\"region\":\"ON\",\"country\":\"CA\"},\"disambiguated-organization\":{\"disambiguated-organization-identifier\":\"https:\/\/ror.org\/02qa1x782\",\"disambiguation-source\":\"ROR\"}},\"url\":null,\"external-ids\":null,\"display-index\":\"1\",\"visibility\":\"public\"}",
+    "context": []
+}

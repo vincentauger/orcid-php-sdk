@@ -1,0 +1,26 @@
+{
+    "statusCode": 401,
+    "headers": {
+        "Date": "Thu, 22 Oct 2026 18:40:30 GMT",
+        "Content-Type": "application\/json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a4eaa17e185992ef-YUL"
+    },
+    "data": "{\"error\":\"invalid_token\",\"error_description\":\"Invalid access token: 00000000-0002-1825-0097-000000000000\"}",
+    "context": []
+}
