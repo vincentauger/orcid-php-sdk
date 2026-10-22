@@ -14,4 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `OrcidToken` and `Scope`
 - `OrcidOAuth::refresh()`, `revoke()` and `userInfo()` (`UserInfo`)
 - Typed exceptions (`OrcidException` and subclasses) with `isRetryable()`; `sendOrFail()` on both connectors
+- `$orcid->record($id)->affiliations()`: list, get, create, update and delete the 7 affiliation types
+  (`Affiliation`, `AffiliationInput`, `AffiliationType`, `FuzzyDate`, `ExternalId`, `Organization`)
+- `OrcidId` normalisation and checksum validation
 - `RequiresMemberApi` / `RequiresScopes` request contracts, checked before sending; optional token `scopes` on `Orcid::member()`

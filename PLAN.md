@@ -27,18 +27,18 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
   - [x] `Scope` enum (`encode`/`decode`/`completeAccess`; unknown scopes ignored when decoding)
   - [x] `Contracts\RequiresMemberApi` and `Contracts\RequiresScopes`, checked in `Orcid::boot()`; optional
     `scopes:` on `Orcid::member()` → `MissingScopeException` before anything is sent
-- [ ] **A3. How calls are organised** — Saloon resources grouped by record:
-  `$orcid->record($id)->person()->get()`, `->activities()->summary()`,
-  `->affiliations()->get|create|update|delete(AffiliationType, …)`. Convenience methods return typed results
-  (`create()` returns the put-code read from `Location`); `send()` still gives the raw `Response`.
+- [ ] **A3. How calls are organised** — `$orcid->record($id)` (bare iD or ORCID URL, checksum-validated):
+  - [x] `->affiliations()->list|get|create|update|delete(AffiliationType, …)`; `create()` returns the put-code
+    read from `Location`, all through `sendOrFail()`; `send()` still gives the raw `Response`
+  - [ ] `->person()->get()`, `->activities()->summary()`
 - [ ] **A4. Request and response classes** — `final readonly`, hand-written `fromArray()`/`toArray()`.
-  Separate read/write classes (`Affiliation` / `AffiliationInput`); one `AffiliationType` enum covering
-  employment, education, qualification, invited-position, distinction, membership and service.
-  `toArray()` leaves out nulls (A1: null = left out). The address requires `city` and `country` (no default),
-  and the organization requires a disambiguated organization (ROR).
-  Blank or whitespace-only strings (ORCID rejects them, 400 / 9047): optional fields become `null`;
-  required fields (organization name, city, country, ROR identifier) throw `InvalidArgumentException`.
-  Enums: `PeerReviewRole`, `PeerReviewType`.
+  - [x] Affiliations: `Affiliation` (read; list summaries flattened) / `AffiliationInput` (write), one
+    `AffiliationType` enum for all 7 types (each recorded against the sandbox). `toArray()` leaves out nulls.
+    Required (ORCID errors 9045/9046/9060): organization name, city, country and a disambiguated organization;
+    blank optional strings become `null`, blank required ones throw `InvalidArgumentException`. Shared
+    `FuzzyDate`, `ExternalId`, `Source`, `Organization*` classes.
+  - [ ] Person and activities summary classes
+  - [ ] Enums: `PeerReviewRole`, `PeerReviewType`
 - [x] **A5. Exceptions** — `OrcidException` (RuntimeException) → `OrcidRequestException` (parsed error
   body + `Response`; reads both ORCID error bodies and OAuth `{error, error_description}` bodies) →
   `Auth` (**401 only**: bad, revoked or expired token), `Forbidden` (403, with `errorCode`, `isNotSource()` for 9010
@@ -51,9 +51,10 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
   - [x] `bin/sandbox-token.sh`: one-off shell script that gets a 3-legged sandbox
     token for the test record and writes it to `.env`
   - [x] Recorded: client credentials, revoke, userinfo without `openid`. Mocked from ORCID's docs:
-    `exchangeCode()` (needs a fresh browser code), `refresh()` (not worth recording: tokens last ~20 years),
+    `exchangeCode()` (needs a fresh browser code), `refresh()` (to record later, once `ORCID_REFRESH_TOKEN` is in `.env`),
     successful `userInfo()` (needs an `openid` token)
-  - [ ] Re-record the A1 evidence through the typed affiliation requests (A3/A4), then drop the `a1/` fixtures
+  - [x] Affiliation calls recorded through the typed requests. The `a1/` fixtures stay as evidence: they cover
+    payloads the SDK deliberately never sends (nulls, plain dates, blank strings, missing ROR)
 - [ ] **Release `0.1.0`** on Packagist.
 - [ ] **Later 0.x: webhooks** (premium members only, not used by OSP) — `Scope::Webhook` (obtained via
   `clientCredentials()`), `$orcid->record($id)->webhooks()->register($callbackUrl)` / `->unregister()`:

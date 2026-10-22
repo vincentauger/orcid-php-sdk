@@ -16,6 +16,8 @@ use VincentAuger\OrcidSdk\Enums\ApiAccess;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Exceptions\MissingScopeException;
+use VincentAuger\OrcidSdk\Resources\RecordResource;
+use VincentAuger\OrcidSdk\Support\OrcidId;
 
 /**
  * ORCID record API connector (Public or Member API).
@@ -73,6 +75,16 @@ final class Orcid extends Connector
     public static function public(?string $accessToken = null, Environment $environment = Environment::Production): self
     {
         return new self(ApiAccess::Public, $accessToken, $environment);
+    }
+
+    /**
+     * Calls on one record. Accepts a bare iD or an ORCID URL.
+     *
+     * @throws \InvalidArgumentException when $orcid is not a valid ORCID iD
+     */
+    public function record(string $orcid): RecordResource
+    {
+        return new RecordResource($this, OrcidId::normalize($orcid));
     }
 
     /**

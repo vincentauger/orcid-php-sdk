@@ -53,6 +53,16 @@ it('replaces client ids', function (): void {
         ->not->toContain('APP-ABCDEFGHIJ123456');
 });
 
+it('only keeps list items created by tests', function (): void {
+    $stored = storeThroughFixture([], ['affiliation-group' => [
+        ['summaries' => [['employment-summary' => ['put-code' => 1, 'department-name' => 'Real department']]]],
+        ['summaries' => [['employment-summary' => ['put-code' => 2, 'department-name' => OrcidFixture::TEST_MARKER.' test']]]],
+    ]]);
+
+    expect($stored['data'])->not->toContain('Real department')
+        ->and(json_decode($stored['data'], true)['affiliation-group'])->toHaveCount(1);
+});
+
 it('replaces OAuth tokens and the token owner name', function (): void {
     $stored = storeThroughFixture([], [
         'access_token' => 'secret-access',

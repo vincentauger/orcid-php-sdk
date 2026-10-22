@@ -16,6 +16,8 @@ use Saloon\Http\Faking\Fixture;
  * - OAuth tokens and the token owner's name are replaced
  * - personal values in person sections (names, emails, keywords, ...) are replaced,
  *   keeping the JSON structure so the fixtures still parse
+ * - list responses only keep the items created by tests (TEST_MARKER), not the other
+ *   items on the sandbox record
  */
 final class OrcidFixture extends Fixture
 {
@@ -27,6 +29,11 @@ final class OrcidFixture extends Fixture
     public const string PLACEHOLDER_CLIENT_ID = 'APP-0000000000000000';
 
     public const string REDACTED = 'Redacted';
+
+    /**
+     * Every item created by a test starts its department name (or title) with this
+     */
+    public const string TEST_MARKER = 'orcid-php-sdk';
 
     private const string ORCID_ID_PATTERN = '/\d{4}-\d{4}-\d{4}-\d{3}[\dX]/';
 
@@ -88,9 +95,21 @@ final class OrcidFixture extends Fixture
             $body['name'] = self::REDACTED;
         }
 
+        if (isset($body['affiliation-group']) && is_array($body['affiliation-group'])) {
+            $body['affiliation-group'] = array_values(array_filter($body['affiliation-group'], $this->isTestGroup(...)));
+        }
+
         $recordedResponse->data = json_encode($this->redactPersonalData($body), JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
 
         return $recordedResponse;
+    }
+
+    /**
+     * Whether a list group holds an item created by a test
+     */
+    private function isTestGroup(mixed $group): bool
+    {
+        return str_contains((string) json_encode($group), '"department-name":"'.self::TEST_MARKER);
     }
 
     /**

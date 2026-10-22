@@ -32,6 +32,56 @@ $orcid = Orcid::public($readPublicToken);
 $oauth = new OrcidOAuth($clientId, $clientSecret, Environment::Sandbox);
 ```
 
+### Affiliations
+
+Employments, educations, qualifications, invited positions, distinctions, memberships and services all work
+the same way:
+
+```php
+use VincentAuger\OrcidSdk\Data\Affiliations\AffiliationInput;
+use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
+use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
+use VincentAuger\OrcidSdk\Data\Organization\Organization;
+use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
+use VincentAuger\OrcidSdk\Enums\AffiliationType;
+
+$affiliations = Orcid::member($accessToken)->record('0000-0002-1825-0097')->affiliations();
+
+$input = new AffiliationInput(
+    organization: new Organization(
+        'Fisheries and Oceans Canada',
+        new OrganizationAddress(city: 'Ottawa', country: 'CA'),
+        DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
+    ),
+    roleTitle: 'Research Scientist',
+    startDate: FuzzyDate::fromString('2021-01'),
+);
+
+$putCode = $affiliations->create(AffiliationType::Employment, $input);   // store it
+$affiliations->update(AffiliationType::Employment, $putCode, $input);     // replaces the whole item
+$affiliations->delete(AffiliationType::Employment, $putCode);
+$employments = $affiliations->list(AffiliationType::Employment);
+```
+
+### Errors
+
+Every convenience method throws a `VincentAuger\OrcidSdk\Exceptions\OrcidException`. Use `isRetryable()` to
+decide whether to try again later (rate limits, ORCID outages, connection failures):
+
+```php
+try {
+    $affiliations->update(AffiliationType::Employment, $putCode, $input);
+} catch (OrcidAuthException $e) {
+    // 401: the token was revoked or expired; the user must authorize again
+} catch (OrcidForbiddenException $e) {
+    // 403: $e->isNotSource() (another client created the item) or $e->isMissingScope()
+} catch (OrcidException $e) {
+    if ($e->isRetryable()) {
+        // retry later
+    }
+}
+```
+
 The SDK is stateless: it never stores or refreshes tokens, and it never retries failed requests. Your
 application decides where tokens live and when a failed call should be retried (for example, in a queued job).
 
