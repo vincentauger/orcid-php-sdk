@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Thu, 22 Oct 2026 20:03:54 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a4eb1ba56f6ca2ac-YUL"
+    },
+    "data": "{\"last-modified-date\":{\"value\":1792699433680},\"distinctions\":{\"last-modified-date\":null,\"affiliation-group\":[],\"path\":\"\/0000-0002-1825-0097\/distinctions\"},\"educations\":{\"last-modified-date\":null,\"affiliation-group\":[],\"path\":\"\/0000-0002-1825-0097\/educations\"},\"employments\":{\"last-modified-date\":{\"value\":1738253858685},\"affiliation-group\":[],\"path\":\"\/0000-0002-1825-0097\/employments\"},\"fundings\":{\"last-modified-date\":null,\"group\":[],\"path\":\"\/0000-0002-1825-0097\/fundings\"},\"invited-positions\":{\"last-modified-date\":null,\"affiliation-group\":[],\"path\":\"\/0000-0002-1825-0097\/invited-positions\"},\"memberships\":{\"last-modified-date\":null,\"affiliation-group\":[],\"path\":\"\/0000-0002-1825-0097\/memberships\"},\"peer-reviews\":{\"last-modified-date\":null,\"group\":[],\"path\":\"\/0000-0002-1825-0097\/peer-reviews\"},\"qualifications\":{\"last-modified-date\":null,\"affiliation-group\":[],\"path\":\"\/0000-0002-1825-0097\/qualifications\"},\"research-resources\":{\"last-modified-date\":null,\"group\":[],\"path\":\"\/0000-0002-1825-0097\/research-resources\"},\"services\":{\"last-modified-date\":{\"value\":1792699433680},\"affiliation-group\":[{\"last-modified-date\":{\"value\":1792699433680},\"external-ids\":{\"external-id\":[]},\"summaries\":[{\"service-summary\":{\"created-date\":{\"value\":1792699433680},\"last-modified-date\":{\"value\":1792699433680},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"Redacted\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"put-code\":128488,\"department-name\":\"orcid-php-sdk activities\",\"role-title\":null,\"start-date\":null,\"end-date\":null,\"organization\":{\"name\":\"Fisheries and Oceans Canada\",\"address\":{\"city\":\"Ottawa\",\"region\":null,\"country\":\"CA\"},\"disambiguated-organization\":{\"disambiguated-organization-identifier\":\"https:\/\/ror.org\/02qa1x782\",\"disambiguation-source\":\"ROR\"}},\"url\":null,\"external-ids\":null,\"display-index\":\"1\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/service\/128488\"}}]}],\"path\":\"\/0000-0002-1825-0097\/services\"},\"works\":{\"last-modified-date\":null,\"group\":[],\"path\":\"\/0000-0002-1825-0097\/works\"},\"path\":\"\/0000-0002-1825-0097\/activities\"}",
+    "context": []
+}

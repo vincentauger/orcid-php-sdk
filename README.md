@@ -63,6 +63,20 @@ $affiliations->delete(AffiliationType::Employment, $putCode);
 $employments = $affiliations->list(AffiliationType::Employment);
 ```
 
+### Person and activities
+
+```php
+$record = Orcid::public()->record('https://orcid.org/0000-0002-1825-0097'); // bare iD or URL
+
+$person = $record->person();
+$person->name?->displayName();
+$person->keywords;
+
+$activities = $record->activities();
+$activities->affiliations(AffiliationType::Education);
+$activities->workCount;
+```
+
 ### Errors
 
 Every convenience method throws a `VincentAuger\OrcidSdk\Exceptions\OrcidException`. Use `isRetryable()` to

@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Thu, 22 Oct 2026 20:03:52 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a4eb1b9a9f79a26d-YUL"
+    },
+    "data": "{\"last-modified-date\":{\"value\":1710875441003},\"name\":{\"created-date\":{\"value\":1709821748353},\"last-modified-date\":{\"value\":1727895327202},\"given-names\":{\"value\":\"Redacted\"},\"family-name\":{\"value\":\"Redacted\"},\"credit-name\":null,\"source\":null,\"visibility\":\"public\",\"path\":\"0000-0002-1825-0097\"},\"other-names\":{\"last-modified-date\":null,\"other-name\":[],\"path\":\"\/0000-0002-1825-0097\/other-names\"},\"biography\":null,\"researcher-urls\":{\"last-modified-date\":null,\"researcher-url\":[],\"path\":\"\/0000-0002-1825-0097\/researcher-urls\"},\"emails\":{\"last-modified-date\":{\"value\":1710875441003},\"email\":[{\"created-date\":{\"value\":1709823581032},\"last-modified-date\":{\"value\":1710875441003},\"source\":{\"source-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"source-client-id\":null,\"source-name\":{\"value\":\"Redacted\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"email\":\"Redacted\",\"path\":null,\"visibility\":\"limited\",\"verified\":true,\"primary\":true,\"put-code\":null}],\"path\":\"\/0000-0002-1825-0097\/email\"},\"addresses\":{\"last-modified-date\":null,\"address\":[],\"path\":\"\/0000-0002-1825-0097\/address\"},\"keywords\":{\"last-modified-date\":null,\"keyword\":[],\"path\":\"\/0000-0002-1825-0097\/keywords\"},\"external-identifiers\":{\"last-modified-date\":null,\"external-identifier\":[],\"path\":\"\/0000-0002-1825-0097\/external-identifiers\"},\"path\":\"\/0000-0002-1825-0097\/person\"}",
+    "context": []
+}

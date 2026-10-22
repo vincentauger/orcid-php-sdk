@@ -61,6 +61,8 @@ Run these commands before committing:
   iDs (→ `0000-0002-1825-0097`), client ids, tokens and personal data.
 - Requests that depend on each other's results (e.g. get a token, then revoke it) must be re-recorded together:
   delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
+- Items created by tests must start their department name with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`):
+  list and activities fixtures only keep those items, so the record's real items never end up in fixtures.
 - Hand-written `MockResponse::make()` is only for responses the sandbox can't produce on demand (a fresh
   authorization code, an `openid` token); say so in a comment.
 - Without a `.env` file, missing fixtures throw instead of calling ORCID, so CI never reaches the API.
@@ -95,6 +97,9 @@ Evidence: `tests/Fixtures/Saloon/a1/`.
   (`client-credentials`); revoke returns 200 with an empty body (`revoke`); `/oauth/userinfo` needs an `openid`
   token, otherwise 403 `access_denied` with the description under `error-description` (hyphen,
   `userinfo-without-openid`).
+- **Visibility:** the Member API with `/read-limited` returns `limited` items (e.g. the email in
+  `record/person-member`); the Public API, even without a token, only returns public ones (`record/person-public`).
+- **All 7 affiliation types** accept the same body and endpoints (`affiliations/<type>/`).
 - **403 is ambiguous; use `error-code`:**
   - 9010: the client is not the source of the item (PUT and DELETE, `e7-*`). The token is fine.
   - 9038: the token lacks the required scope (`e9`, a `/read-public` token trying to POST). Its

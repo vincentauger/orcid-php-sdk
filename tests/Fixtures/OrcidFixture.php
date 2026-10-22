@@ -95,13 +95,32 @@ final class OrcidFixture extends Fixture
             $body['name'] = self::REDACTED;
         }
 
-        if (isset($body['affiliation-group']) && is_array($body['affiliation-group'])) {
-            $body['affiliation-group'] = array_values(array_filter($body['affiliation-group'], $this->isTestGroup(...)));
-        }
+        $body = $this->keepTestGroups($body);
 
         $recordedResponse->data = json_encode($this->redactPersonalData($body), JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
 
         return $recordedResponse;
+    }
+
+    /**
+     * Remove affiliation groups not created by tests, at any depth (lists and the activities summary)
+     *
+     * @param  array<array-key, mixed>  $data
+     * @return array<array-key, mixed>
+     */
+    private function keepTestGroups(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (! is_array($value)) {
+                continue;
+            }
+
+            $data[$key] = $key === 'affiliation-group'
+                ? array_values(array_filter($value, $this->isTestGroup(...)))
+                : $this->keepTestGroups($value);
+        }
+
+        return $data;
     }
 
     /**

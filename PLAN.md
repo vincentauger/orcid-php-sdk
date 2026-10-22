@@ -27,18 +27,19 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
   - [x] `Scope` enum (`encode`/`decode`/`completeAccess`; unknown scopes ignored when decoding)
   - [x] `Contracts\RequiresMemberApi` and `Contracts\RequiresScopes`, checked in `Orcid::boot()`; optional
     `scopes:` on `Orcid::member()` → `MissingScopeException` before anything is sent
-- [ ] **A3. How calls are organised** — `$orcid->record($id)` (bare iD or ORCID URL, checksum-validated):
+- [x] **A3. How calls are organised** — `$orcid->record($id)` (bare iD or ORCID URL, checksum-validated):
   - [x] `->affiliations()->list|get|create|update|delete(AffiliationType, …)`; `create()` returns the put-code
     read from `Location`, all through `sendOrFail()`; `send()` still gives the raw `Response`
-  - [ ] `->person()->get()`, `->activities()->summary()`
-- [ ] **A4. Request and response classes** — `final readonly`, hand-written `fromArray()`/`toArray()`.
+  - [x] `->person()` and `->activities()` (return the data directly; no extra `get()`/`summary()` step)
+- [x] **A4. Request and response classes** — `final readonly`, hand-written `fromArray()`/`toArray()`.
   - [x] Affiliations: `Affiliation` (read; list summaries flattened) / `AffiliationInput` (write), one
     `AffiliationType` enum for all 7 types (each recorded against the sandbox). `toArray()` leaves out nulls.
     Required (ORCID errors 9045/9046/9060): organization name, city, country and a disambiguated organization;
     blank optional strings become `null`, blank required ones throw `InvalidArgumentException`. Shared
     `FuzzyDate`, `ExternalId`, `Source`, `Organization*` classes.
-  - [ ] Person and activities summary classes
-  - [ ] Enums: `PeerReviewRole`, `PeerReviewType`
+  - [x] `Person` (name, other names, biography, URLs, emails, countries, keywords, external identifiers) and
+    `ActivitiesSummary` (typed affiliations; works, fundings, peer reviews and research resources counted only)
+  - [x] Enums: `PeerReviewRole`, `PeerReviewType`
 - [x] **A5. Exceptions** — `OrcidException` (RuntimeException) → `OrcidRequestException` (parsed error
   body + `Response`; reads both ORCID error bodies and OAuth `{error, error_description}` bodies) →
   `Auth` (**401 only**: bad, revoked or expired token), `Forbidden` (403, with `errorCode`, `isNotSource()` for 9010

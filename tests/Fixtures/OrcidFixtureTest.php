@@ -63,6 +63,14 @@ it('only keeps list items created by tests', function (): void {
         ->and(json_decode($stored['data'], true)['affiliation-group'])->toHaveCount(1);
 });
 
+it('only keeps test items in nested lists (activities summary)', function (): void {
+    $stored = storeThroughFixture([], ['employments' => ['affiliation-group' => [
+        ['summaries' => [['employment-summary' => ['department-name' => 'Real department']]]],
+    ]]]);
+
+    expect($stored['data'])->not->toContain('Real department');
+});
+
 it('replaces OAuth tokens and the token owner name', function (): void {
     $stored = storeThroughFixture([], [
         'access_token' => 'secret-access',

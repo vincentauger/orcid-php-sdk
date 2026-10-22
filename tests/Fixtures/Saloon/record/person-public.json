@@ -1,0 +1,25 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Thu, 22 Oct 2026 20:03:53 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "1245",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-papi-use2-a1",
+        "x-via": "a1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a4eb1b9f0f64a837-YUL"
+    },
+    "data": "{\"last-modified-date\":null,\"name\":{\"created-date\":{\"value\":1709821748353},\"last-modified-date\":{\"value\":1727895327202},\"given-names\":{\"value\":\"Redacted\"},\"family-name\":{\"value\":\"Redacted\"},\"credit-name\":null,\"source\":null,\"visibility\":\"public\",\"path\":\"0000-0002-1825-0097\"},\"other-names\":{\"last-modified-date\":null,\"other-name\":[],\"path\":\"\/0000-0002-1825-0097\/other-names\"},\"biography\":null,\"researcher-urls\":{\"last-modified-date\":null,\"researcher-url\":[],\"path\":\"\/0000-0002-1825-0097\/researcher-urls\"},\"emails\":{\"last-modified-date\":null,\"email\":[],\"path\":\"\/0000-0002-1825-0097\/email\"},\"addresses\":{\"last-modified-date\":null,\"address\":[],\"path\":\"\/0000-0002-1825-0097\/address\"},\"keywords\":{\"last-modified-date\":null,\"keyword\":[],\"path\":\"\/0000-0002-1825-0097\/keywords\"},\"external-identifiers\":{\"last-modified-date\":null,\"external-identifier\":[],\"path\":\"\/0000-0002-1825-0097\/external-identifiers\"},\"path\":\"\/0000-0002-1825-0097\/person\"}",
+    "context": []
+}
