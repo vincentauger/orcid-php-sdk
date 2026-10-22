@@ -65,7 +65,8 @@ It needs `curl` and `jq`.
 ### Recording
 
 Delete the fixture you want to refresh and run the test: with a `.env` file, a missing fixture is recorded from
-the sandbox through `Tests\Fixtures\OrcidFixture`, which removes ORCID iDs, tokens and personal data.
+the sandbox through `Tests\Fixtures\OrcidFixture`, which replaces ORCID iDs, client ids and tokens. Profile
+content is kept, so only record against a sandbox record that holds test content.
 **Review every new fixture before committing it.**
 
 Tests may only update or delete items they created in the same run. Your sandbox client may be shared with an

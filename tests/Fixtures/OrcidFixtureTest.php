@@ -71,7 +71,7 @@ it('only keeps test items in nested lists (activities summary)', function (): vo
     expect($stored['data'])->not->toContain('Real department');
 });
 
-it('replaces OAuth tokens and the token owner name', function (): void {
+it('replaces OAuth tokens', function (): void {
     $stored = storeThroughFixture([], [
         'access_token' => 'secret-access',
         'refresh_token' => 'secret-refresh',
@@ -83,32 +83,18 @@ it('replaces OAuth tokens and the token owner name', function (): void {
     expect(json_decode($stored['data'], true))->toBe([
         'access_token' => OrcidFixture::REDACTED,
         'refresh_token' => OrcidFixture::REDACTED,
-        'name' => OrcidFixture::REDACTED,
+        'name' => 'Jane Doe',
         'orcid' => OrcidFixture::PLACEHOLDER_ID,
         'scope' => '/activities/update',
     ]);
 });
 
-it('redacts personal values but keeps the structure and organization names', function (): void {
-    $stored = storeThroughFixture([], [
-        'name' => [
-            'given-names' => ['value' => 'Jane'],
-            'family-name' => ['value' => 'Doe'],
-            'visibility' => 'public',
-        ],
-        'emails' => ['email' => [['email' => 'jane@example.org', 'put-code' => 12]]],
-        'external-identifiers' => ['external-identifier' => [['external-id-type' => 'Scopus Author ID', 'external-id-value' => '1234567']]],
+it('keeps profile content', function (): void {
+    $body = [
+        'name' => ['given-names' => ['value' => 'Jane'], 'family-name' => ['value' => 'Doe']],
+        'keywords' => ['keyword' => [['content' => 'ceramics']]],
         'organization' => ['name' => 'Fisheries and Oceans Canada'],
-    ]);
+    ];
 
-    expect(json_decode($stored['data'], true))->toBe([
-        'name' => [
-            'given-names' => ['value' => OrcidFixture::REDACTED],
-            'family-name' => ['value' => OrcidFixture::REDACTED],
-            'visibility' => 'public',
-        ],
-        'emails' => ['email' => [['email' => OrcidFixture::REDACTED, 'put-code' => 12]]],
-        'external-identifiers' => ['external-identifier' => [['external-id-type' => 'Scopus Author ID', 'external-id-value' => OrcidFixture::REDACTED]]],
-        'organization' => ['name' => 'Fisheries and Oceans Canada'],
-    ]);
+    expect(json_decode(storeThroughFixture([], $body)['data'], true))->toBe($body);
 });

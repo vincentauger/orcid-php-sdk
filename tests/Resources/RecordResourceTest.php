@@ -13,8 +13,8 @@ use VincentAuger\OrcidSdk\Enums\AffiliationType;
 use VincentAuger\OrcidSdk\Requests\Person\GetPerson;
 
 /*
- * Recorded against the ORCID sandbox. Personal values are redacted in the
- * fixtures, so assertions check structure rather than names.
+ * Recorded against the ORCID sandbox record, which only holds test content.
+ * Re-recording against a record with other content means updating the values below.
  */
 
 it('reads the person section through the Member API', function (): void {
@@ -22,17 +22,20 @@ it('reads the person section through the Member API', function (): void {
 
     $person = $this->getMemberApiClient()->withMockClient($mockClient)->record($this->orcidId())->person();
 
-    // The sandbox record has a biography, a website, a country, keywords and a limited email.
-    // If you re-record against a record without them, relax these assertions.
-    expect($person->name?->displayName())->toBeString()
-        ->and($person->biography)->toBeString()
-        ->and($person->researcherUrls)->not->toBeEmpty()
-        ->and($person->countries)->not->toBeEmpty()
-        ->and($person->keywords)->not->toBeEmpty()
+    expect($person->name?->givenNames)->toBe('Vincent')
+        ->and($person->name?->familyName)->toBe('Auger')
+        ->and($person->name?->displayName())->toBe('Vincent Auger')
+        ->and($person->biography)->toBe('A test bio.')
+        ->and($person->researcherUrls)->toHaveCount(1)
+        ->and($person->researcherUrls[0]->name)->toBe('DFO')
+        ->and($person->researcherUrls[0]->url)->toBe('https://dfo-mpo.gc.ca')
+        ->and($person->countries)->toBe(['CA'])
+        ->and($person->keywords)->toBe(['test', 'fun'])
         ->and($person->lastModifiedAt)->toBeInstanceOf(DateTimeImmutable::class);
 
     // /read-limited also returns limited items, like the email
-    expect($person->emails)->not->toBeEmpty()
+    expect($person->emails)->toHaveCount(1)
+        ->and($person->emails[0]->email)->toBe('vincentauger@mailinator.com')
         ->and($person->emails[0]->visibility)->toBe('limited');
 });
 
@@ -42,8 +45,8 @@ it('reads the person section through the Public API without a token', function (
     $person = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId())->person();
 
     // public items only: the limited email is not returned
-    expect($person->name)->not->toBeNull()
-        ->and($person->keywords)->not->toBeEmpty()
+    expect($person->name?->displayName())->toBe('Vincent Auger')
+        ->and($person->keywords)->toBe(['test', 'fun'])
         ->and($person->emails)->toBeEmpty();
 });
 

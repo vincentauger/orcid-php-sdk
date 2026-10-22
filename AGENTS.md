@@ -57,8 +57,10 @@ Run these commands before committing:
 - Follow the DataCite SDK pattern: each typed request is tested with
   `new MockClient([SomeRequest::class => new OrcidFixture('folder/name')])`. With a `.env`, a missing fixture is
   recorded from the sandbox on the first run; afterwards it is replayed.
-- Use `OrcidFixture`, never plain `MockResponse::fixture()`: it is the same Saloon fixture, plus removal of ORCID
-  iDs (→ `0000-0002-1825-0097`), client ids, tokens and personal data.
+- Use `OrcidFixture`, never plain `MockResponse::fixture()`: it is the same Saloon fixture, plus replacement of
+  ORCID iDs (→ `0000-0002-1825-0097`), client ids (→ `APP-0000000000000000`), tokens and cookies. Profile
+  content is kept: the sandbox record only holds test content. Never record against a record with real
+  personal data.
 - Requests that depend on each other's results (e.g. get a token, then revoke it) must be re-recorded together:
   delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
 - Items created by tests must start their department name with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`):

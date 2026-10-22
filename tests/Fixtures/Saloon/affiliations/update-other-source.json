@@ -1,7 +1,7 @@
 {
     "statusCode": 403,
     "headers": {
-        "Date": "Thu, 22 Oct 2026 19:32:39 GMT",
+        "Date": "Thu, 22 Oct 2026 20:08:29 GMT",
         "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
         "Content-Length": "343",
         "Connection": "keep-alive",
@@ -18,7 +18,7 @@
         "x-via": "b1",
         "cf-cache-status": "DYNAMIC",
         "set-cookie": "Redacted",
-        "CF-RAY": "a4eaede36f4dc335-EWR"
+        "CF-RAY": "a4eb225f8abf97bf-YUL"
     },
     "data": "{\"response-code\":403,\"developer-message\":\"403 Forbidden: You are not the source of the work, so you are not allowed to update it.\",\"user-message\":\"The client application is not the source of the resource it is trying to access.\",\"error-code\":9010,\"more-info\":\"https:\/\/members.orcid.org\/api\/resources\/troubleshooting\"}",
     "context": []

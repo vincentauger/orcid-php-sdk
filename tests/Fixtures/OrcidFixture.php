@@ -8,16 +8,17 @@ use Saloon\Data\RecordedResponse;
 use Saloon\Http\Faking\Fixture;
 
 /**
- * Saloon fixture that strips credentials and personal data before a
- * response recorded against the ORCID sandbox is written to disk.
+ * Saloon fixture that strips credentials and identifiers before a response
+ * recorded against the ORCID sandbox is written to disk.
  *
  * - every ORCID iD (body and headers, e.g. Location) becomes PLACEHOLDER_ID
  * - every client id (e.g. source-client-id on activities) becomes PLACEHOLDER_CLIENT_ID
- * - OAuth tokens and the token owner's name are replaced
- * - personal values in person sections (names, emails, keywords, ...) are replaced,
- *   keeping the JSON structure so the fixtures still parse
+ * - OAuth tokens and cookies are replaced
  * - list responses only keep the items created by tests (TEST_MARKER), not the other
  *   items on the sandbox record
+ *
+ * Profile data (names, biography, keywords, ...) is kept: the sandbox record only
+ * holds test content. Never record against a record with real personal data.
  */
 final class OrcidFixture extends Fixture
 {
@@ -39,20 +40,6 @@ final class OrcidFixture extends Fixture
 
     private const string CLIENT_ID_PATTERN = '/APP-[A-Z0-9]{16}/';
 
-    /**
-     * Person sections whose string values are personal data
-     */
-    private const array PERSONAL_SECTIONS = [
-        'name', 'given-names', 'family-name', 'credit-name', 'other-names',
-        'biography', 'researcher-urls', 'emails', 'addresses', 'keywords',
-        'external-identifiers', 'source-name',
-    ];
-
-    /**
-     * Leaf keys holding the actual personal values inside those sections
-     */
-    private const array PERSONAL_LEAVES = ['value', 'content', 'email', 'url-name', 'external-id-value'];
-
     protected function defineSensitiveHeaders(): array
     {
         return [
@@ -66,8 +53,6 @@ final class OrcidFixture extends Fixture
             'access_token' => self::REDACTED,
             'refresh_token' => self::REDACTED,
             'id_token' => self::REDACTED,
-            'given_name' => self::REDACTED,
-            'family_name' => self::REDACTED,
         ];
     }
 
@@ -89,15 +74,9 @@ final class OrcidFixture extends Fixture
             return $recordedResponse;
         }
 
-        // OAuth token and userinfo responses return the owner's name as a top-level string
-        // (on records, the top-level `name` is an object handled by redactPersonalData)
-        if (is_string($body['name'] ?? null)) {
-            $body['name'] = self::REDACTED;
-        }
-
         $body = $this->keepTestGroups($body);
 
-        $recordedResponse->data = json_encode($this->redactPersonalData($body), JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+        $recordedResponse->data = json_encode($body, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
 
         return $recordedResponse;
     }
@@ -148,22 +127,5 @@ final class OrcidFixture extends Fixture
         });
 
         return $headers;
-    }
-
-    /**
-     * @param  array<array-key, mixed>  $data
-     * @return array<array-key, mixed>
-     */
-    private function redactPersonalData(array $data, bool $inPersonalSection = false): array
-    {
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $data[$key] = $this->redactPersonalData($value, $inPersonalSection || in_array($key, self::PERSONAL_SECTIONS, true));
-            } elseif ($inPersonalSection && is_string($value) && in_array($key, self::PERSONAL_LEAVES, true)) {
-                $data[$key] = self::REDACTED;
-            }
-        }
-
-        return $data;
     }
 }
