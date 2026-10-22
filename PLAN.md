@@ -88,7 +88,8 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
 
 ## Follow-ups (not in this work)
 
-Writing works and peer reviews (later `0.x`) · OSP can use its premium membership's multiple client-credentials
+Writing works and peer reviews (later `0.x`) · an implicit/OpenID flow authorization URL (`response_type=token`,
+`openid` scope) for apps that use it; `userInfo()` already covers the server side · OSP can use its premium membership's multiple client-credentials
 integrations to give dev, staging and prod separate clients · real organization cities · notifying authors whose ORCID
 connection stopped working · a UI prompt to reconnect when the token's
 scope is too narrow.
