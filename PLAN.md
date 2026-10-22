@@ -56,7 +56,7 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
     successful `userInfo()` (needs an `openid` token)
   - [x] Affiliation calls recorded through the typed requests. The `a1/` fixtures stay as evidence: they cover
     payloads the SDK deliberately never sends (nulls, plain dates, blank strings, missing ROR)
-- [ ] **Release `0.1.0`** on Packagist.
+- [x] **Release `0.1.0`** on Packagist (tagged 2026-10-22; bug fixes go in patches, breaking changes in minors while `0.x`).
 - [ ] **Later 0.x: webhooks** (premium members only, not used by OSP) — `Scope::Webhook` (obtained via
   `clientCredentials()`), `$orcid->record($id)->webhooks()->register($callbackUrl)` / `->unregister()`:
   PUT/DELETE with an empty body on the unversioned `/{orcid}/webhook/{url-encoded callback}`; 201 created,
