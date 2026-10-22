@@ -51,7 +51,7 @@ final class OrcidFixture extends Fixture
     /**
      * Leaf keys holding the actual personal values inside those sections
      */
-    private const array PERSONAL_LEAVES = ['value', 'content', 'email', 'url-name'];
+    private const array PERSONAL_LEAVES = ['value', 'content', 'email', 'url-name', 'external-id-value'];
 
     protected function defineSensitiveHeaders(): array
     {

@@ -97,6 +97,7 @@ it('redacts personal values but keeps the structure and organization names', fun
             'visibility' => 'public',
         ],
         'emails' => ['email' => [['email' => 'jane@example.org', 'put-code' => 12]]],
+        'external-identifiers' => ['external-identifier' => [['external-id-type' => 'Scopus Author ID', 'external-id-value' => '1234567']]],
         'organization' => ['name' => 'Fisheries and Oceans Canada'],
     ]);
 
@@ -107,6 +108,7 @@ it('redacts personal values but keeps the structure and organization names', fun
             'visibility' => 'public',
         ],
         'emails' => ['email' => [['email' => OrcidFixture::REDACTED, 'put-code' => 12]]],
+        'external-identifiers' => ['external-identifier' => [['external-id-type' => 'Scopus Author ID', 'external-id-value' => OrcidFixture::REDACTED]]],
         'organization' => ['name' => 'Fisheries and Oceans Canada'],
     ]);
 });
