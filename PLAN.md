@@ -91,7 +91,8 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
 Goal: every call in ORCID's [v3.0 guide](https://github.com/ORCID/orcid-model/blob/master/src/main/resources/record_3.0/README.md),
 JSON only, then `1.0`. Each section follows the affiliations pattern: a sandbox check first (required fields and
 error codes, written in `AGENTS.md` with the fixtures as evidence), then `final readonly` read/write classes,
-then a resource on `$orcid->record($id)`, all recorded through `OrcidFixture`. The SDK serves OSP first but
+then a resource on the member connector (`$orcid->works()`, ADR 0003) and reads on `$orcid->record($id)`,
+all recorded through `OrcidFixture`. The SDK serves OSP first but
 stays generic: it is public. Vocabulary: `GLOSSARY.md`; decisions: `docs/adr/`.
 
 Decided for every section:
@@ -104,6 +105,8 @@ Decided for every section:
   `summaries()` (all of them, for syncing). Affiliations stay flat, plus `displayIndex` (ADR 0001).
 - One method call sends one HTTP request: bulk calls throw above 100 items, callers split (ADR 0002).
 - Finding our own items: `Source::isClient($clientId)`; the connector never knows the client id.
+- A member connector is bound to its record: `Orcid::member(OrcidToken)` exposes the sections directly, with
+  the token's scopes; `record($id)` stays for reading any record with a public or client-credentials token (ADR 0003).
 - Test items each get their own `self` external id, so ORCID never groups them together.
 
 Order: C0 first; the other sections in any order, one minor each (breaking changes allowed in `0.x`; OSP only
@@ -129,7 +132,7 @@ uses affiliations and OAuth). `1.0` = C8.
 - [ ] **C1. Works** (what most integrations write)
   - `Work` / `WorkInput` / `WorkSummary` / `WorkGroup`; enums `WorkType` (v3.0 list: `dissertation-thesis`, `software`,
     `annotation`, `physical-object`, ...), `CitationType`, `ContributorRole`, `ContributorSequence`
-  - `$record->works()->list|get|create|update|delete`, plus `getMany(putCodes)` (`GET /works/{a,b,...}`) and
+  - `$orcid->works()->list|get|create|update|delete`, plus `getMany(putCodes)` (`GET /works/{a,b,...}`) and
     `createMany(inputs)` (`POST /works`), both max 100 per call; `createMany()` returns a `BulkResult`
     (`created`: input index → put-code, `failed`: input index → error, `hasFailures()`)
   - v3.0 requires an external id with relationship `self`: check it in the sandbox, then validate in `WorkInput`
@@ -145,12 +148,12 @@ uses affiliations and OAuth). `1.0` = C8.
   (title, hosts, external ids, dates, URL) and resource items (name, `ResearchResourceType`, hosts, ids).
 - [ ] **C5. Person sections** (`/person/update`, Member API)
   - Writable: other names, keywords, researcher URLs, external identifiers, addresses:
-    `$record->keywords()->list|get|create|update|delete`, etc.
-  - Read only: `$record->biography()`, `->emails()`, `->personalDetails()`
+    `$orcid->keywords()->list|get|create|update|delete`, etc.
+  - Read only: `$orcid->biography()`, `->emails()`, `->personalDetails()`
   - `Person` exposes typed items (with put-codes and visibility) instead of plain strings (breaking); the same
     item classes (`Keyword`, ...) are returned by `person()` and by `->keywords()->list()`
 - [ ] **C6. Whole record and summary**
-  - `$record->get()` → `Record` (person + activities); `$record->summary()` → `RecordSummary`. The guide calls
+  - whole record → `Record` (person + activities); record summary → `RecordSummary`, on both connector shapes. The guide calls
     `/summary` both "Member API only" and `/read-public`: check both in the sandbox.
   - `ActivitiesSummary` gets typed work, funding, peer review and research resource summaries; counts stay
     as methods
