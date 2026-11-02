@@ -108,3 +108,17 @@ Evidence: `tests/Fixtures/Saloon/a1/`. No test replays these: they record payloa
   - 9010: the client is not the source of the item (PUT and DELETE, `e7-*`). The token is fine.
   - 9038: the token lacks the required scope (`e9`, a `/read-public` token trying to POST). Its
     `developer-message` says "409 Conflict" even though the status is 403.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues on `vincentauger/orcid-php-sdk`, through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
