@@ -7,9 +7,12 @@ use Tests\Fixtures\OrcidFixture;
 use VincentAuger\OrcidSdk\Data\Affiliations\AffiliationInput;
 use VincentAuger\OrcidSdk\Data\Common\ExternalId;
 use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
+use VincentAuger\OrcidSdk\Data\Common\Title;
 use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
 use VincentAuger\OrcidSdk\Data\Organization\Organization;
 use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
+use VincentAuger\OrcidSdk\Data\Works\WorkInput;
+use VincentAuger\OrcidSdk\Enums\WorkType;
 
 pest()->extend(BaseTest::class);
 
@@ -35,4 +38,18 @@ function testAffiliation(
         endDate: $endDate,
         externalIds: [new ExternalId('grant_number', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
     );
+}
+
+/**
+ * A work for tests: its title starts with the test marker, and it has its own `self` external identifier, so
+ * ORCID never groups it with another work.
+ */
+function testWork(string $label, mixed ...$fields): WorkInput
+{
+    return new WorkInput(...[
+        'title' => new Title(OrcidFixture::TEST_MARKER.' '.$label),
+        'type' => WorkType::JournalArticle,
+        'externalIds' => [new ExternalId('other-id', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
+        ...$fields,
+    ]);
 }

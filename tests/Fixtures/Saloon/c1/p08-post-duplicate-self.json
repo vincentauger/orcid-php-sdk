@@ -1,0 +1,25 @@
+{
+    "statusCode": 409,
+    "headers": {
+        "Date": "Mon, 02 Nov 2026 19:33:08 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "511",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a54591b8ca670d24-YUL"
+    },
+    "data": "{\"response-code\":409,\"developer-message\":\"409 Conflict: You have already added this activity (matched by external identifiers), please see element with put-code 2556381. If you are trying to edit the item, please use PUT instead of POST.\",\"user-message\":\"There was an error when updating the record. Please try again. If the error persists, please contact EOS Open Science Portal for assistance.\",\"error-code\":9021,\"more-info\":\"https:\/\/members.orcid.org\/api\/resources\/troubleshooting\"}",
+    "context": []
+}

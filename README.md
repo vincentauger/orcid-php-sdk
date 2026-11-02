@@ -78,6 +78,53 @@ $ours = array_filter($employments, fn ($employment) => $employment->source?->isC
 ORCID applies the researcher's default visibility to new items; clients can't set or change it. Read classes
 expose it as a `Visibility` enum.
 
+### Works
+
+A work needs a title, a type and an external identifier with the relationship `self` (usually its DOI), which
+identifies it: ORCID refuses a second work from your client with the same one. `WorkInput` checks what ORCID
+would reject before anything is sent.
+
+```php
+use VincentAuger\OrcidSdk\Data\Common\Contributor;
+use VincentAuger\OrcidSdk\Data\Common\ExternalId;
+use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
+use VincentAuger\OrcidSdk\Data\Common\Title;
+use VincentAuger\OrcidSdk\Data\Common\Url;
+use VincentAuger\OrcidSdk\Data\Works\WorkInput;
+use VincentAuger\OrcidSdk\Enums\ContributorRole;
+use VincentAuger\OrcidSdk\Enums\WorkType;
+use VincentAuger\OrcidSdk\Exceptions\OrcidConflictException;
+
+$works = Orcid::member(accessToken: $accessToken, orcid: $orcidId)->works();
+
+$input = new WorkInput(
+    title: new Title('Ocean acidification', subtitle: 'A review'),
+    type: WorkType::JournalArticle,
+    externalIds: [new ExternalId('doi', '10.5555/12345678', url: 'https://doi.org/10.5555/12345678')], // self by default
+    journalTitle: 'Journal of Oceans',
+    publicationDate: FuzzyDate::fromString('2021-03'),
+    url: new Url('https://example.org/articles/12345678'),
+    contributors: [new Contributor('Josiah Carberry', $orcidId, ContributorRole::WritingOriginalDraft)],
+);
+
+try {
+    $putCode = $works->create($input);                 // store it
+} catch (OrcidConflictException $e) {
+    // already there: your client added a work with this DOI before
+    $putCode = $e->existingPutCode() ?? throw $e;
+}
+
+$work = $works->get($putCode);
+$work->title?->title;
+$work->type;        // WorkType, or null for a type ORCID added later...
+$work->rawType;     // ...whose value is kept here
+
+$works->update($putCode, $input);                      // replaces the whole item
+$works->delete($putCode);
+
+Orcid::public()->record($orcidId)->works()->get($putCode); // reads only
+```
+
 ### Person and activities
 
 The bound member connector reads its own record (`$orcid->person()`, `$orcid->activities()`, including limited
@@ -97,7 +144,7 @@ $activities->workCount;
 $record->affiliations()->list(AffiliationType::Employment); // reads only: no create, update or delete
 ```
 
-Own-record calls (`affiliations()`, `person()`, `activities()`) on a connector without an `orcid` throw a
+Own-record calls (`affiliations()`, `works()`, `person()`, `activities()`) on a connector without an `orcid` throw a
 `LogicException` before anything is sent.
 
 ### Errors

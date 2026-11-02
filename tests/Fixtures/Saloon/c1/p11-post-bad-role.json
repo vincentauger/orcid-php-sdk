@@ -1,0 +1,25 @@
+{
+    "statusCode": 400,
+    "headers": {
+        "Date": "Mon, 02 Nov 2026 19:33:09 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "1264",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a54591bc6ec70d24-YUL"
+    },
+    "data": "{\"response-code\":400,\"developer-message\":\"404 Bad Request: Invalid contributor role: boss. Expected one of [author, assignee, editor, chair-or-translator, co-investigator, co-inventor, graduate-student, other-inventor, principal-investigator, postdoctoral-researcher, support-staff, http:\/\/credit.niso.org\/contributor-roles\/conceptualization\/, http:\/\/credit.niso.org\/contributor-roles\/data-curation\/, http:\/\/credit.niso.org\/contributor-roles\/formal-analysis\/, http:\/\/credit.niso.org\/contributor-roles\/funding-acquisition\/, http:\/\/credit.niso.org\/contributor-roles\/investigation\/, http:\/\/credit.niso.org\/contributor-roles\/methodology\/, http:\/\/credit.niso.org\/contributor-roles\/project-administration\/, http:\/\/credit.niso.org\/contributor-roles\/resources\/, http:\/\/credit.niso.org\/contributor-roles\/software\/, http:\/\/credit.niso.org\/contributor-roles\/supervision\/, http:\/\/credit.niso.org\/contributor-roles\/validation\/, http:\/\/credit.niso.org\/contributor-roles\/visualization\/, http:\/\/credit.niso.org\/contributor-roles\/writing-original-draft\/, http:\/\/credit.niso.org\/contributor-roles\/writing-review-editing\/]. \",\"user-message\":\"Invalid contributor role.\",\"error-code\":9058,\"more-info\":\"https:\/\/members.orcid.org\/api\/resources\/troubleshooting\"}",
+    "context": []
+}

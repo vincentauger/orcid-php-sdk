@@ -44,6 +44,15 @@ An item in one of the seven affiliation sections: employment, education, qualifi
 distinction, membership, service.
 _Avoid_: Employment (for affiliations in general), position
 
+**Work**:
+An item in the works section: a research output (article, data set, software, ...), identified by its `self`
+external identifier.
+_Avoid_: Publication, output
+
+**Contributor**:
+A person credited on a work: a credit name and, when they authenticated it, their ORCID iD.
+_Avoid_: Author (for contributors in general), collaborator
+
 **External identifier**:
 An identifier from another system attached to an item or a record, e.g. a DOI or a grant number. With the
 relationship `self`, it identifies the item itself.

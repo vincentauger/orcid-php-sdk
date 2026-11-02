@@ -46,4 +46,9 @@ final readonly class RecordResource
     {
         return new ReadOnlyAffiliationsResource($this->connector, $this->orcid);
     }
+
+    public function works(): ReadOnlyWorksResource
+    {
+        return new ReadOnlyWorksResource($this->connector, $this->orcid);
+    }
 }

@@ -122,6 +122,33 @@ Evidence: `tests/Fixtures/Saloon/a1/`. No test replays these: they record payloa
   - 9038: the token lacks the required scope (`e9`, a `/read-public` token trying to POST). Its
     `developer-message` says "409 Conflict" even though the status is 403.
 
+## Works (verified against the sandbox, 2026-11-02)
+
+Evidence: `tests/Fixtures/Saloon/c1/` (no test replays these either). Everything under "ORCID API behaviour"
+above holds for works too.
+
+- **Required:** a title (9047, `p04`), a type (9047, `p05`) and an external id with the relationship `self`
+  (400, error 9023): none at all (`p02`), only `part-of` (`p03`) or only `version-of` (`p27`) all fail. An
+  external id type ORCID doesn't know is 9023 too (`p10`). Works have no start or end date, only a
+  publication date.
+- **Duplicates:** a POST whose `self` id this client already used is 409, error 9021 (`p08`), and so is a PUT
+  that gives a work another one's `self` id (`p15`). Ids are compared normalized: a DOI differing only in case
+  is a duplicate (`p19`). The developer message names the existing put-code
+  (`OrcidConflictException::existingPutCode()`).
+- **Enums:** an unknown type, citation type, language code or country is 400, 9047 (`p06`, `p13`, `p12`,
+  `p25`); an unknown contributor role is 400, error 9058 (`p11`). Roles: ORCID's original ones and the CRediT
+  URIs, stored as sent (`p09`). `undefined` is accepted as a type (`q01`) and some aliases are mapped
+  (`dataset` → `data-set`, `q05`); the SDK sends neither.
+- **Strings:** a blank title or journal title is 9047 (`p07`, `q09`); a title over 1000 characters too
+  (`p21`); a blank citation value is 400, error 9020 (`p22`); a translated title needs a language code (9047,
+  `p14`). A blank subtitle or URL is dropped (`q02`, `q08`), a blank short description stored as `""` (`q03`).
+- **Not checked by ORCID:** the URL (`q07`, "not a url" stored) and the external id's format (`q04`: an invalid
+  DOI is stored, with `external-id-normalized-error` 8001). A contributor needs no name or iD (`p24`).
+  `contributor-email` is accepted but never returned (`q06`), so the SDK doesn't send it.
+- **PUT** needs the put-code in the body as well: missing or different, 400, error 9019 (`q11`, `q12`); an
+  unknown put-code is 404, 9016 (`q10`). A contributor iD sent as `{"path"}` alone is enough: ORCID adds the
+  `uri` and `host` (`works/lifecycle/get`).
+
 ## Agent skills
 
 ### Issue tracker

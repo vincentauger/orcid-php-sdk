@@ -122,8 +122,8 @@ uses affiliations and OAuth). `1.0` = C8.
   - [x] `Visibility` enum (`public`, `limited`, `registered-only`, `private`) replacing `?string $visibility`
   - [x] `Source`: add `assertion-origin-*` fields (token delegation, Search & Link wizards)
   - [x] `ExternalId`: add the read-only `external-id-normalized` (works and peer reviews)
-  - [ ] New shared classes: `Title` (title, subtitle, translated title), `Contributor` (iD, credit name, role,
-    sequence), `Amount`, `Url`
+  - [ ] New shared classes: `Amount` (with fundings). Done with works (#4): `Title` (title, subtitle,
+    translated title), `Contributor` (iD, credit name, role, sequence), `Url`
   - [x] A `ReadsPutCodeFromLocation` trait for every create request
   - [x] `OrcidFixture`: generalise the `TEST_MARKER` filter beyond `department-name` (work/funding/resource titles,
     peer review subject names, person item content), so each new list fixture only keeps test items
@@ -133,7 +133,8 @@ uses affiliations and OAuth). `1.0` = C8.
     inputs stay without visibility)
   - [ ] Sandbox: which summary is preferred in a group (needs one
     work added by hand on the sandbox website, sharing a DOI with a test work)
-- [ ] **C1. Works** (what most integrations write)
+- [ ] **C1. Works** (what most integrations write). Done (#4): sandbox check (`c1/`, in `AGENTS.md`), `Work` /
+  `WorkInput`, the enums, `get|create|update|delete`, duplicates (409, 9021). Left: grouped `list()` (#5), bulk (#6)
   - `Work` / `WorkInput` / `WorkSummary` / `WorkGroup`; enums `WorkType` (v3.0 list: `dissertation-thesis`, `software`,
     `annotation`, `physical-object`, ...), `CitationType`, `ContributorRole`, `ContributorSequence`
   - `$orcid->works()->list|get|create|update|delete`, plus `getMany(putCodes)` (`GET /works/{a,b,...}`) and

@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `Orcid::member(accessToken:, orcid:, scopes:, environment:)`: a member connector bound to its record, with
   `affiliations()`, `person()` and `activities()` for that record (ADR 0003)
+- Works: `$orcid->works()->get|create|update|delete` on a bound member connector, `record($id)->works()->get()`
+  on any connector. `Work` (read) / `WorkInput` (write, validated before sending: a `self` external identifier,
+  title, type, lengths, codes), `Citation`; enums `WorkType`, `CitationType`, `ContributorRole` (original and
+  CRediT roles), `ContributorSequence`
+- Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes
+- `OrcidConflictException::isDuplicate()` (error 9021) and `existingPutCode()`
 - `Visibility` enum, `Source` assertion-origin fields, `ExternalId::$normalizedValue`, `Affiliation::$displayIndex`,
   `Email::$source`
 

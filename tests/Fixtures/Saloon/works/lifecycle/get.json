@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Mon, 02 Nov 2026 19:46:04 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a545a4a79e58ade0-YYZ"
+    },
+    "data": "{\"created-date\":{\"value\":1793648763961},\"last-modified-date\":{\"value\":1793648763961},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"put-code\":2556398,\"path\":\"\/0000-0002-1825-0097\/work\/2556398\",\"title\":{\"title\":{\"value\":\"orcid-php-sdk lifecycle\"},\"subtitle\":{\"value\":\"A subtitle\"},\"translated-title\":{\"value\":\"Cycle de vie\",\"language-code\":\"fr\"}},\"journal-title\":{\"value\":\"Journal of SDK Testing\"},\"short-description\":\"A work created by the SDK tests\",\"citation\":{\"citation-type\":\"bibtex\",\"citation-value\":\"@article{lifecycle, title={orcid-php-sdk lifecycle}}\"},\"type\":\"journal-article\",\"publication-date\":{\"year\":{\"value\":\"2021\"},\"month\":{\"value\":\"03\"},\"day\":null},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"other-id\",\"external-id-value\":\"orcid-php-sdk-lifecycle\",\"external-id-normalized\":{\"value\":\"orcid-php-sdk-lifecycle\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"},{\"external-id-type\":\"issn\",\"external-id-value\":\"1234-5679\",\"external-id-normalized\":{\"value\":\"1234-5679\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"part-of\"}]},\"url\":{\"value\":\"https:\/\/example.org\/orcid-php-sdk\/lifecycle\"},\"contributors\":{\"contributor\":[{\"contributor-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"credit-name\":{\"value\":\"Test Author\"},\"contributor-email\":null,\"contributor-attributes\":{\"contributor-sequence\":\"first\",\"contributor-role\":\"author\"}},{\"contributor-orcid\":null,\"credit-name\":{\"value\":\"Second Author\"},\"contributor-email\":null,\"contributor-attributes\":{\"contributor-sequence\":\"additional\",\"contributor-role\":\"http:\/\/credit.niso.org\/contributor-roles\/software\/\"}}]},\"language-code\":\"en\",\"country\":{\"value\":\"CA\"},\"visibility\":\"public\"}",
+    "context": []
+}
