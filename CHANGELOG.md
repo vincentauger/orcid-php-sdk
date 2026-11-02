@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Requires Saloon `^4.5` (was `^4.0`)
 - **Breaking:** `Orcid::member()` takes `orcid` and `scopes` before `environment`; use named arguments
 - **Breaking:** `record($id)` only reads: `record($id)->affiliations()` returns a `ReadOnlyAffiliationsResource`
   (`list()`, `get()`). Write through the bound connector: `Orcid::member(accessToken: ..., orcid: ...)->affiliations()`
