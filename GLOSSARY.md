@@ -1,0 +1,66 @@
+# ORCID PHP SDK
+
+A PHP client for ORCID's v3.0 API, used by OSP and published for anyone. It follows ORCID's own vocabulary,
+so its users can read ORCID's documentation alongside it.
+
+## Records
+
+**ORCID iD**:
+The identifier of one researcher, e.g. `0000-0002-1825-0097`.
+_Avoid_: ORCID (alone), ORCID number
+
+**Record**:
+Everything ORCID holds about one ORCID iD.
+_Avoid_: Profile, account
+
+**Section**:
+One part of a record. A **person section** describes the researcher (names, keywords, websites, emails,
+countries, external identifiers); an **activity section** lists what they did (works, fundings, peer reviews,
+research resources and the seven affiliation sections).
+_Avoid_: Category, field, endpoint
+
+**Item**:
+One entry in a section, identified by its put-code and added by exactly one source.
+_Avoid_: Entry, activity, record (for a single item)
+
+**Put-code**:
+ORCID's identifier for an item, unique within its record.
+_Avoid_: Item id, ORCID id (for an item)
+
+**Source**:
+Who added an item: a client (an ORCID integration, e.g. OSP or Crossref) or the researcher themselves. Only
+the source can update or delete its item.
+_Avoid_: Owner, author, creator
+
+**Visibility**:
+Who may read an item: everyone (public), trusted parties (limited) or only the researcher (private).
+_Avoid_: Privacy, access level
+
+## Activities
+
+**Affiliation**:
+An item in one of the seven affiliation sections: employment, education, qualification, invited position,
+distinction, membership, service.
+_Avoid_: Employment (for affiliations in general), position
+
+**External identifier**:
+An identifier from another system attached to an item or a record, e.g. a DOI or a grant number. With the
+relationship `self`, it identifies the item itself.
+_Avoid_: External id (in prose), PID
+
+**Group**:
+Items from different sources that ORCID considers the same thing, because they share a `self` external
+identifier.
+_Avoid_: Duplicate set, cluster
+
+**Preferred summary**:
+The summary within a group that the researcher chose to show, and the one ORCID displays.
+_Avoid_: Primary, main version, canonical
+
+**Summary**:
+The short form of an item returned in lists; the full item comes from reading it by put-code.
+_Avoid_: Preview, list item
+
+**Activities summary**:
+The summaries of every activity section of a record, read in one call.
+_Avoid_: Activities (alone), record summary

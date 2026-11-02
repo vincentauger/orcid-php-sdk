@@ -86,9 +86,89 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
 7. Tests use `Saloon::fake()` with minimal `MockResponse`s: the reconcile branches, failure handling, records
    left pending, dispatches after reconnecting, and the mapper. Update `OrcidIntegrationTest` to use `Scope`.
 
+## C. Complete the v3.0 API (agreed 2026-11-02)
+
+Goal: every call in ORCID's [v3.0 guide](https://github.com/ORCID/orcid-model/blob/master/src/main/resources/record_3.0/README.md),
+JSON only, then `1.0`. Each section follows the affiliations pattern: a sandbox check first (required fields and
+error codes, written in `AGENTS.md` with the fixtures as evidence), then `final readonly` read/write classes,
+then a resource on `$orcid->record($id)`, all recorded through `OrcidFixture`. The SDK serves OSP first but
+stays generic: it is public. Vocabulary: `GLOSSARY.md`; decisions: `docs/adr/`.
+
+Decided for every section:
+- Classes: `X` (read: tolerant, never fails on what ORCID returns), `XInput` (write: validated before sending),
+  `XSummary` where list items differ from the full item. Input classes have no visibility (ORCID applies the
+  researcher's default: to verify in C0); read classes expose a `Visibility` enum.
+- Enums ORCID can extend (work, funding and contributor types, roles, ...): read classes hold `?Enum $x` plus
+  `string $rawX`, so an unknown value loses nothing; input classes only take the enum.
+- Works, fundings and peer reviews: `list()` returns groups, with `preferred()` (one summary per group) and
+  `summaries()` (all of them, for syncing). Affiliations stay flat, plus `displayIndex` (ADR 0001).
+- One method call sends one HTTP request: bulk calls throw above 100 items, callers split (ADR 0002).
+- Finding our own items: `Source::isClient($clientId)`; the connector never knows the client id.
+- Test items each get their own `self` external id, so ORCID never groups them together.
+
+Order: C0 first; the other sections in any order, one minor each (breaking changes allowed in `0.x`; OSP only
+uses affiliations and OAuth). `1.0` = C8.
+
+- [x] **Test cleanup** (before C0): every call is tested through the typed requests; `RawRequest` and the
+  tests replaying `a1/` are gone (the `a1/` fixtures stay as evidence). Errors recorded under `errors/`.
+  Left: `PersonDataTest` still uses a hand-built payload, because the sandbox record has no other names,
+  external identifiers or credit name; add them on the record, re-record `record/person-*`, then move it.
+- [ ] **C0. Shared groundwork**
+  - `Visibility` enum (`public`, `limited`, `registered-only`, `private`) replacing `?string $visibility`
+  - `Source`: add `assertion-origin-*` fields (token delegation, Search & Link wizards)
+  - `ExternalId`: add the read-only `external-id-normalized` (works and peer reviews)
+  - New shared classes: `Title` (title, subtitle, translated title), `Contributor` (iD, credit name, role,
+    sequence), `Amount`, `Url`
+  - A `ReadsPutCodeFromLocation` trait for every create request (today only in `CreateAffiliation`)
+  - `OrcidFixture`: generalise the `TEST_MARKER` filter beyond `department-name` (work/funding/resource titles,
+    peer review subject names, person item content), so each new list fixture only keeps test items
+  - Typed resources per section, sharing request traits; no generic "section" class, because the payloads differ
+  - `Source::isClient()`; `Affiliation::$displayIndex`; unique `self` ids for test affiliations
+  - Sandbox: what ORCID does with `visibility` sent by a client; which summary is preferred in a group (needs one
+    work added by hand on the sandbox website, sharing a DOI with a test work)
+- [ ] **C1. Works** (what most integrations write)
+  - `Work` / `WorkInput` / `WorkSummary` / `WorkGroup`; enums `WorkType` (v3.0 list: `dissertation-thesis`, `software`,
+    `annotation`, `physical-object`, ...), `CitationType`, `ContributorRole`, `ContributorSequence`
+  - `$record->works()->list|get|create|update|delete`, plus `getMany(putCodes)` (`GET /works/{a,b,...}`) and
+    `createMany(inputs)` (`POST /works`), both max 100 per call; `createMany()` returns a `BulkResult`
+    (`created`: input index → put-code, `failed`: input index → error, `hasFailures()`)
+  - v3.0 requires an external id with relationship `self`: check it in the sandbox, then validate in `WorkInput`
+  - Sandbox: required fields, duplicate `self` id (409 → `OrcidConflictException`?), bulk partial failures
+- [ ] **C2. Fundings** — `Funding` / `FundingInput` / `FundingSummary` / `FundingGroup`, `FundingType` (`grant`, `contract`,
+  `award`, `salary-award`), `FundingContributorRole`, `Amount` (ISO 4217 currency); reuses `Organization`
+  (disambiguated organization required). Sandbox: start date required when an end date is given.
+- [ ] **C3. Peer reviews** — `PeerReview` / `PeerReviewInput` / `PeerReviewSummary` / `PeerReviewGroup`,
+  reusing `PeerReviewRole` / `PeerReviewType`, plus `PeerReviewSubjectType`. The convening organization is
+  required, and `review-group-id` must exist in ORCID's group-id registry: a valid `issn:` id is created
+  automatically (ORCID's peer review tutorial). Sandbox: the error for an invalid ISSN.
+- [ ] **C4. Research resources** (lowest demand: infrastructure providers) — `ResearchResource` with a proposal
+  (title, hosts, external ids, dates, URL) and resource items (name, `ResearchResourceType`, hosts, ids).
+- [ ] **C5. Person sections** (`/person/update`, Member API)
+  - Writable: other names, keywords, researcher URLs, external identifiers, addresses:
+    `$record->keywords()->list|get|create|update|delete`, etc.
+  - Read only: `$record->biography()`, `->emails()`, `->personalDetails()`
+  - `Person` exposes typed items (with put-codes and visibility) instead of plain strings (breaking); the same
+    item classes (`Keyword`, ...) are returned by `person()` and by `->keywords()->list()`
+- [ ] **C6. Whole record and summary**
+  - `$record->get()` → `Record` (person + activities); `$record->summary()` → `RecordSummary`. The guide calls
+    `/summary` both "Member API only" and `/read-public`: check both in the sandbox.
+  - `ActivitiesSummary` gets typed work, funding, peer review and research resource summaries; counts stay
+    as methods
+- [ ] **C7. Search** (on the connector: `$orcid->search(...)`, not under a record)
+  - `search($solrQuery, start, rows)` → iDs and `numFound`; `expandedSearch()` (names, institutions);
+    `csvSearch()` maybe. Raw Solr query string for now, no query builder.
+  - The guide says 1000 results by default and `rows` up to 200: check in the sandbox.
+  - Fixtures only query our own test record (by iD or marker keyword): other sandbox users' names must not be
+    recorded.
+- [ ] **C8. `1.0`** — README section per resource, every call covered by a fixture test and a `live` test,
+  OSP has run `0.x` in production, public API frozen.
+
+Not planned: XML, API v2.x, token delegation (needs ORCID to enable it on the client), member-only reporting.
+
 ## Follow-ups (not in this work)
 
-Writing works and peer reviews (later `0.x`) · an implicit/OpenID flow authorization URL (`response_type=token`,
+The group-id record API (`/v3.0/group-id-record`, scopes `/group-id-record/read|update` through
+`clientCredentials()`), for peer review groups other than ISSNs · an implicit/OpenID flow authorization URL (`response_type=token`,
 `openid` scope) for apps that use it; `userInfo()` already covers the server side · OSP can use its premium membership's multiple client-credentials
 integrations to give dev, staging and prod separate clients · real organization cities · notifying authors whose ORCID
 connection stopped working · a UI prompt to reconnect when the token's
