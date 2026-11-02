@@ -18,6 +18,8 @@ final readonly class ExternalId
         public string $value,
         public ExternalIdRelationship $relationship = ExternalIdRelationship::Self,
         public ?string $url = null,
+        /** Read only: ORCID's normalized form of the value (e.g. a lowercase DOI), used to group items; never sent */
+        public ?string $normalizedValue = null,
     ) {
         if (trim($type) === '' || trim($value) === '') {
             throw new \InvalidArgumentException('An external id needs a type and a value');
@@ -39,8 +41,9 @@ final readonly class ExternalId
         return new self(
             type: $type,
             value: $value,
-            relationship: ExternalIdRelationship::tryFrom(Json::string($data, 'external-id-relationship') ?? '') ?? ExternalIdRelationship::Self,
+            relationship: Json::enum($data, 'external-id-relationship', ExternalIdRelationship::class) ?? ExternalIdRelationship::Self,
             url: Json::string($data, 'external-id-url'),
+            normalizedValue: Json::string($data, 'external-id-normalized'),
         );
     }
 

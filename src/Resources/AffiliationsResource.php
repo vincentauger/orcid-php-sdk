@@ -10,37 +10,35 @@ use VincentAuger\OrcidSdk\Enums\AffiliationType;
 use VincentAuger\OrcidSdk\Orcid;
 use VincentAuger\OrcidSdk\Requests\Affiliations\CreateAffiliation;
 use VincentAuger\OrcidSdk\Requests\Affiliations\DeleteAffiliation;
-use VincentAuger\OrcidSdk\Requests\Affiliations\GetAffiliation;
-use VincentAuger\OrcidSdk\Requests\Affiliations\ListAffiliations;
 use VincentAuger\OrcidSdk\Requests\Affiliations\UpdateAffiliation;
 
 /**
  * Employments, educations, qualifications, invited positions, distinctions,
- * memberships and services of a record. Every method throws an OrcidException
- * on failure.
+ * memberships and services of the record a member connector is bound to:
+ * $orcid->affiliations(). Every method throws an OrcidException on failure.
  */
 final readonly class AffiliationsResource
 {
+    private ReadOnlyAffiliationsResource $readOnly;
+
     public function __construct(
         private Orcid $connector,
         private string $orcid,
-    ) {}
+    ) {
+        $this->readOnly = new ReadOnlyAffiliationsResource($connector, $orcid);
+    }
 
     /**
      * @return list<Affiliation>
      */
     public function list(AffiliationType $type): array
     {
-        $request = new ListAffiliations($this->orcid, $type);
-
-        return $request->createDtoFromResponse($this->connector->sendOrFail($request));
+        return $this->readOnly->list($type);
     }
 
     public function get(AffiliationType $type, int $putCode): Affiliation
     {
-        $request = new GetAffiliation($this->orcid, $type, $putCode);
-
-        return $request->createDtoFromResponse($this->connector->sendOrFail($request));
+        return $this->readOnly->get($type, $putCode);
     }
 
     /**

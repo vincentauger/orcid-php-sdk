@@ -1,0 +1,25 @@
+{
+    "statusCode": 403,
+    "headers": {
+        "Date": "Mon, 02 Nov 2026 19:17:02 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "425",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a5457a208a6aa23b-YYZ"
+    },
+    "data": "{\"response-code\":403,\"developer-message\":\"403 Forbidden: You can't change the visibility of an item, please remove the visibility or set it to the current value.\",\"user-message\":\"There was an error when updating the record. Please try again. If the error persists, please contact ${clientName} for assistance.\",\"error-code\":9035,\"more-info\":\"https:\/\/members.orcid.org\/api\/resources\/troubleshooting\"}",
+    "context": []
+}

@@ -8,6 +8,7 @@ use Dotenv\Dotenv;
 use PHPUnit\Framework\TestCase;
 use Saloon\MockConfig;
 use Tests\Fixtures\OrcidFixture;
+use VincentAuger\OrcidSdk\Data\Common\Source;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Orcid;
@@ -49,11 +50,30 @@ class BaseTest extends TestCase
     }
 
     /**
+     * Whether an item was added by the sandbox member client: a response replayed from a fixture carries the
+     * placeholder client id, a live one (while recording) the real one
+     */
+    public function isOurs(?Source $source): bool
+    {
+        $clientId = $this->env('ORCID_CLIENT_ID');
+
+        return $source instanceof Source
+            && ($source->isClient(OrcidFixture::PLACEHOLDER_CLIENT_ID) || ($clientId !== null && $source->isClient($clientId)));
+    }
+
+    /**
+     * Member API client bound to the test record, with its 3-legged token
+     *
      * @param  list<Scope>|null  $scopes  The token's scopes, to check them before sending
      */
     public function getMemberApiClient(?array $scopes = null): Orcid
     {
-        return Orcid::member($this->env('ORCID_ACCESS_TOKEN') ?? 'test-token', Environment::Sandbox, $scopes);
+        return Orcid::member(
+            accessToken: $this->env('ORCID_ACCESS_TOKEN') ?? 'test-token',
+            orcid: $this->orcidId(),
+            scopes: $scopes,
+            environment: Environment::Sandbox,
+        );
     }
 
     public function getPublicApiClient(): Orcid

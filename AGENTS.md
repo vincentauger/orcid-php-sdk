@@ -26,7 +26,9 @@ endpoints), built on Saloon. See `PLAN.md` for the roadmap and the decisions beh
 
 ## Architecture
 
-- `Orcid` is the record API connector (`Orcid::member($token)` / `Orcid::public($token)`)
+- `Orcid` is the record API connector (`Orcid::member(accessToken:, orcid:, scopes:)` / `Orcid::public($token)`).
+  A member connector with an `orcid` is bound to that record: the sections hang off it (`$orcid->affiliations()`).
+  `record($id)` only reads, on every connector (ADR 0003)
 - `OrcidOAuth` is the OAuth connector (orcid.org): token exchange, client credentials, refresh, revoke, userinfo
 - `Enums\Environment` resolves every host for production and sandbox; never hard-code hosts elsewhere
 - `Orcid`'s base URL is the host only: record requests start their endpoint with `/v3.0` (`ApiVersion::V3_0`);
@@ -63,8 +65,14 @@ Run these commands before committing:
   personal data.
 - Requests that depend on each other's results (e.g. get a token, then revoke it) must be re-recorded together:
   delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
-- Items created by tests must start their department name with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`):
-  list and activities fixtures only keep those items, so the record's real items never end up in fixtures.
+- Items created by tests must start a marker field with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`): the
+  department name for affiliations. List and activities fixtures only keep those items, so the record's real items
+  never end up in fixtures. A new section adds its summary key and marker field to `OrcidFixture::TEST_MARKER_FIELDS`.
+- Each test item has its own `self` external identifier (`testAffiliation()` in `tests/Pest.php`), so ORCID never
+  groups test items together.
+- While recording, responses are live and carry real ids; once replayed, the placeholders. Assertions that run
+  before a chain's cleanup must hold for both (e.g. `$this->isOurs($source)`), or a failed recording leaves items
+  behind on the sandbox.
 - Every test that covers a call sends it through the typed requests (no generic test request). Errors are
   recorded too (`errors/`). Hand-written `MockResponse::make()` is only for responses the sandbox can't produce
   on demand (a fresh authorization code, an `openid` token, rate limits, 5xx, connection failures); say so in a
@@ -104,8 +112,13 @@ Evidence: `tests/Fixtures/Saloon/a1/`. No test replays these: they record payloa
 - **Visibility:** the Member API with `/read-limited` returns `limited` items (e.g. the email in
   `record/person-member`); the Public API, even without a token, only returns public ones (`record/person-public`).
 - **All 7 affiliation types** accept the same body and endpoints (`affiliations/<type>/`).
+- **Visibility can't be set by a client** (verified 2026-11-02, `e19`, `e20`): sent on a POST, it is ignored and
+  the researcher's default applies (`private` sent, `public` stored); sent on a PUT with another value than the
+  current one, 403 with error 9035 ("You can't change the visibility of an item"). So input classes have no
+  visibility.
 - **403 is ambiguous; use `error-code`:**
   - 9010: the client is not the source of the item (PUT and DELETE, `e7-*`). The token is fine.
+  - 9035: a PUT tried to change the item's visibility (`e20`).
   - 9038: the token lacks the required scope (`e9`, a `/read-public` token trying to POST). Its
     `developer-message` says "409 Conflict" even though the status is 403.
 

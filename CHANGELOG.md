@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Orcid::member(accessToken:, orcid:, scopes:, environment:)`: a member connector bound to its record, with
+  `affiliations()`, `person()` and `activities()` for that record (ADR 0003)
+- `Visibility` enum, `Source` assertion-origin fields, `ExternalId::$normalizedValue`, `Affiliation::$displayIndex`,
+  `Email::$source`
+
+### Changed
+
+- **Breaking:** `Orcid::member()` takes `orcid` and `scopes` before `environment`; use named arguments
+- **Breaking:** `record($id)` only reads: `record($id)->affiliations()` returns a `ReadOnlyAffiliationsResource`
+  (`list()`, `get()`). Write through the bound connector: `Orcid::member(accessToken: ..., orcid: ...)->affiliations()`
+- **Breaking:** read classes expose `visibility` as a `Visibility` enum instead of a string
+
 ## [0.1.0] - 2026-10-22
 
 ### Added

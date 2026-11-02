@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Mon, 02 Nov 2026 19:22:57 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a54582c9ef0daaf2-YYZ"
+    },
+    "data": "{\"last-modified-date\":{\"value\":1793646039316},\"name\":{\"created-date\":{\"value\":1709821748353},\"last-modified-date\":{\"value\":1793646215402},\"given-names\":{\"value\":\"Vincent\"},\"family-name\":{\"value\":\"Auger\"},\"credit-name\":{\"value\":\"V JP Auger\"},\"source\":null,\"visibility\":\"public\",\"path\":\"0000-0002-1825-0097\"},\"other-names\":{\"last-modified-date\":{\"value\":1793646039316},\"other-name\":[{\"created-date\":{\"value\":1793646010177},\"last-modified-date\":{\"value\":1793646039316},\"source\":{\"source-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"source-client-id\":null,\"source-name\":{\"value\":\"V JP Auger\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"content\":\"JP Auger\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/other-names\/19146\",\"put-code\":19146,\"display-index\":2}],\"path\":\"\/0000-0002-1825-0097\/other-names\"},\"biography\":{\"created-date\":{\"value\":1792699479730},\"last-modified-date\":{\"value\":1792699479730},\"content\":\"A test bio.\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/biography\"},\"researcher-urls\":{\"last-modified-date\":{\"value\":1792699507702},\"researcher-url\":[{\"created-date\":{\"value\":1792699507702},\"last-modified-date\":{\"value\":1792699507702},\"source\":{\"source-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"source-client-id\":null,\"source-name\":{\"value\":\"V JP Auger\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"url-name\":\"DFO\",\"url\":{\"value\":\"https:\/\/dfo-mpo.gc.ca\"},\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/researcher-urls\/48660\",\"put-code\":48660,\"display-index\":1}],\"path\":\"\/0000-0002-1825-0097\/researcher-urls\"},\"emails\":{\"last-modified-date\":null,\"email\":[],\"path\":\"\/0000-0002-1825-0097\/email\"},\"addresses\":{\"last-modified-date\":{\"value\":1792699538023},\"address\":[{\"created-date\":{\"value\":1792699538023},\"last-modified-date\":{\"value\":1792699538023},\"source\":{\"source-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"source-client-id\":null,\"source-name\":{\"value\":\"V JP Auger\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"country\":{\"value\":\"CA\"},\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/address\/8230\",\"put-code\":8230,\"display-index\":1}],\"path\":\"\/0000-0002-1825-0097\/address\"},\"keywords\":{\"last-modified-date\":{\"value\":1792699518952},\"keyword\":[{\"created-date\":{\"value\":1792699518952},\"last-modified-date\":{\"value\":1792699518952},\"source\":{\"source-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"source-client-id\":null,\"source-name\":{\"value\":\"V JP Auger\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"content\":\"test\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/keywords\/8400\",\"put-code\":8400,\"display-index\":2},{\"created-date\":{\"value\":1792699518942},\"last-modified-date\":{\"value\":1792699518942},\"source\":{\"source-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"source-client-id\":null,\"source-name\":{\"value\":\"V JP Auger\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"content\":\"fun\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/keywords\/8399\",\"put-code\":8399,\"display-index\":1}],\"path\":\"\/0000-0002-1825-0097\/keywords\"},\"external-identifiers\":{\"last-modified-date\":null,\"external-identifier\":[],\"path\":\"\/0000-0002-1825-0097\/external-identifiers\"},\"path\":\"\/0000-0002-1825-0097\/person\"}",
+    "context": []
+}

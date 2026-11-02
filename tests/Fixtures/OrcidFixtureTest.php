@@ -71,6 +71,28 @@ it('only keeps test items in nested lists (activities summary)', function (): vo
     expect($stored['data'])->not->toContain('Real department');
 });
 
+it('only keeps test items of other sections, by their own marker field', function (): void {
+    $stored = storeThroughFixture([], ['works' => ['group' => [
+        ['work-summary' => [['put-code' => 1, 'title' => ['title' => ['value' => 'Real work']]]]],
+        ['work-summary' => [['put-code' => 2, 'title' => ['title' => ['value' => OrcidFixture::TEST_MARKER.' work']]]]],
+    ]], 'fundings' => ['group' => [
+        ['funding-summary' => [['put-code' => 3, 'title' => ['title' => ['value' => 'Real funding']]]]],
+    ]]]);
+
+    $data = json_decode($stored['data'], true);
+
+    expect($stored['data'])->not->toContain('Real work')
+        ->not->toContain('Real funding')
+        ->and($data['works']['group'])->toHaveCount(1)
+        ->and($data['fundings']['group'])->toBeEmpty();
+});
+
+it('keeps lists without filtered summaries', function (): void {
+    $body = ['external-ids' => ['external-id' => [['external-id-type' => 'doi', 'external-id-value' => '10.1/x']]]];
+
+    expect(json_decode(storeThroughFixture([], $body)['data'], true))->toBe($body);
+});
+
 it('replaces OAuth tokens', function (): void {
     $stored = storeThroughFixture([], [
         'access_token' => 'secret-access',

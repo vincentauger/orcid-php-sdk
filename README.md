@@ -22,8 +22,17 @@ use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Orcid;
 use VincentAuger\OrcidSdk\OrcidOAuth;
 
-// Member API, with a token granted by the record owner (3-legged OAuth)
-$orcid = Orcid::member($accessToken, Environment::Sandbox);
+// Member API, bound to the record a 3-legged token was granted on: store the token's
+// access token, ORCID iD and scopes, and pass them back here
+$orcid = Orcid::member(
+    accessToken: $accessToken,
+    orcid: '0000-0002-1825-0097',
+    scopes: $scopes,              // optional: a missing scope throws MissingScopeException before sending
+    environment: Environment::Sandbox,
+);
+
+// Member API without a record, e.g. a /read-public client credentials token: reads only, through record($id)
+$orcid = Orcid::member(accessToken: $readPublicToken);
 
 // Public API, ideally with a /read-public client credentials token
 $orcid = Orcid::public($readPublicToken);
@@ -45,7 +54,7 @@ use VincentAuger\OrcidSdk\Data\Organization\Organization;
 use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
 
-$affiliations = Orcid::member($accessToken)->record('0000-0002-1825-0097')->affiliations();
+$affiliations = Orcid::member(accessToken: $accessToken, orcid: $orcidId)->affiliations();
 
 $input = new AffiliationInput(
     organization: new Organization(
@@ -61,9 +70,18 @@ $putCode = $affiliations->create(AffiliationType::Employment, $input);   // stor
 $affiliations->update(AffiliationType::Employment, $putCode, $input);     // replaces the whole item
 $affiliations->delete(AffiliationType::Employment, $putCode);
 $employments = $affiliations->list(AffiliationType::Employment);
+
+// find the items your client added, e.g. to sync them
+$ours = array_filter($employments, fn ($employment) => $employment->source?->isClient($clientId));
 ```
 
+ORCID applies the researcher's default visibility to new items; clients can't set or change it. Read classes
+expose it as a `Visibility` enum.
+
 ### Person and activities
+
+The bound member connector reads its own record (`$orcid->person()`, `$orcid->activities()`, including limited
+items with `/read-limited`). Every connector reads any record's public items through `record($id)`:
 
 ```php
 $record = Orcid::public()->record('https://orcid.org/0000-0002-1825-0097'); // bare iD or URL
@@ -75,7 +93,12 @@ $person->keywords;
 $activities = $record->activities();
 $activities->affiliations(AffiliationType::Education);
 $activities->workCount;
+
+$record->affiliations()->list(AffiliationType::Employment); // reads only: no create, update or delete
 ```
+
+Own-record calls (`affiliations()`, `person()`, `activities()`) on a connector without an `orcid` throw a
+`LogicException` before anything is sent.
 
 ### Errors
 

@@ -12,17 +12,21 @@ use Saloon\Traits\Plugins\HasTimeout;
 use VincentAuger\OrcidSdk\Concerns\ThrowsOrcidExceptions;
 use VincentAuger\OrcidSdk\Contracts\RequiresMemberApi;
 use VincentAuger\OrcidSdk\Contracts\RequiresScopes;
+use VincentAuger\OrcidSdk\Data\Activities\ActivitiesSummary;
+use VincentAuger\OrcidSdk\Data\Person\Person;
 use VincentAuger\OrcidSdk\Enums\ApiAccess;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Exceptions\MissingScopeException;
+use VincentAuger\OrcidSdk\Resources\AffiliationsResource;
 use VincentAuger\OrcidSdk\Resources\RecordResource;
 use VincentAuger\OrcidSdk\Support\OrcidId;
 
 /**
  * ORCID record API connector (Public or Member API).
  *
- * The connector is stateless: it only holds the bearer token it is given.
+ * The connector is stateless: it only holds the bearer token it is given and,
+ * for a member connector, the record that token was granted on (ADR 0003).
  * Obtaining, storing and refreshing tokens is the caller's responsibility
  * (see OrcidOAuth for the token endpoints).
  *
@@ -42,30 +46,52 @@ final class Orcid extends Connector
     protected int $requestTimeout = 30;
 
     /**
+     * The normalised ORCID iD of the record this connector is bound to, if any
+     */
+    public readonly ?string $orcid;
+
+    /**
      * @param  Scope[]|null  $scopes  The token's scopes, if known (e.g. stored with the token). When given,
      *                                requests needing a scope the token lacks throw MissingScopeException
      *                                before anything is sent.
+     * @param  string|null  $orcid  The record the token was granted on (Member API only), bare iD or ORCID URL
      */
     public function __construct(
         public readonly ApiAccess $access = ApiAccess::Public,
         private readonly ?string $accessToken = null,
         public readonly Environment $environment = Environment::Production,
         public readonly ?array $scopes = null,
+        ?string $orcid = null,
     ) {
         if ($this->access === ApiAccess::Member && $this->accessToken === null) {
             throw new \InvalidArgumentException('An access token is required for member API access');
         }
+
+        if ($this->access === ApiAccess::Public && $orcid !== null) {
+            throw new \InvalidArgumentException('Only a member API connector can be bound to a record: use record($id) to read one');
+        }
+
+        $this->orcid = $orcid === null ? null : OrcidId::normalize($orcid);
     }
 
     /**
-     * Member API client using a token obtained through the 3-legged OAuth flow
-     * (or a client credentials token for member-only 2-legged scopes).
+     * Member API client, with the values an integration stores for a token.
+     *
+     * With `$orcid` (the record a 3-legged token was granted on), the record's sections hang off the connector:
+     * `Orcid::member(accessToken: $token, orcid: $id)->affiliations()`. Without it (e.g. a /read-public client
+     * credentials token, for the Member API's higher limits), the connector only reads, through record($id).
      *
      * @param  Scope[]|null  $scopes  The token's scopes, if known; see the constructor
+     *
+     * @throws \InvalidArgumentException when $orcid is not a valid ORCID iD
      */
-    public static function member(string $accessToken, Environment $environment = Environment::Production, ?array $scopes = null): self
-    {
-        return new self(ApiAccess::Member, $accessToken, $environment, $scopes);
+    public static function member(
+        string $accessToken,
+        ?string $orcid = null,
+        ?array $scopes = null,
+        Environment $environment = Environment::Production,
+    ): self {
+        return new self(ApiAccess::Member, $accessToken, $environment, $scopes, $orcid);
     }
 
     /**
@@ -78,13 +104,43 @@ final class Orcid extends Connector
     }
 
     /**
-     * Calls on one record. Accepts a bare iD or an ORCID URL.
+     * Reads on any record. Accepts a bare iD or an ORCID URL.
      *
      * @throws \InvalidArgumentException when $orcid is not a valid ORCID iD
      */
     public function record(string $orcid): RecordResource
     {
         return new RecordResource($this, OrcidId::normalize($orcid));
+    }
+
+    /**
+     * The affiliations of the record this connector is bound to
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function affiliations(): AffiliationsResource
+    {
+        return new AffiliationsResource($this, $this->boundOrcid(__FUNCTION__));
+    }
+
+    /**
+     * The person section of the record this connector is bound to
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function person(): Person
+    {
+        return $this->record($this->boundOrcid(__FUNCTION__))->person();
+    }
+
+    /**
+     * Summary of every activity on the record this connector is bound to
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function activities(): ActivitiesSummary
+    {
+        return $this->record($this->boundOrcid(__FUNCTION__))->activities();
     }
 
     /**
@@ -109,6 +165,14 @@ final class Orcid extends Connector
                 ));
             }
         }
+    }
+
+    private function boundOrcid(string $method): string
+    {
+        return $this->orcid ?? throw new \LogicException(sprintf(
+            'Orcid::%s() needs a connector bound to a record: Orcid::member(accessToken: ..., orcid: ...). Use record($id) to read any record.',
+            $method,
+        ));
     }
 
     public function resolveBaseUrl(): string

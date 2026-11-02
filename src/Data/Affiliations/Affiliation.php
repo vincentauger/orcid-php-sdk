@@ -9,6 +9,7 @@ use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
 use VincentAuger\OrcidSdk\Data\Common\Source;
 use VincentAuger\OrcidSdk\Data\Organization\Organization;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
+use VincentAuger\OrcidSdk\Enums\Visibility;
 use VincentAuger\OrcidSdk\Support\Json;
 
 /**
@@ -31,10 +32,12 @@ final readonly class Affiliation
         public ?string $url = null,
         public array $externalIds = [],
         public ?Source $source = null,
-        public ?string $visibility = null,
+        public ?Visibility $visibility = null,
         public ?\DateTimeImmutable $createdAt = null,
         public ?\DateTimeImmutable $lastModifiedAt = null,
         public ?string $path = null,
+        /** The order the researcher chose among their affiliations of this type */
+        public ?int $displayIndex = null,
     ) {}
 
     /**
@@ -53,10 +56,11 @@ final readonly class Affiliation
             url: Json::string($data, 'url'),
             externalIds: ExternalId::listFromArray(Json::object($data, 'external-ids')),
             source: Source::fromArray(Json::object($data, 'source')),
-            visibility: Json::string($data, 'visibility'),
+            visibility: Json::enum($data, 'visibility', Visibility::class),
             createdAt: Json::timestamp($data, 'created-date'),
             lastModifiedAt: Json::timestamp($data, 'last-modified-date'),
             path: Json::string($data, 'path'),
+            displayIndex: Json::int($data, 'display-index'),
         );
     }
 

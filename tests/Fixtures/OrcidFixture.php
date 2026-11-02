@@ -15,7 +15,7 @@ use Saloon\Http\Faking\Fixture;
  * - every client id (e.g. source-client-id on activities) becomes PLACEHOLDER_CLIENT_ID
  * - OAuth tokens and cookies are replaced
  * - list responses only keep the items created by tests (TEST_MARKER), not the other
- *   items on the sandbox record
+ *   items on the sandbox record: see TEST_MARKER_FIELDS and keepTestItems()
  *
  * Profile data (names, biography, keywords, ...) is kept: the sandbox record only
  * holds test content. Never record against a record with real personal data.
@@ -35,6 +35,26 @@ final class OrcidFixture extends Fixture
      * Every item created by a test starts its department name (or title) with this
      */
     public const string TEST_MARKER = 'orcid-php-sdk';
+
+    /**
+     * The summaries kept in fixtures only when created by tests, by key, with their field that starts with
+     * TEST_MARKER (plain or wrapped as {"value": ...}, at any depth). An element of any list (e.g. a group)
+     * that holds such summaries is dropped unless one of them is a test item. A new section adds its own here.
+     *
+     * @var array<string, string>
+     */
+    public const array TEST_MARKER_FIELDS = [
+        'employment-summary' => 'department-name',
+        'education-summary' => 'department-name',
+        'qualification-summary' => 'department-name',
+        'invited-position-summary' => 'department-name',
+        'distinction-summary' => 'department-name',
+        'membership-summary' => 'department-name',
+        'service-summary' => 'department-name',
+        'work-summary' => 'title',
+        'funding-summary' => 'title',
+        'research-resource-summary' => 'title',
+    ];
 
     private const string ORCID_ID_PATTERN = '/\d{4}-\d{4}-\d{4}-\d{3}[\dX]/';
 
@@ -82,32 +102,78 @@ final class OrcidFixture extends Fixture
     }
 
     /**
-     * Remove affiliation groups not created by tests, at any depth (lists and the activities summary)
+     * Remove list elements holding summaries not created by tests, at any depth (lists and the activities summary)
      *
      * @param  array<array-key, mixed>  $data
      * @return array<array-key, mixed>
      */
     private function keepTestGroups(array $data): array
     {
-        foreach ($data as $key => $value) {
-            if (! is_array($value)) {
-                continue;
-            }
+        // a whole group first, then the summaries inside it
+        if (array_is_list($data)) {
+            $data = array_values(array_filter($data, $this->isKept(...)));
+        }
 
-            $data[$key] = $key === 'affiliation-group'
-                ? array_values(array_filter($value, $this->isTestGroup(...)))
-                : $this->keepTestGroups($value);
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[$key] = $this->keepTestGroups($value);
+            }
         }
 
         return $data;
     }
 
     /**
-     * Whether a list group holds an item created by a test
+     * Whether a list element is kept: it holds no filtered summary, or at least one created by a test
      */
-    private function isTestGroup(mixed $group): bool
+    private function isKept(mixed $element): bool
     {
-        return str_contains((string) json_encode($group), '"department-name":"'.self::TEST_MARKER);
+        $summaries = $this->summaries($element);
+
+        if ($summaries === []) {
+            return true;
+        }
+
+        foreach ($summaries as [$field, $summary]) {
+            $pattern = '/"'.preg_quote($field, '/').'":(?:\{"value":)?"'.preg_quote(self::TEST_MARKER, '/').'/';
+
+            if (preg_match($pattern, (string) json_encode($summary, JSON_UNESCAPED_SLASHES)) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The filtered summaries in a value, at any depth, each with its marker field
+     *
+     * @return list<array{string, mixed}>
+     */
+    private function summaries(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $summaries = [];
+
+        foreach ($value as $key => $child) {
+            $field = is_string($key) ? self::TEST_MARKER_FIELDS[$key] ?? null : null;
+
+            if ($field === null) {
+                array_push($summaries, ...$this->summaries($child));
+            } elseif (is_array($child) && array_is_list($child)) {
+                // works and fundings: a list of summaries under one key
+                foreach ($child as $summary) {
+                    $summaries[] = [$field, $summary];
+                }
+            } else {
+                $summaries[] = [$field, $child];
+            }
+        }
+
+        return $summaries;
     }
 
     /**

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace VincentAuger\OrcidSdk\Data\Person;
 
+use VincentAuger\OrcidSdk\Data\Common\Source;
+use VincentAuger\OrcidSdk\Enums\Visibility;
 use VincentAuger\OrcidSdk\Support\Json;
 
 /**
@@ -15,7 +17,8 @@ final readonly class Email
         public string $email,
         public bool $primary = false,
         public bool $verified = false,
-        public ?string $visibility = null,
+        public ?Visibility $visibility = null,
+        public ?Source $source = null,
     ) {}
 
     /**
@@ -33,7 +36,8 @@ final readonly class Email
             email: $email,
             primary: ($data['primary'] ?? false) === true,
             verified: ($data['verified'] ?? false) === true,
-            visibility: Json::string($data, 'visibility'),
+            visibility: Json::enum($data, 'visibility', Visibility::class),
+            source: Source::fromArray(Json::object($data, 'source')),
         );
     }
 }

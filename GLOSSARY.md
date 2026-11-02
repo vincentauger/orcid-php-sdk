@@ -33,7 +33,8 @@ the source can update or delete its item.
 _Avoid_: Owner, author, creator
 
 **Visibility**:
-Who may read an item: everyone (public), trusted parties (limited) or only the researcher (private).
+Who may read an item: everyone (public), trusted parties (limited), signed-in ORCID users (registered-only,
+legacy) or only the researcher (private).
 _Avoid_: Privacy, access level
 
 ## Activities

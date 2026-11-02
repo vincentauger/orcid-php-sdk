@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VincentAuger\OrcidSdk\Data\Person;
 
+use VincentAuger\OrcidSdk\Enums\Visibility;
 use VincentAuger\OrcidSdk\Support\Json;
 
 final readonly class PersonName
@@ -13,7 +14,7 @@ final readonly class PersonName
         public ?string $familyName = null,
         /** The name the person prefers to be credited with ("published name") */
         public ?string $creditName = null,
-        public ?string $visibility = null,
+        public ?Visibility $visibility = null,
     ) {}
 
     /**
@@ -29,7 +30,7 @@ final readonly class PersonName
             givenNames: Json::string($data, 'given-names'),
             familyName: Json::string($data, 'family-name'),
             creditName: Json::string($data, 'credit-name'),
-            visibility: Json::string($data, 'visibility'),
+            visibility: Json::enum($data, 'visibility', Visibility::class),
         );
     }
 

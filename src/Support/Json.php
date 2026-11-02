@@ -38,6 +38,22 @@ final class Json
     }
 
     /**
+     * A backed enum case from the string at `$key`; null when missing or unknown to the SDK
+     *
+     * @template T of \BackedEnum
+     *
+     * @param  array<array-key, mixed>  $data
+     * @param  class-string<T>  $enum
+     * @return T|null
+     */
+    public static function enum(array $data, string $key, string $enum): ?\BackedEnum
+    {
+        $value = self::string($data, $key);
+
+        return $value === null ? null : $enum::tryFrom($value);
+    }
+
+    /**
      * A nested object at `$key`, or null when missing
      *
      * @param  array<array-key, mixed>  $data

@@ -98,7 +98,7 @@ stays generic: it is public. Vocabulary: `GLOSSARY.md`; decisions: `docs/adr/`.
 Decided for every section:
 - Classes: `X` (read: tolerant, never fails on what ORCID returns), `XInput` (write: validated before sending),
   `XSummary` where list items differ from the full item. Input classes have no visibility (ORCID applies the
-  researcher's default: to verify in C0); read classes expose a `Visibility` enum.
+  researcher's default and refuses changes: verified, `a1/e19`, `e20`); read classes expose a `Visibility` enum.
 - Enums ORCID can extend (work, funding and contributor types, roles, ...): read classes hold `?Enum $x` plus
   `string $rawX`, so an unknown value loses nothing; input classes only take the enum.
 - Works, fundings and peer reviews: `list()` returns groups, with `preferred()` (one summary per group) and
@@ -117,18 +117,21 @@ uses affiliations and OAuth). `1.0` = C8.
   tests replaying `a1/` are gone (the `a1/` fixtures stay as evidence). Errors recorded under `errors/`.
   Left: `PersonDataTest` still uses a hand-built payload, because the sandbox record has no other names,
   external identifiers or credit name; add them on the record, re-record `record/person-*`, then move it.
-- [ ] **C0. Shared groundwork**
-  - `Visibility` enum (`public`, `limited`, `registered-only`, `private`) replacing `?string $visibility`
-  - `Source`: add `assertion-origin-*` fields (token delegation, Search & Link wizards)
-  - `ExternalId`: add the read-only `external-id-normalized` (works and peer reviews)
-  - New shared classes: `Title` (title, subtitle, translated title), `Contributor` (iD, credit name, role,
+- [ ] **C0. Shared groundwork** (#2 done: the items below marked [x])
+  - [x] Member connector bound to its record (ADR 0003); `record($id)` only reads
+  - [x] `Visibility` enum (`public`, `limited`, `registered-only`, `private`) replacing `?string $visibility`
+  - [x] `Source`: add `assertion-origin-*` fields (token delegation, Search & Link wizards)
+  - [x] `ExternalId`: add the read-only `external-id-normalized` (works and peer reviews)
+  - [ ] New shared classes: `Title` (title, subtitle, translated title), `Contributor` (iD, credit name, role,
     sequence), `Amount`, `Url`
-  - A `ReadsPutCodeFromLocation` trait for every create request (today only in `CreateAffiliation`)
-  - `OrcidFixture`: generalise the `TEST_MARKER` filter beyond `department-name` (work/funding/resource titles,
+  - [x] A `ReadsPutCodeFromLocation` trait for every create request
+  - [x] `OrcidFixture`: generalise the `TEST_MARKER` filter beyond `department-name` (work/funding/resource titles,
     peer review subject names, person item content), so each new list fixture only keeps test items
   - Typed resources per section, sharing request traits; no generic "section" class, because the payloads differ
-  - `Source::isClient()`; `Affiliation::$displayIndex`; unique `self` ids for test affiliations
-  - Sandbox: what ORCID does with `visibility` sent by a client; which summary is preferred in a group (needs one
+  - [x] `Source::isClient()`; `Affiliation::$displayIndex`; unique `self` ids for test affiliations
+  - [x] Sandbox: what ORCID does with `visibility` sent by a client (ignored on POST, 403 9035 on a change by PUT:
+    inputs stay without visibility)
+  - [ ] Sandbox: which summary is preferred in a group (needs one
     work added by hand on the sandbox website, sharing a DOI with a test work)
 - [ ] **C1. Works** (what most integrations write)
   - `Work` / `WorkInput` / `WorkSummary` / `WorkGroup`; enums `WorkType` (v3.0 list: `dissertation-thesis`, `software`,

@@ -11,7 +11,8 @@ use VincentAuger\OrcidSdk\Requests\Activities\GetActivitiesSummary;
 use VincentAuger\OrcidSdk\Requests\Person\GetPerson;
 
 /**
- * Calls scoped to one ORCID record: $orcid->record('0000-0002-1825-0097')->...
+ * Reads on any ORCID record: $orcid->record('0000-0002-1825-0097')->... Writes go
+ * through a member connector bound to its record (Orcid::member(accessToken:, orcid:)).
  */
 final readonly class RecordResource
 {
@@ -41,8 +42,8 @@ final readonly class RecordResource
         return $request->createDtoFromResponse($this->connector->sendOrFail($request));
     }
 
-    public function affiliations(): AffiliationsResource
+    public function affiliations(): ReadOnlyAffiliationsResource
     {
-        return new AffiliationsResource($this->connector, $this->orcid);
+        return new ReadOnlyAffiliationsResource($this->connector, $this->orcid);
     }
 }

@@ -3,42 +3,25 @@
 declare(strict_types=1);
 
 use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Response;
 use Tests\Fixtures\OrcidFixture;
 use VincentAuger\OrcidSdk\Data\Affiliations\Affiliation;
-use VincentAuger\OrcidSdk\Data\Affiliations\AffiliationInput;
-use VincentAuger\OrcidSdk\Data\Common\ExternalId;
 use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
-use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
-use VincentAuger\OrcidSdk\Data\Organization\Organization;
-use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
+use VincentAuger\OrcidSdk\Enums\ExternalIdRelationship;
 use VincentAuger\OrcidSdk\Enums\Scope;
+use VincentAuger\OrcidSdk\Enums\Visibility;
 use VincentAuger\OrcidSdk\Exceptions\MissingScopeException;
 use VincentAuger\OrcidSdk\Exceptions\OrcidForbiddenException;
 use VincentAuger\OrcidSdk\Exceptions\OrcidNotFoundException;
 use VincentAuger\OrcidSdk\Orcid;
+use VincentAuger\OrcidSdk\Requests\Affiliations\CreateAffiliation;
 
 /*
  * Recorded against the ORCID sandbox. Every test only touches items it created
  * (department names start with OrcidFixture::TEST_MARKER) and deletes them.
  * Each test's fixtures are a chain: to re-record, delete the whole folder.
  */
-
-function testAffiliation(string $label, ?string $roleTitle = 'Tester', ?FuzzyDate $endDate = null): AffiliationInput
-{
-    return new AffiliationInput(
-        organization: new Organization(
-            'Fisheries and Oceans Canada',
-            new OrganizationAddress('Ottawa', 'CA', 'ON'),
-            DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
-        ),
-        departmentName: OrcidFixture::TEST_MARKER.' '.$label,
-        roleTitle: $roleTitle,
-        startDate: FuzzyDate::fromString('2021-01-05'),
-        endDate: $endDate,
-        externalIds: [new ExternalId('grant_number', 'ORCID-PHP-SDK-1')],
-    );
-}
 
 it('creates, reads, updates, lists and deletes an employment', function (): void {
     $folder = 'affiliations/employment-lifecycle';
@@ -52,7 +35,7 @@ it('creates, reads, updates, lists and deletes an employment', function (): void
     ]);
 
     // with known scopes, they are checked before sending: the token has them all
-    $affiliations = $this->getMemberApiClient(Scope::completeAccess())->withMockClient($mockClient)->record($this->orcidId())->affiliations();
+    $affiliations = $this->getMemberApiClient(Scope::completeAccess())->withMockClient($mockClient)->affiliations();
 
     $putCode = $affiliations->create(AffiliationType::Employment, testAffiliation('lifecycle'));
 
@@ -67,14 +50,20 @@ it('creates, reads, updates, lists and deletes an employment', function (): void
         ->and((string) $created->startDate)->toBe('2021-01-05')
         ->and($created->endDate)->toBeNull()
         ->and($created->externalIds)->toHaveCount(1)
-        ->and($created->externalIds[0]->value)->toBe('ORCID-PHP-SDK-1')
+        ->and($created->externalIds[0]->value)->toBe('orcid-php-sdk-lifecycle')
+        ->and($created->externalIds[0]->relationship)->toBe(ExternalIdRelationship::Self)
+        ->and($created->externalIds[0]->normalizedValue)->toBe('orcid-php-sdk-lifecycle')
         ->and($created->organization?->name)->toBe('Fisheries and Oceans Canada')
         ->and($created->organization?->address?->city)->toBe('Ottawa')
         ->and($created->organization?->disambiguatedOrganization?->identifier)->toBe('https://ror.org/02qa1x782')
-        ->and($created->source?->clientId)->toBe(OrcidFixture::PLACEHOLDER_CLIENT_ID)
+        ->and($this->isOurs($created->source))->toBeTrue()
+        ->and($created->source?->isClient('APP-SOMEONEELSE00000'))->toBeFalse()
         ->and($created->source?->isRecordOwner())->toBeFalse()
+        ->and($created->source?->assertionOriginClientId)->toBeNull()
+        ->and($created->source?->assertionOriginOrcid)->toBeNull()
+        ->and($created->source?->assertionOriginName)->toBeNull()
         ->and($created->createdAt)->toBeInstanceOf(DateTimeImmutable::class)
-        ->and($created->visibility)->toBe('public');
+        ->and($created->visibility)->toBe(Visibility::Public);
 
     // PUT replaces the whole item: the role title left out is cleared
     $updated = $affiliations->update(AffiliationType::Employment, $putCode, testAffiliation('lifecycle', roleTitle: null, endDate: FuzzyDate::fromString('2023')));
@@ -82,9 +71,14 @@ it('creates, reads, updates, lists and deletes an employment', function (): void
     expect($updated->roleTitle)->toBeNull()
         ->and((string) $updated->endDate)->toBe('2023');
 
-    $listed = array_map(fn (Affiliation $affiliation): int => $affiliation->putCode, $affiliations->list(AffiliationType::Employment));
+    $listed = array_values(array_filter(
+        $affiliations->list(AffiliationType::Employment),
+        fn (Affiliation $affiliation): bool => $affiliation->putCode === $putCode,
+    ));
 
-    expect($listed)->toContain($putCode);
+    expect($listed)->toHaveCount(1)
+        ->and($listed[0]->displayIndex)->toBe(1)
+        ->and($listed[0]->visibility)->toBe(Visibility::Public);
 
     $affiliations->delete(AffiliationType::Employment, $putCode);
 
@@ -100,7 +94,7 @@ it('creates, lists and deletes every affiliation type', function (AffiliationTyp
         new OrcidFixture("{$folder}/delete"),
     ]);
 
-    $affiliations = $this->getMemberApiClient()->withMockClient($mockClient)->record($this->orcidId())->affiliations();
+    $affiliations = $this->getMemberApiClient()->withMockClient($mockClient)->affiliations();
 
     $putCode = $affiliations->create($type, testAffiliation($type->value));
     $listed = $affiliations->list($type);
@@ -117,7 +111,7 @@ it('refuses to update an item created by another source', function (): void {
     // put-code 71553 is an employment the sandbox record owner added by hand
     $mockClient = new MockClient([new OrcidFixture('affiliations/update-other-source')]);
 
-    $affiliations = $this->getMemberApiClient()->withMockClient($mockClient)->record($this->orcidId())->affiliations();
+    $affiliations = $this->getMemberApiClient()->withMockClient($mockClient)->affiliations();
 
     expect(fn (): Affiliation => $affiliations->update(AffiliationType::Employment, 71553, testAffiliation('not ours')))
         ->toThrow(function (OrcidForbiddenException $exception): void {
@@ -128,11 +122,11 @@ it('refuses to update an item created by another source', function (): void {
 it('checks the token scopes and the API before sending', function (): void {
     $mockClient = new MockClient([]);
 
-    $readOnly = Orcid::member('token', scopes: [Scope::ReadLimited])->withMockClient($mockClient);
+    $readOnly = Orcid::member(accessToken: 'token', orcid: '0000-0002-1825-0097', scopes: [Scope::ReadLimited])->withMockClient($mockClient);
 
-    expect(fn (): int => $readOnly->record('0000-0002-1825-0097')->affiliations()->create(AffiliationType::Employment, testAffiliation('scope')))
+    expect(fn (): int => $readOnly->affiliations()->create(AffiliationType::Employment, testAffiliation('scope')))
         ->toThrow(MissingScopeException::class)
-        ->and(fn (): int => Orcid::public()->withMockClient($mockClient)->record('0000-0002-1825-0097')->affiliations()->create(AffiliationType::Employment, testAffiliation('public')))
+        ->and(fn (): Response => Orcid::public()->withMockClient($mockClient)->send(new CreateAffiliation('0000-0002-1825-0097', AffiliationType::Employment, testAffiliation('public'))))
         ->toThrow(LogicException::class, 'requires the Member API');
 
     $mockClient->assertNothingSent();

@@ -7,10 +7,6 @@ use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\PendingRequest;
 use Tests\Fixtures\OrcidFixture;
-use VincentAuger\OrcidSdk\Data\Affiliations\AffiliationInput;
-use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
-use VincentAuger\OrcidSdk\Data\Organization\Organization;
-use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
 use VincentAuger\OrcidSdk\Data\Person\Person;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
 use VincentAuger\OrcidSdk\Enums\Environment;
@@ -50,18 +46,6 @@ function orcidFailure(Closure $call): OrcidException
     throw new RuntimeException('Expected an OrcidException');
 }
 
-function errorTestAffiliation(string $ror): AffiliationInput
-{
-    return new AffiliationInput(
-        organization: new Organization(
-            'Fisheries and Oceans Canada',
-            new OrganizationAddress('Ottawa', 'CA'),
-            DisambiguatedOrganization::ror($ror),
-        ),
-        departmentName: OrcidFixture::TEST_MARKER.' errors',
-    );
-}
-
 /**
  * Public API client answering every request with the given mock
  */
@@ -73,8 +57,8 @@ function mockedPublicApi(MockResponse|Closure $mock): Orcid
 it('maps a bad payload to a validation exception with ORCID error details', function (): void {
     $client = $this->getMemberApiClient()->withMockClient(new MockClient([new OrcidFixture('errors/invalid-organization')]));
 
-    $exception = orcidFailure(fn (): int => $client->record($this->orcidId())->affiliations()
-        ->create(AffiliationType::Employment, errorTestAffiliation('https://ror.org/000000000')));
+    $exception = orcidFailure(fn (): int => $client->affiliations()
+        ->create(AffiliationType::Employment, testAffiliation('errors', ror: 'https://ror.org/000000000')));
 
     expect($exception)->toBeInstanceOf(OrcidValidationException::class)
         ->and($exception->errorCode)->toBe(9045)
@@ -85,9 +69,10 @@ it('maps a bad payload to a validation exception with ORCID error details', func
 });
 
 it('maps a bad or revoked token (OAuth error body) to an auth exception', function (): void {
-    $client = Orcid::member('invalid-token', Environment::Sandbox)->withMockClient(new MockClient([new OrcidFixture('errors/invalid-token')]));
+    $client = Orcid::member(accessToken: 'invalid-token', orcid: $this->orcidId(), environment: Environment::Sandbox)
+        ->withMockClient(new MockClient([new OrcidFixture('errors/invalid-token')]));
 
-    $exception = orcidFailure(fn (): Person => $client->record($this->orcidId())->person());
+    $exception = orcidFailure(fn (): Person => $client->person());
 
     expect($exception)->toBeInstanceOf(OrcidAuthException::class)
         ->and($exception->oauthError)->toBe('invalid_token')
@@ -98,10 +83,11 @@ it('maps a bad or revoked token (OAuth error body) to an auth exception', functi
 it('tells "not the source" apart from "missing scope" on 403', function (): void {
     // put-code 71553 is an employment the sandbox record owner added by hand
     $client = $this->getMemberApiClient()->withMockClient(new MockClient([new OrcidFixture('affiliations/update-other-source')]));
-    $notSource = orcidFailure(fn () => $client->record($this->orcidId())->affiliations()
-        ->update(AffiliationType::Employment, 71553, errorTestAffiliation('https://ror.org/02qa1x782')));
+    $notSource = orcidFailure(fn () => $client->affiliations()
+        ->update(AffiliationType::Employment, 71553, testAffiliation('not ours')));
 
-    // a throwaway /read-public token can't write, even on the Member API. To re-record, delete the whole folder.
+    // a throwaway /read-public token can't write, even on the Member API: without the token's scopes,
+    // the connector sends the request and ORCID refuses it (9038). To re-record, delete the whole folder.
     $mockClient = new MockClient([
         RequestClientCredentialsToken::class => new OrcidFixture('errors/missing-scope/client-credentials'),
         CreateAffiliation::class => new OrcidFixture('errors/missing-scope/create'),
@@ -109,9 +95,9 @@ it('tells "not the source" apart from "missing scope" on 403', function (): void
     ]);
     $oauth = $this->getOAuthClient()->withMockClient($mockClient);
     $readPublic = $oauth->clientCredentials([Scope::ReadPublic])->accessToken;
-    $client = Orcid::member($readPublic, Environment::Sandbox)->withMockClient($mockClient);
-    $missingScope = orcidFailure(fn (): int => $client->record($this->orcidId())->affiliations()
-        ->create(AffiliationType::Employment, errorTestAffiliation('https://ror.org/02qa1x782')));
+    $client = Orcid::member(accessToken: $readPublic, orcid: $this->orcidId(), environment: Environment::Sandbox)->withMockClient($mockClient);
+    $missingScope = orcidFailure(fn (): int => $client->affiliations()
+        ->create(AffiliationType::Employment, testAffiliation('missing scope')));
     $oauth->revoke($readPublic);
 
     expect($notSource)->toBeInstanceOf(OrcidForbiddenException::class)
@@ -125,7 +111,7 @@ it('tells "not the source" apart from "missing scope" on 403', function (): void
 it('maps an unknown item to a not found exception', function (): void {
     $client = $this->getMemberApiClient()->withMockClient(new MockClient([new OrcidFixture('errors/not-found')]));
 
-    $exception = orcidFailure(fn () => $client->record($this->orcidId())->affiliations()->get(AffiliationType::Employment, 1));
+    $exception = orcidFailure(fn () => $client->affiliations()->get(AffiliationType::Employment, 1));
 
     expect($exception)->toBeInstanceOf(OrcidNotFoundException::class)
         ->and($exception->errorCode)->toBe(9016);
