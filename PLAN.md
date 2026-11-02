@@ -105,8 +105,9 @@ Decided for every section:
   `summaries()` (all of them, for syncing). Affiliations stay flat, plus `displayIndex` (ADR 0001).
 - One method call sends one HTTP request: bulk calls throw above 100 items, callers split (ADR 0002).
 - Finding our own items: `Source::isClient($clientId)`; the connector never knows the client id.
-- A member connector is bound to its record: `Orcid::member(OrcidToken)` exposes the sections directly, with
-  the token's scopes; `record($id)` stays for reading any record with a public or client-credentials token (ADR 0003).
+- A member connector is bound to its record: `Orcid::member(accessToken:, orcid:, scopes:)` exposes the
+  sections directly; every connector keeps `record($id)` for reads only (a member connector without `orcid`,
+  e.g. client credentials for higher limits, only reads that way) (ADR 0003).
 - Test items each get their own `self` external id, so ORCID never groups them together.
 
 Order: C0 first; the other sections in any order, one minor each (breaking changes allowed in `0.x`; OSP only
