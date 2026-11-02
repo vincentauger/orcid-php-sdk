@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\PendingRequest;
+use Tests\Fixtures\OrcidFixture;
 use VincentAuger\OrcidSdk\Data\OrcidToken;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
@@ -49,6 +50,7 @@ it('leaves out optional authorization URL parameters', function (): void {
 });
 
 it('exchanges an authorization code for a token', function (): void {
+    // Not recorded: needs a fresh authorization code from the browser
     $mockClient = new MockClient([ExchangeAuthorizationCode::class => threeLeggedTokenResponse()]);
 
     $token = new OrcidOAuth('APP-1', 'secret', Environment::Sandbox)
@@ -80,43 +82,11 @@ it('exchanges an authorization code for a token', function (): void {
     });
 });
 
-it('requests a client credentials token', function (): void {
-    $mockClient = new MockClient([RequestClientCredentialsToken::class => MockResponse::make([
-        'access_token' => '4bed1e13-7792-4129-9f07-aaf7b88ba88f',
-        'token_type' => 'bearer',
-        'refresh_token' => '2d76d8d0-6fd6-426b-a017-61e0ceda0ad2',
-        'expires_in' => 631138518,
-        'scope' => '/read-public',
-        'orcid' => null,
-    ])]);
-
-    $token = new OrcidOAuth('APP-1', 'secret')->withMockClient($mockClient)->clientCredentials();
-
-    expect($token->scopes)->toBe([Scope::ReadPublic])
-        ->and($token->orcid)->toBeNull()
-        ->and($token->name)->toBeNull();
-
-    $mockClient->assertSent(function (RequestClientCredentialsToken $request, $response): bool {
-        /** @var PendingRequest $pending */
-        $pending = $response->getPendingRequest();
-
-        return $pending->body()?->all() === [
-            'grant_type' => 'client_credentials',
-            'scope' => '/read-public',
-            'client_id' => 'APP-1',
-            'client_secret' => 'secret',
-        ];
-    });
-});
-
 it('throws when the token endpoint rejects the request', function (): void {
-    $mockClient = new MockClient([ExchangeAuthorizationCode::class => MockResponse::make([
-        'error' => 'invalid_grant',
-        'error_description' => 'Invalid authorization code: Q70Y3A',
-    ], 400)]);
+    $mockClient = new MockClient([ExchangeAuthorizationCode::class => new OrcidFixture('oauth/exchange-invalid-code')]);
 
     try {
-        new OrcidOAuth('APP-1', 'secret')->withMockClient($mockClient)->exchangeCode('Q70Y3A', 'https://example.org/callback');
+        $this->getOAuthClient()->withMockClient($mockClient)->exchangeCode('Q70Y3A', $_ENV['ORCID_REDIRECT_URI'] ?? 'https://example.org/callback');
         $this->fail('Expected an exception');
     } catch (OrcidValidationException $exception) {
         expect($exception->oauthError)->toBe('invalid_grant')

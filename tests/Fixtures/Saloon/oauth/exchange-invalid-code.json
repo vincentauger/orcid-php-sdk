@@ -1,0 +1,20 @@
+{
+    "statusCode": 400,
+    "headers": {
+        "Date": "Mon, 02 Nov 2026 17:39:01 GMT",
+        "Content-Type": "application\/json;charset=UTF-8",
+        "Content-Length": "82",
+        "Connection": "keep-alive",
+        "Set-Cookie": [
+            "AWSALB=M89zEuQnycOC38rvqs3bcMlE08NhloEL2oq\/K6uxBevvcea+UV5lbiHXtYHcptDYeudY5cSIl7lDCoLak118UpwG0S++PAPJKi3o2u1vNrldlex\/6\/dQzaUgSiZF; Expires=Mon, 09 Nov 2026 17:39:01 GMT; Path=\/",
+            "AWSALBCORS=M89zEuQnycOC38rvqs3bcMlE08NhloEL2oq\/K6uxBevvcea+UV5lbiHXtYHcptDYeudY5cSIl7lDCoLak118UpwG0S++PAPJKi3o2u1vNrldlex\/6\/dQzaUgSiZF; Expires=Mon, 09 Nov 2026 17:39:01 GMT; Path=\/; SameSite=None; Secure",
+            "__cf_bm=UAFEV1f1DfABMqoKj3_u6VbUQ5QzFsub8MKLSupIPCQ-1793641141.5334864-1.0.1.1-uwHi7tizd43f_8Ss9UYUQXa.hZveMyo0sF7XaYwLarCUcwLnqVC8yqzx3YVWDJXVp13J04dimpjVTTtKOFyV.Au2v9CV1z_qGO2tXlZoUCtBOO6w2c1Nhgcxp_eiT9TJ; HttpOnly; SameSite=None; Secure; Path=\/; Domain=sandbox.orcid.org; Expires=Mon, 02 Nov 2026 18:09:01 GMT"
+        ],
+        "Server": "cloudflare",
+        "oauth_authorization_code_exchange": "ON",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a544ea8e8e87a310-YUL"
+    },
+    "data": "{\"error_description\":\"Invalid authorization code: Q70Y3A\",\"error\":\"invalid_grant\"}",
+    "context": []
+}

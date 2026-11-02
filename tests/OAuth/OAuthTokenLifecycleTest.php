@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
+use Saloon\Http\Response;
 use Tests\Fixtures\OrcidFixture;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Exceptions\OrcidForbiddenException;
@@ -35,6 +36,14 @@ it('gets and revokes a client credentials token', function (): void {
 
     $oauth->revoke($token->accessToken);
 
+    $mockClient->assertSent(function (RequestClientCredentialsToken $request, Response $response) use ($oauth): bool {
+        $body = $response->getPendingRequest()->body()?->all() ?? [];
+
+        return $body['grant_type'] === 'client_credentials'
+            && $body['scope'] === '/read-public'
+            && $body['client_id'] === $oauth->clientId
+            && isset($body['client_secret']);
+    });
     $mockClient->assertSent(fn (RevokeToken $request): bool => $request->body()->get('token') === $token->accessToken);
 });
 

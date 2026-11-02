@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Saloon\MockConfig;
 use Tests\Fixtures\OrcidFixture;
 use VincentAuger\OrcidSdk\Enums\Environment;
+use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Orcid;
 use VincentAuger\OrcidSdk\OrcidOAuth;
 
@@ -47,9 +48,12 @@ class BaseTest extends TestCase
         return $this->env('ORCID_ORCID_ID') ?? OrcidFixture::PLACEHOLDER_ID;
     }
 
-    public function getMemberApiClient(): Orcid
+    /**
+     * @param  list<Scope>|null  $scopes  The token's scopes, to check them before sending
+     */
+    public function getMemberApiClient(?array $scopes = null): Orcid
     {
-        return Orcid::member($this->env('ORCID_ACCESS_TOKEN') ?? 'test-token', Environment::Sandbox);
+        return Orcid::member($this->env('ORCID_ACCESS_TOKEN') ?? 'test-token', Environment::Sandbox, $scopes);
     }
 
     public function getPublicApiClient(): Orcid

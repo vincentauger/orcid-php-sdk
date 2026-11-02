@@ -65,8 +65,10 @@ Run these commands before committing:
   delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
 - Items created by tests must start their department name with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`):
   list and activities fixtures only keep those items, so the record's real items never end up in fixtures.
-- Hand-written `MockResponse::make()` is only for responses the sandbox can't produce on demand (a fresh
-  authorization code, an `openid` token); say so in a comment.
+- Every test that covers a call sends it through the typed requests (no generic test request). Errors are
+  recorded too (`errors/`). Hand-written `MockResponse::make()` is only for responses the sandbox can't produce
+  on demand (a fresh authorization code, an `openid` token, rate limits, 5xx, connection failures); say so in a
+  comment.
 - Without a `.env` file, missing fixtures throw instead of calling ORCID, so CI never reaches the API.
 - With a `.env` file, tests refuse to run unless `ORCID_ENVIRONMENT=sandbox`.
 - Always review a newly recorded fixture before committing it.
@@ -76,7 +78,7 @@ Run these commands before committing:
 
 ## ORCID API behaviour (verified against the sandbox, 2026-10-22)
 
-Evidence: `tests/Fixtures/Saloon/a1/`.
+Evidence: `tests/Fixtures/Saloon/a1/`. No test replays these: they record payloads the SDK never sends.
 
 - **PUT replaces the whole item.** A field sent as `null` and a field left out both clear it (`e3b`, `e3d`),
   so `toArray()` leaves out null fields.

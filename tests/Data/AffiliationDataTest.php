@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Saloon\Data\RecordedResponse;
 use VincentAuger\OrcidSdk\Data\Affiliations\Affiliation;
 use VincentAuger\OrcidSdk\Data\Affiliations\AffiliationInput;
 use VincentAuger\OrcidSdk\Data\Common\ExternalId;
@@ -21,20 +20,6 @@ function dfo(?string $city = 'Ottawa', ?string $country = 'CA', ?DisambiguatedOr
         new OrganizationAddress($city, $country, 'ON'),
         $id ?? DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
     );
-}
-
-/**
- * The body of a fixture recorded during A1
- *
- * @return array<string, mixed>
- */
-function a1Body(string $name): array
-{
-    $file = __DIR__.'/../Fixtures/Saloon/a1/'.$name.'.json';
-    $recorded = RecordedResponse::fromFile((string) file_get_contents($file));
-
-    /** @var array<string, mixed> */
-    return json_decode((string) $recorded->data, true);
 }
 
 describe('FuzzyDate', function (): void {
@@ -143,31 +128,7 @@ describe('AffiliationInput', function (): void {
 });
 
 describe('Affiliation', function (): void {
-    it('reads an item recorded from the sandbox', function (): void {
-        $affiliation = Affiliation::fromArray(AffiliationType::Employment, a1Body('e3a-get'));
-
-        expect($affiliation->type)->toBe(AffiliationType::Employment)
-            ->and($affiliation->putCode)->toBeInt()
-            ->and($affiliation->departmentName)->toBe('orcid-php-sdk A1 E1')
-            ->and($affiliation->roleTitle)->toBe('Tester')
-            ->and((string) $affiliation->startDate)->toBe('2021-01-05')
-            ->and((string) $affiliation->endDate)->toBe('2023')
-            ->and($affiliation->organization?->name)->toBe('Fisheries and Oceans Canada')
-            ->and($affiliation->organization?->address?->city)->toBe('Ottawa')
-            ->and($affiliation->organization?->disambiguatedOrganization?->identifier)->toBe('https://ror.org/02qa1x782')
-            ->and($affiliation->source?->clientId)->toBe('APP-0000000000000000')
-            ->and($affiliation->source?->isRecordOwner())->toBeFalse()
-            ->and($affiliation->createdAt)->toBeInstanceOf(DateTimeImmutable::class)
-            ->and($affiliation->visibility)->toBe('public');
-    });
-
-    it('reads cleared fields as null', function (): void {
-        $affiliation = Affiliation::fromArray(AffiliationType::Employment, a1Body('e3b-get'));
-
-        expect($affiliation->roleTitle)->toBeNull()
-            ->and($affiliation->endDate)->toBeNull();
-    });
-
+    // Our client can't produce these: the sandbox's own items are filtered out of fixtures
     it('recognises items added by the record owner', function (): void {
         $affiliation = Affiliation::fromArray(AffiliationType::Employment, [
             'put-code' => 1,

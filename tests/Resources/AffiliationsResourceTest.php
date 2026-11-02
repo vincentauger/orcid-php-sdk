@@ -51,7 +51,8 @@ it('creates, reads, updates, lists and deletes an employment', function (): void
         new OrcidFixture("{$folder}/get-deleted"),
     ]);
 
-    $affiliations = $this->getMemberApiClient()->withMockClient($mockClient)->record($this->orcidId())->affiliations();
+    // with known scopes, they are checked before sending: the token has them all
+    $affiliations = $this->getMemberApiClient(Scope::completeAccess())->withMockClient($mockClient)->record($this->orcidId())->affiliations();
 
     $putCode = $affiliations->create(AffiliationType::Employment, testAffiliation('lifecycle'));
 
@@ -59,14 +60,21 @@ it('creates, reads, updates, lists and deletes an employment', function (): void
 
     $created = $affiliations->get(AffiliationType::Employment, $putCode);
 
-    expect($created->putCode)->toBe($putCode)
+    expect($created->type)->toBe(AffiliationType::Employment)
+        ->and($created->putCode)->toBe($putCode)
         ->and($created->departmentName)->toBe('orcid-php-sdk lifecycle')
         ->and($created->roleTitle)->toBe('Tester')
         ->and((string) $created->startDate)->toBe('2021-01-05')
         ->and($created->endDate)->toBeNull()
         ->and($created->externalIds)->toHaveCount(1)
         ->and($created->externalIds[0]->value)->toBe('ORCID-PHP-SDK-1')
-        ->and($created->organization?->disambiguatedOrganization?->identifier)->toBe('https://ror.org/02qa1x782');
+        ->and($created->organization?->name)->toBe('Fisheries and Oceans Canada')
+        ->and($created->organization?->address?->city)->toBe('Ottawa')
+        ->and($created->organization?->disambiguatedOrganization?->identifier)->toBe('https://ror.org/02qa1x782')
+        ->and($created->source?->clientId)->toBe(OrcidFixture::PLACEHOLDER_CLIENT_ID)
+        ->and($created->source?->isRecordOwner())->toBeFalse()
+        ->and($created->createdAt)->toBeInstanceOf(DateTimeImmutable::class)
+        ->and($created->visibility)->toBe('public');
 
     // PUT replaces the whole item: the role title left out is cleared
     $updated = $affiliations->update(AffiliationType::Employment, $putCode, testAffiliation('lifecycle', roleTitle: null, endDate: FuzzyDate::fromString('2023')));
