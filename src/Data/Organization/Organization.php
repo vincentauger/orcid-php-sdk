@@ -33,6 +33,30 @@ final readonly class Organization
     }
 
     /**
+     * Read the {"organization": [...]} wrapper used by ORCID (research resource hosts)
+     *
+     * @param  array<array-key, mixed>|null  $data
+     * @return list<self>
+     */
+    public static function listFromArray(?array $data): array
+    {
+        if ($data === null) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(self::fromArray(...), Json::list($data, 'organization'))));
+    }
+
+    /**
+     * @param  list<self>  $organizations
+     * @return array{organization: list<array<string, mixed>>}
+     */
+    public static function listToArray(array $organizations): array
+    {
+        return ['organization' => array_map(static fn (self $organization): array => $organization->toArray(), $organizations)];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array

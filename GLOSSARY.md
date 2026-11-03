@@ -59,6 +59,26 @@ An item in the peer reviews section: a review the researcher did (as reviewer, e
 article, a grant proposal, ...), within a review group and convened by an organization, usually the publisher.
 _Avoid_: Review (alone, for the item), referee report
 
+**Research resource**:
+An item in the research resources section: access a researcher was granted to resources (a vessel, a facility, a
+collection, a service, ...) through a **proposal**, with the **resource items** it gave access to. Added by
+infrastructure providers.
+_Avoid_: Resource (alone, for the item), booking, allocation
+
+**Proposal**:
+The part of a research resource that says what access was granted for: a title, its hosts, identifiers and dates.
+ORCID groups research resources by the proposal's `self` external identifier.
+_Avoid_: Application, project
+
+**Resource item**:
+One resource a research resource gave access to: a name, a type (infrastructures, collections, equipment, services),
+its hosts and identifiers.
+_Avoid_: Resource (alone), asset
+
+**Host**:
+An organization that grants access to research resources (on a proposal) or provides one (on a resource item).
+_Avoid_: Provider, owner
+
 **Review group**:
 What a peer review was done for, usually a journal: ORCID's group id, e.g. `issn:0706-652X`. ORCID creates an ISSN
 group on first use; others come from its group-id registry. Not a **Group**: one review group holds many groups.

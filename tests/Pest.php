@@ -13,10 +13,14 @@ use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
 use VincentAuger\OrcidSdk\Data\Organization\Organization;
 use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
 use VincentAuger\OrcidSdk\Data\PeerReviews\PeerReviewInput;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceInput;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceItemInput;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceProposalInput;
 use VincentAuger\OrcidSdk\Data\Works\WorkInput;
 use VincentAuger\OrcidSdk\Enums\FundingType;
 use VincentAuger\OrcidSdk\Enums\PeerReviewRole;
 use VincentAuger\OrcidSdk\Enums\PeerReviewType;
+use VincentAuger\OrcidSdk\Enums\ResearchResourceType;
 use VincentAuger\OrcidSdk\Enums\WorkType;
 
 pest()->extend(BaseTest::class);
@@ -93,6 +97,38 @@ function testPeerReview(string $label, mixed ...$fields): PeerReviewInput
         ),
         ...$fields,
     ]);
+}
+
+/**
+ * A research resource for tests: its proposal title starts with the test marker, and the proposal has its own `self`
+ * external identifier, so ORCID never groups it with another research resource. Fields change the proposal; pass
+ * `items` to change the resource items.
+ *
+ * @param  list<ResearchResourceItemInput>|null  $items
+ */
+function testResearchResource(string $label, ?array $items = null, mixed ...$fields): ResearchResourceInput
+{
+    $slug = OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label);
+    $host = new Organization(
+        'Fisheries and Oceans Canada',
+        new OrganizationAddress('Ottawa', 'CA', 'ON'),
+        DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
+    );
+
+    return new ResearchResourceInput(
+        new ResearchResourceProposalInput(...[
+            'title' => new Title(OrcidFixture::TEST_MARKER.' '.$label),
+            'hosts' => [$host],
+            'externalIds' => [new ExternalId('proposal-id', $slug)],
+            ...$fields,
+        ]),
+        $items ?? [new ResearchResourceItemInput(
+            OrcidFixture::TEST_MARKER.' vessel',
+            ResearchResourceType::Infrastructures,
+            [$host],
+            [new ExternalId('source-work-id', $slug.'-vessel')],
+        )],
+    );
 }
 
 /**

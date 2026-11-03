@@ -33,6 +33,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   check digit, no subject subtitle, lengths), `PeerReviewSummary`, `PeerReviewGroup` (with its review group id),
   `PeerReviewGroups` (`byReviewGroup()`); enum `PeerReviewSubjectType` (work and funding types, and
   `research-resource-proposal`)
+- Research resources: `$orcid->researchResources()->list|get|create|update|delete` on a bound member connector,
+  `record($id)->researchResources()->list|get` on any connector. `ResearchResource` (read: a
+  `ResearchResourceProposal` and `ResearchResourceItem`s) / `ResearchResourceInput` (write, with
+  `ResearchResourceProposalInput` and `ResearchResourceItemInput`, validated before sending: a host with an address and
+  a disambiguated organization, an external identifier, at least one item, a start date with an end date, no subtitle,
+  lengths), `ResearchResourceSummary`, `ResearchResourceGroup`, `ResearchResourceGroups`; enum `ResearchResourceType`;
+  `Organization::listFromArray()` / `listToArray()`
 - Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes, and `Amount` (a decimal string and an ISO 4217
   currency)
 - `OrcidConflictException::isDuplicate()` (error 9021) and `existingPutCode()`

@@ -22,6 +22,7 @@ use VincentAuger\OrcidSdk\Resources\AffiliationsResource;
 use VincentAuger\OrcidSdk\Resources\FundingsResource;
 use VincentAuger\OrcidSdk\Resources\PeerReviewsResource;
 use VincentAuger\OrcidSdk\Resources\RecordResource;
+use VincentAuger\OrcidSdk\Resources\ResearchResourcesResource;
 use VincentAuger\OrcidSdk\Resources\WorksResource;
 use VincentAuger\OrcidSdk\Support\OrcidId;
 
@@ -160,6 +161,16 @@ final class Orcid extends Connector
     public function peerReviews(): PeerReviewsResource
     {
         return new PeerReviewsResource($this, $this->boundOrcid(__FUNCTION__));
+    }
+
+    /**
+     * The research resources of the record this connector is bound to
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function researchResources(): ResearchResourcesResource
+    {
+        return new ResearchResourcesResource($this, $this->boundOrcid(__FUNCTION__));
     }
 
     /**

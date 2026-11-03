@@ -101,7 +101,7 @@ Decided for every section:
   researcher's default and refuses changes: verified, `a1/e19`, `e20`); read classes expose a `Visibility` enum.
 - Enums ORCID can extend (work, funding and contributor types, roles, ...): read classes hold `?Enum $x` plus
   `string $rawX`, so an unknown value loses nothing; input classes only take the enum.
-- Works, fundings and peer reviews: `list()` returns groups, with `preferred()` (one summary per group) and
+- Works, fundings, peer reviews and research resources: `list()` returns groups, with `preferred()` (one summary per group) and
   `summaries()` (all of them, for syncing). Affiliations stay flat, plus `displayIndex` (ADR 0001).
 - One method call sends one HTTP request: bulk calls throw above 100 items, callers split (ADR 0002).
 - Finding our own items: `Source::isClient($clientId)`; the connector never knows the client id.
@@ -152,8 +152,11 @@ uses affiliations and OAuth). `1.0` = C8.
   `PeerReviewSummary` / `PeerReviewGroup`, reusing `PeerReviewRole` / `PeerReviewType`, plus `PeerReviewSubjectType`.
   ORCID nests groups in their review group: `PeerReviewGroups` keeps one flat list of groups, each with its review
   group id, and `byReviewGroup()` nests them again.
-- [ ] **C4. Research resources** (lowest demand: infrastructure providers) — `ResearchResource` with a proposal
-  (title, hosts, external ids, dates, URL) and resource items (name, `ResearchResourceType`, hosts, ids).
+- [x] **C4. Research resources** (#9; sandbox check in `c4/`, in `AGENTS.md`: every host needs a disambiguated
+  organization, 9045; at least one resource item) — `ResearchResource` with a `ResearchResourceProposal` (title, hosts,
+  external ids, dates, URL) and `ResearchResourceItem`s (name, `ResearchResourceType`, hosts, ids);
+  `ResearchResourceInput` nests `ResearchResourceProposalInput` and `ResearchResourceItemInput`, as ORCID does.
+  `ResearchResourceSummary` (the proposal only) / `ResearchResourceGroup`.
 - [ ] **C5. Person sections** (`/person/update`, Member API)
   - Writable: other names, keywords, researcher URLs, external identifiers, addresses:
     `$orcid->keywords()->list|get|create|update|delete`, etc.

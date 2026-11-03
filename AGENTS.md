@@ -66,7 +66,8 @@ Run these commands before committing:
 - Requests that depend on each other's results (e.g. get a token, then revoke it) must be re-recorded together:
   delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
 - Items created by tests must start a marker field with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`): the
-  department name for affiliations, the review identifier's value for peer reviews. List and activities fixtures only keep those items (a group holding one is
+  department name for affiliations, the review identifier's value for peer reviews, the title otherwise (the
+  proposal's for research resources). List and activities fixtures only keep those items (a group holding one is
   kept whole), so the record's real items never end up in fixtures, apart from the hand-added work grouped with a
   test work on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`). A new section adds its summary key and marker field to `OrcidFixture::TEST_MARKER_FIELDS`.
 - Each test item has its own `self` external identifier (`testAffiliation()` in `tests/Pest.php`), so ORCID never
@@ -235,6 +236,36 @@ above holds for peer reviews too.
   identifiers `external-ids` and its date `completion-date`. A client's peer review gets display index `"1"`.
 - **Test marker:** a summary has no subject name, so test peer reviews start their review identifier's value with
   `OrcidFixture::TEST_MARKER` (`testPeerReview()`), in the review group `TEST_REVIEW_GROUP` (a DFO series).
+
+## Research resources (verified against the sandbox, 2026-11-03)
+
+Evidence: `tests/Fixtures/Saloon/c4/` (no test replays these either). Everything under "ORCID API behaviour"
+above holds for research resources too.
+
+- **Required** (all 400, 9047 schema errors): the proposal (`s02`), its title (`s03`), hosts (`s04`, an empty list
+  `s05`) and external ids (`s06`); at least one resource item (`s08`, an empty list `s32`), each with a name (`s09`),
+  a type (`s10`), hosts (`s12`, `s36`) and external ids (`s13`). Any relationship will do, on the proposal (`part-of`
+  only, `s07`) and on an item (`s23`). Proposal ids of type `grant_number` and item ids of type `doi` work too
+  (`s37`); an unknown id type is 400, 9023, on either (`s22`, `s21`).
+- **Hosts** (proposal and items alike): a non-blank name is assumed required, as for fundings (`c2/g11`, not
+  probed here); an `address` is required (9047, `s15`, `s35`), a country alone is enough
+  (`s16`), and so is a `disambiguated-organization` (400, error 9045, `s14`, `s34`).
+- **Dates:** optional; an end date without a start date is 400, error 9050 (`s17`); an end date before the start date
+  is accepted (`s18`), the SDK refuses it, as for fundings.
+- **Enums and strings** (9047): an unknown resource type (`s11`; ORCID's are `infrastructures`, `collections`,
+  `equipment`, `services`, `s23`), a title `subtitle` (`s19`), a translated title without a language code (`s33`, read as an unknown one), a blank
+  resource name (`s24`), a title or resource name over 1000 characters (`s25`, `s26`). A blank proposal or item URL is
+  dropped (`s27`). An RRID ORCID can't parse is stored with `external-id-normalized-error` 8001 (`s23-get`).
+- **Duplicates:** a POST whose `self` proposal id this client already used is 409, error 9021, naming the existing
+  put-code (`s20`). Two research resources sharing only a `part-of` id are both created (`s30`, `s31`).
+- **PUT** needs the put-code in the body (400, error 9019, `s28`); an unknown put-code is 404, 9016 (`s29`); a PUT
+  replaces the items too (`s39`).
+- **Lists** (`s38`): `{"group": [{"external-ids", "research-resource-summary": [...]}]}`, like fundings, grouped by the
+  proposal's `self` ids; a research resource without one is a group of its own with no external ids. A summary holds
+  the proposal only, no resource items. A client's research resource gets display index `"1"`, on a GET of the full item too
+  (`s01-get`), but a PUT's response has none (`s39`).
+- **Test marker:** test research resources start their proposal title with `OrcidFixture::TEST_MARKER`
+  (`testResearchResource()`), and have their own `self` proposal id.
 
 ## Agent skills
 

@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 14:51:37 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a54c32b479b0ac63-YYZ"
+    },
+    "data": "{\"created-date\":{\"value\":1793717405011},\"last-modified-date\":{\"value\":1793717497190},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"proposal\":{\"title\":{\"title\":{\"value\":\"orcid-php-sdk s01 updated\"},\"translated-title\":null},\"hosts\":{\"organization\":[{\"name\":\"Fisheries and Oceans Canada\",\"address\":{\"city\":\"Ottawa\",\"region\":\"ON\",\"country\":\"CA\"},\"disambiguated-organization\":{\"disambiguated-organization-identifier\":\"https:\/\/ror.org\/02qa1x782\",\"disambiguation-source\":\"ROR\"}}]},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"proposal-id\",\"external-id-value\":\"orcid-php-sdk-s01\",\"external-id-normalized\":{\"value\":\"orcid-php-sdk-s01\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"start-date\":null,\"end-date\":null,\"url\":null},\"resource-item\":[{\"resource-name\":\"orcid-php-sdk s01 vessel\",\"resource-type\":\"infrastructures\",\"hosts\":{\"organization\":[{\"name\":\"Fisheries and Oceans Canada\",\"address\":{\"city\":\"Ottawa\",\"region\":\"ON\",\"country\":\"CA\"},\"disambiguated-organization\":{\"disambiguated-organization-identifier\":\"https:\/\/ror.org\/02qa1x782\",\"disambiguation-source\":\"ROR\"}}]},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"rrid\",\"external-id-value\":\"RRID:SCR_ca192f\",\"external-id-normalized\":null,\"external-id-normalized-error\":{\"error-code\":\"8001\",\"error-message\":\"Cannot normalize identifier value rrid:RRID:SCR_ca192f\",\"transient\":true},\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"url\":null}],\"display-index\":null,\"visibility\":\"public\",\"put-code\":3646,\"path\":null}",
+    "context": []
+}

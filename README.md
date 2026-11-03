@@ -288,6 +288,63 @@ Orcid::public()->record($orcidId)->peerReviews()->get($putCode); // reads only
 ORCID groups peer reviews by review group, then by `self` review identifier: the subject's identifier groups nothing.
 Summaries in a list carry nothing about the subject: read the peer review by put-code for that.
 
+### Research resources
+
+For infrastructure providers (research vessels, facilities, collections, ...): a research resource records that a
+researcher was granted access through a proposal, and which resource items it gave access to. ORCID requires the
+proposal's title (no subtitle), at least one host and an external identifier, and at least one resource item, each
+with a name, a `ResearchResourceType`, a host and an external identifier. Every host needs an address (a city or a
+country) and a disambiguated organization. Any relationship will do for the identifiers; give the proposal a `self`
+one, since ORCID groups research resources by it. The inputs check all this before anything is sent.
+
+```php
+use VincentAuger\OrcidSdk\Data\Common\ExternalId;
+use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
+use VincentAuger\OrcidSdk\Data\Common\Title;
+use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
+use VincentAuger\OrcidSdk\Data\Organization\Organization;
+use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceInput;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceItemInput;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceProposalInput;
+use VincentAuger\OrcidSdk\Enums\ResearchResourceType;
+
+$researchResources = Orcid::member(accessToken: $accessToken, orcid: $orcidId)->researchResources();
+
+$host = new Organization(
+    'Fisheries and Oceans Canada',
+    new OrganizationAddress('Ottawa', 'CA'),
+    DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
+);
+
+$input = new ResearchResourceInput(
+    proposal: new ResearchResourceProposalInput(
+        title: new Title('Ship time on the CCGS Amundsen'),
+        hosts: [$host],                                           // who granted the access
+        externalIds: [new ExternalId('proposal-id', 'AMD-2021-07')], // self by default
+        startDate: FuzzyDate::fromString('2021-07'),              // an end date needs a start date
+        endDate: FuzzyDate::fromString('2021-08'),
+    ),
+    items: [new ResearchResourceItemInput(
+        name: 'CCGS Amundsen',
+        type: ResearchResourceType::Infrastructures,              // or Collections, Equipment, Services
+        hosts: [$host],                                           // who provides the resource
+        externalIds: [new ExternalId('source-work-id', 'amundsen')],
+    )],
+);
+
+$putCode = $researchResources->create($input); // a duplicate `self` proposal identifier throws OrcidConflictException
+
+$researchResource = $researchResources->get($putCode); // ->proposal and ->items
+$researchResources->update($putCode, $input);  // replaces the whole item
+$researchResources->delete($putCode);
+
+$list = $researchResources->list();            // groups, as for works: preferred() and summaries()
+Orcid::public()->record($orcidId)->researchResources()->get($putCode); // reads only
+```
+
+Summaries in a list only carry the proposal: read the research resource by put-code for its items.
+
 ### Person and activities
 
 The bound member connector reads its own record (`$orcid->person()`, `$orcid->activities()`, including limited
@@ -307,7 +364,7 @@ $activities->workCount;
 $record->affiliations()->list(AffiliationType::Employment); // reads only: no create, update or delete
 ```
 
-Own-record calls (`affiliations()`, `works()`, `fundings()`, `person()`, `activities()`) on a connector without an `orcid` throw a
+Own-record calls (`affiliations()`, `works()`, `fundings()`, `peerReviews()`, `researchResources()`, `person()`, `activities()`) on a connector without an `orcid` throw a
 `LogicException` before anything is sent.
 
 ### Errors
