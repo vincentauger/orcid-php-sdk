@@ -87,6 +87,22 @@ it('only keeps test items of other sections, by their own marker field', functio
         ->and($data['fundings']['group'])->toBeEmpty();
 });
 
+it('keeps the other sources\' summaries in a group holding a test item', function (): void {
+    $stored = storeThroughFixture([], ['group' => [
+        ['work-summary' => [
+            ['put-code' => 1, 'title' => ['title' => ['value' => OrcidFixture::TEST_MARKER.' work']]],
+            ['put-code' => 2, 'title' => ['title' => ['value' => 'Hand-added work, same DOI']]],
+        ]],
+        ['work-summary' => [['put-code' => 3, 'title' => ['title' => ['value' => 'Real work']]]]],
+    ]]);
+
+    $groups = json_decode($stored['data'], true)['group'];
+
+    expect($groups)->toHaveCount(1)
+        ->and(array_column($groups[0]['work-summary'], 'put-code'))->toBe([1, 2])
+        ->and($stored['data'])->not->toContain('Real work');
+});
+
 it('keeps lists without filtered summaries', function (): void {
     $body = ['external-ids' => ['external-id' => [['external-id-type' => 'doi', 'external-id-value' => '10.1/x']]]];
 

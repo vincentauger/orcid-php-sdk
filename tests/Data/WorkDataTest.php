@@ -10,7 +10,9 @@ use VincentAuger\OrcidSdk\Data\Common\TranslatedTitle;
 use VincentAuger\OrcidSdk\Data\Common\Url;
 use VincentAuger\OrcidSdk\Data\Works\Citation;
 use VincentAuger\OrcidSdk\Data\Works\Work;
+use VincentAuger\OrcidSdk\Data\Works\WorkGroups;
 use VincentAuger\OrcidSdk\Data\Works\WorkInput;
+use VincentAuger\OrcidSdk\Data\Works\WorkSummary;
 use VincentAuger\OrcidSdk\Enums\CitationType;
 use VincentAuger\OrcidSdk\Enums\ContributorRole;
 use VincentAuger\OrcidSdk\Enums\ContributorSequence;
@@ -199,5 +201,35 @@ describe('Work', function (): void {
             ->and($work->rawType)->toBe('data-set')
             ->and($work->title)->toBeNull()
             ->and($work->citation?->type)->toBe(CitationType::Bibtex);
+    });
+});
+
+describe('WorkGroups', function (): void {
+    // hand-built: the sandbox can't put the preferred summary anywhere but first on demand (the researcher
+    // chooses it on the ORCID website)
+    it('prefers the highest display index, the first one listed on a tie', function (): void {
+        $list = WorkGroups::fromArray(['group' => [
+            ['work-summary' => [
+                ['put-code' => 1, 'display-index' => '0', 'type' => 'hologram'],
+                ['put-code' => 2, 'display-index' => '3'],
+                ['put-code' => 3, 'display-index' => '1'],
+            ]],
+            ['work-summary' => [['put-code' => 4, 'display-index' => '0'], ['put-code' => 5, 'display-index' => '0']]],
+            ['work-summary' => []],
+        ]]);
+
+        expect($list->groups)->toHaveCount(2)
+            ->and(array_map(fn (WorkSummary $summary): int => $summary->putCode, $list->preferred()))->toBe([2, 4])
+            ->and(array_map(fn (WorkSummary $summary): int => $summary->putCode, $list->summaries()))->toBe([1, 2, 3, 4, 5])
+            ->and($list->groups[0]->summaries[0]->type)->toBeNull()
+            ->and($list->groups[0]->summaries[0]->rawType)->toBe('hologram');
+    });
+
+    it('reads a record without works', function (): void {
+        $list = WorkGroups::fromArray(['last-modified-date' => null, 'group' => [], 'path' => '/0000-0002-1825-0097/works']);
+
+        expect($list->groups)->toBe([])
+            ->and($list->preferred())->toBe([])
+            ->and($list->summaries())->toBe([]);
     });
 });

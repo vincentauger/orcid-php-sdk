@@ -131,10 +131,10 @@ uses affiliations and OAuth). `1.0` = C8.
   - [x] `Source::isClient()`; `Affiliation::$displayIndex`; unique `self` ids for test affiliations
   - [x] Sandbox: what ORCID does with `visibility` sent by a client (ignored on POST, 403 9035 on a change by PUT:
     inputs stay without visibility)
-  - [ ] Sandbox: which summary is preferred in a group (needs one
-    work added by hand on the sandbox website, sharing a DOI with a test work)
+  - [x] Sandbox: which summary is preferred in a group: the highest display index, listed first (`works/list`,
+    in `AGENTS.md`)
 - [ ] **C1. Works** (what most integrations write). Done (#4): sandbox check (`c1/`, in `AGENTS.md`), `Work` /
-  `WorkInput`, the enums, `get|create|update|delete`, duplicates (409, 9021). Left: grouped `list()` (#5), bulk (#6)
+  `WorkInput`, the enums, `get|create|update|delete`, duplicates (409, 9021), grouped `list()` (#5). Left: bulk (#6)
   - `Work` / `WorkInput` / `WorkSummary` / `WorkGroup`; enums `WorkType` (v3.0 list: `dissertation-thesis`, `software`,
     `annotation`, `physical-object`, ...), `CitationType`, `ContributorRole`, `ContributorSequence`
   - `$orcid->works()->list|get|create|update|delete`, plus `getMany(putCodes)` (`GET /works/{a,b,...}`) and

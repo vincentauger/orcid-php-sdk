@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on any connector. `Work` (read) / `WorkInput` (write, validated before sending: a `self` external identifier,
   title, type, lengths, codes), `Citation`; enums `WorkType`, `CitationType`, `ContributorRole` (original and
   CRediT roles), `ContributorSequence`
+- Works lists: `$orcid->works()->list()` and `record($id)->works()->list()` return `WorkGroups`, ORCID's groups
+  (`WorkGroup`: external ids and `WorkSummary` items), with `preferred()` (one summary per group, what ORCID
+  displays) and `summaries()` (every summary, for syncing) (ADR 0001)
 - Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes
 - `OrcidConflictException::isDuplicate()` (error 9021) and `existingPutCode()`
 - `Visibility` enum, `Source` assertion-origin fields, `ExternalId::$normalizedValue`, `Affiliation::$displayIndex`,

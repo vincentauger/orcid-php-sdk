@@ -66,10 +66,11 @@ Run these commands before committing:
 - Requests that depend on each other's results (e.g. get a token, then revoke it) must be re-recorded together:
   delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
 - Items created by tests must start a marker field with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`): the
-  department name for affiliations. List and activities fixtures only keep those items, so the record's real items
-  never end up in fixtures. A new section adds its summary key and marker field to `OrcidFixture::TEST_MARKER_FIELDS`.
+  department name for affiliations. List and activities fixtures only keep those items (a group holding one is
+  kept whole), so the record's real items never end up in fixtures, apart from the hand-added work grouped with a
+  test work on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`). A new section adds its summary key and marker field to `OrcidFixture::TEST_MARKER_FIELDS`.
 - Each test item has its own `self` external identifier (`testAffiliation()` in `tests/Pest.php`), so ORCID never
-  groups test items together.
+  groups test items together. Only the works list tests share one, `HAND_ADDED_DOI`, to join the hand-added work.
 - While recording, responses are live and carry real ids; once replayed, the placeholders. Assertions that run
   before a chain's cleanup must hold for both (e.g. `$this->isOurs($source)`), or a failed recording leaves items
   behind on the sandbox.
@@ -148,6 +149,12 @@ above holds for works too.
 - **PUT** needs the put-code in the body as well: missing or different, 400, error 9019 (`q11`, `q12`); an
   unknown put-code is 404, 9016 (`q10`). A contributor iD sent as `{"path"}` alone is enough: ORCID adds the
   `uri` and `host` (`works/lifecycle/get`).
+- **Groups** (verified 2026-11-03, `works/list/list`): a test work whose DOI is
+  `https://doi.org/10.1016/J.POCEAN.2016.07.005` joins the hand-added work's group (`10.1016/j.pocean.2016.07.005`):
+  both normalize to the lowercase bare DOI. The work added last gets the highest display index (`"1"`, the
+  hand-added one keeps `"0"`) and is listed first; the group's external ids are the `self` ones of that summary,
+  as sent (`part-of` ids are left out). The SDK prefers the highest display index, the first listed on a tie. A
+  researcher choosing another preferred source on the website was not recorded.
 
 ## Agent skills
 

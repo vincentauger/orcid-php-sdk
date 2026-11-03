@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 12:40:55 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a54b7342bb9ea313-YUL"
+    },
+    "data": "{\"last-modified-date\":{\"value\":1793709655404},\"group\":[{\"last-modified-date\":{\"value\":1793709655404},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"doi\",\"external-id-value\":\"https:\/\/doi.org\/10.1016\/J.POCEAN.2016.07.005\",\"external-id-normalized\":{\"value\":\"10.1016\/j.pocean.2016.07.005\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"work-summary\":[{\"put-code\":2557323,\"created-date\":{\"value\":1793709655404},\"last-modified-date\":{\"value\":1793709655404},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"title\":{\"title\":{\"value\":\"orcid-php-sdk list\"},\"subtitle\":null,\"translated-title\":null},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"doi\",\"external-id-value\":\"https:\/\/doi.org\/10.1016\/J.POCEAN.2016.07.005\",\"external-id-normalized\":{\"value\":\"10.1016\/j.pocean.2016.07.005\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"url\":null,\"type\":\"journal-article\",\"publication-date\":null,\"journal-title\":null,\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/work\/2557323\",\"display-index\":\"1\"},{\"put-code\":2556379,\"created-date\":{\"value\":1793645986136},\"last-modified-date\":{\"value\":1793645986136},\"source\":{\"source-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"source-client-id\":null,\"source-name\":{\"value\":\"V JP Auger\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"title\":{\"title\":{\"value\":\"Current and future trends in marine image annotation software\"},\"subtitle\":null,\"translated-title\":null},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"doi\",\"external-id-value\":\"10.1016\/j.pocean.2016.07.005\",\"external-id-normalized\":{\"value\":\"10.1016\/j.pocean.2016.07.005\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":{\"value\":\"https:\/\/doi.org\/10.1016\/j.pocean.2016.07.005\"},\"external-id-relationship\":\"self\"},{\"external-id-type\":\"issn\",\"external-id-value\":\"0079-6611\",\"external-id-normalized\":{\"value\":\"0079-6611\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":{\"value\":\"https:\/\/portal.issn.org\/resource\/ISSN\/0079-6611\"},\"external-id-relationship\":\"part-of\"}]},\"url\":{\"value\":\"http:\/\/dx.doi.org\/10.1016\/j.pocean.2016.07.005\"},\"type\":\"journal-article\",\"publication-date\":{\"year\":{\"value\":\"2016\"},\"month\":{\"value\":\"12\"},\"day\":null},\"journal-title\":{\"value\":\"Progress in Oceanography\"},\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/work\/2556379\",\"display-index\":\"0\"}]}],\"path\":\"\/0000-0002-1825-0097\/works\"}",
+    "context": []
+}

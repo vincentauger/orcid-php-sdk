@@ -17,6 +17,11 @@ use VincentAuger\OrcidSdk\Enums\WorkType;
 pest()->extend(BaseTest::class);
 
 /**
+ * The DOI of the work added by hand on the sandbox record (issue #3): a test work with the same DOI is grouped with it
+ */
+const HAND_ADDED_DOI = '10.1016/j.pocean.2016.07.005';
+
+/**
  * An affiliation for tests: its department name starts with the test marker, and it has its own
  * `self` external identifier, so ORCID never groups it with another test item.
  */

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace VincentAuger\OrcidSdk\Resources;
 
 use VincentAuger\OrcidSdk\Data\Works\Work;
+use VincentAuger\OrcidSdk\Data\Works\WorkGroups;
 use VincentAuger\OrcidSdk\Orcid;
 use VincentAuger\OrcidSdk\Requests\Works\GetWork;
+use VincentAuger\OrcidSdk\Requests\Works\ListWorks;
 
 /**
  * Reads on the works of any record: $orcid->record($id)->works().
@@ -18,6 +20,16 @@ final readonly class ReadOnlyWorksResource
         private Orcid $connector,
         private string $orcid,
     ) {}
+
+    /**
+     * The record's works as groups: preferred() to display them, summaries() to sync
+     */
+    public function list(): WorkGroups
+    {
+        $request = new ListWorks($this->orcid);
+
+        return $request->createDtoFromResponse($this->connector->sendOrFail($request));
+    }
 
     /**
      * One work in full, by put-code

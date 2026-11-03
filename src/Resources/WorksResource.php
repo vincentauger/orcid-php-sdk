@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VincentAuger\OrcidSdk\Resources;
 
 use VincentAuger\OrcidSdk\Data\Works\Work;
+use VincentAuger\OrcidSdk\Data\Works\WorkGroups;
 use VincentAuger\OrcidSdk\Data\Works\WorkInput;
 use VincentAuger\OrcidSdk\Exceptions\OrcidConflictException;
 use VincentAuger\OrcidSdk\Orcid;
@@ -25,6 +26,14 @@ final readonly class WorksResource
         private string $orcid,
     ) {
         $this->readOnly = new ReadOnlyWorksResource($connector, $orcid);
+    }
+
+    /**
+     * The record's works as groups: preferred() to display them, summaries() to sync
+     */
+    public function list(): WorkGroups
+    {
+        return $this->readOnly->list();
     }
 
     /**

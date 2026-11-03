@@ -125,6 +125,32 @@ $works->delete($putCode);
 Orcid::public()->record($orcidId)->works()->get($putCode); // reads only
 ```
 
+ORCID groups the works from different sources that share a `self` external identifier (the same DOI from a
+publisher and from your system), so `list()` returns groups. Each summary and group carries ORCID's normalized
+identifiers, so `10.1/ABC` and `https://doi.org/10.1/abc` compare equal:
+
+```php
+$list = $works->list();                    // or Orcid::public()->record($orcidId)->works()->list()
+
+foreach ($list->preferred() as $summary) { // one per group, the one ORCID displays
+    echo $summary->title, PHP_EOL;
+}
+
+foreach ($list->summaries() as $summary) { // every summary: yours may not be the preferred one
+    if ($summary->source?->isClient($clientId)) {
+        // one of your works: $summary->putCode
+    }
+}
+
+foreach ($list->groups as $group) {        // is this DOI already on the record, from any source?
+    foreach ($group->externalIds as $id) {
+        if ($id->type === 'doi' && $id->normalizedValue === strtolower($doi)) { // $doi: a bare DOI
+            // already there
+        }
+    }
+}
+```
+
 ### Person and activities
 
 The bound member connector reads its own record (`$orcid->person()`, `$orcid->activities()`, including limited

@@ -13,6 +13,7 @@ use VincentAuger\OrcidSdk\Data\Common\TranslatedTitle;
 use VincentAuger\OrcidSdk\Data\Common\Url;
 use VincentAuger\OrcidSdk\Data\Works\Citation;
 use VincentAuger\OrcidSdk\Data\Works\Work;
+use VincentAuger\OrcidSdk\Data\Works\WorkSummary;
 use VincentAuger\OrcidSdk\Enums\CitationType;
 use VincentAuger\OrcidSdk\Enums\ContributorRole;
 use VincentAuger\OrcidSdk\Enums\ContributorSequence;
@@ -151,6 +152,59 @@ it('refuses a second work with the same self identifier', function (): void {
         ->and($conflict?->errorCode)->toBe(9021)
         ->and($conflict?->isDuplicate())->toBeTrue()
         ->and($conflict?->existingPutCode())->toBe($putCode);
+});
+
+it('lists works as groups, with the preferred summary and every summary', function (): void {
+    $folder = 'works/list';
+    $mockClient = new MockClient([
+        new OrcidFixture("{$folder}/create"),
+        new OrcidFixture("{$folder}/list"),
+        new OrcidFixture("{$folder}/list-public"),
+        new OrcidFixture("{$folder}/delete"),
+    ]);
+
+    $works = $this->getMemberApiClient()->withMockClient($mockClient)->works();
+
+    // the same DOI as the work added by hand on the sandbox record (in another form), so ORCID groups the two
+    $putCode = $works->create(testWork('list', externalIds: [new ExternalId('doi', 'https://doi.org/'.strtoupper(HAND_ADDED_DOI))]));
+
+    // read before the cleanup, asserted after it, so a failed assertion never leaves the work behind
+    $list = $works->list();
+    $public = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId())->works()->list();
+
+    $works->delete($putCode);
+
+    // the fixture only keeps the group holding the test work, with the hand-added work in it
+    expect($list->groups)->toHaveCount(1);
+
+    $group = $list->groups[0];
+    $ours = $group->summaries[0];
+    $handAdded = $group->summaries[1];
+
+    expect($group->summaries)->toHaveCount(2)
+        ->and($group->externalIds)->toHaveCount(1)
+        ->and($group->externalIds[0]->type)->toBe('doi')
+        ->and($group->externalIds[0]->normalizedValue)->toBe(HAND_ADDED_DOI)
+        // the work added last gets the highest display index: ORCID lists it first and displays it
+        ->and($ours->putCode)->toBe($putCode)
+        ->and($this->isOurs($ours->source))->toBeTrue()
+        ->and($ours->displayIndex)->toBe(1)
+        ->and($ours->title?->title)->toBe('orcid-php-sdk list')
+        ->and($ours->type)->toBe(WorkType::JournalArticle)
+        ->and($ours->externalIds[0]->value)->toBe('https://doi.org/'.strtoupper(HAND_ADDED_DOI))
+        ->and($ours->externalIds[0]->normalizedValue)->toBe(HAND_ADDED_DOI)
+        ->and($ours->visibility)->toBe(Visibility::Public)
+        ->and($handAdded->source?->isRecordOwner())->toBeTrue()
+        ->and($handAdded->displayIndex)->toBe(0)
+        ->and($handAdded->title?->title)->toBe('Current and future trends in marine image annotation software')
+        ->and($handAdded->journalTitle)->toBe('Progress in Oceanography')
+        ->and((string) $handAdded->publicationDate)->toBe('2016-12')
+        ->and(array_map(fn (ExternalId $id): ?string => $id->normalizedValue, $handAdded->externalIds))->toBe([HAND_ADDED_DOI, '0079-6611'])
+        ->and($group->preferred())->toBe($ours)
+        ->and($list->preferred())->toBe([$ours])
+        ->and($list->summaries())->toBe([$ours, $handAdded])
+        ->and(array_map(fn (WorkSummary $summary): int => $summary->putCode, $public->summaries()))
+        ->toBe([$putCode, $handAdded->putCode]);
 });
 
 it('checks the token scopes and the API before sending', function (): void {
