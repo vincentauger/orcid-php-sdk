@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 13:31:04 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a54bbcb72cb846f9-YUL"
+    },
+    "data": "{\"created-date\":{\"value\":1793712664053},\"last-modified-date\":{\"value\":1793712664053},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"put-code\":19605,\"path\":\"\/0000-0002-1825-0097\/funding\/19605\",\"type\":\"grant\",\"organization-defined-type\":{\"value\":\"Discovery grant\"},\"title\":{\"title\":{\"value\":\"orcid-php-sdk lifecycle\"},\"translated-title\":{\"value\":\"Cycle de vie\",\"language-code\":\"fr\"}},\"short-description\":\"A funding created by the SDK tests\",\"amount\":{\"value\":\"125000.5\",\"currency-code\":\"CAD\"},\"url\":{\"value\":\"https:\/\/example.org\/orcid-php-sdk\/lifecycle\"},\"start-date\":{\"year\":{\"value\":\"2021\"},\"month\":{\"value\":\"01\"},\"day\":{\"value\":\"05\"}},\"end-date\":{\"year\":{\"value\":\"2024\"},\"month\":{\"value\":\"12\"},\"day\":null},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"grant_number\",\"external-id-value\":\"orcid-php-sdk-lifecycle\",\"external-id-normalized\":null,\"external-id-normalized-error\":null,\"external-id-url\":{\"value\":\"https:\/\/example.org\/orcid-php-sdk\/grants\/lifecycle\"},\"external-id-relationship\":\"self\"},{\"external-id-type\":\"grant_number\",\"external-id-value\":\"orcid-php-sdk-lifecycle-programme\",\"external-id-normalized\":null,\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"part-of\"}]},\"contributors\":{\"contributor\":[{\"contributor-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"credit-name\":{\"value\":\"V JP Auger\"},\"contributor-email\":null,\"contributor-attributes\":{\"contributor-role\":\"lead\"}},{\"contributor-orcid\":null,\"credit-name\":{\"value\":\"Co Lead\"},\"contributor-email\":null,\"contributor-attributes\":{\"contributor-role\":\"co-lead\"}},{\"contributor-orcid\":null,\"credit-name\":{\"value\":\"Funding Acquisition\"},\"contributor-email\":null,\"contributor-attributes\":{\"contributor-role\":\"http:\/\/credit.niso.org\/contributor-roles\/funding-acquisition\/\"}}]},\"organization\":{\"name\":\"Fisheries and Oceans Canada\",\"address\":{\"city\":\"Ottawa\",\"region\":\"ON\",\"country\":\"CA\"},\"disambiguated-organization\":{\"disambiguated-organization-identifier\":\"https:\/\/ror.org\/02qa1x782\",\"disambiguation-source\":\"ROR\"}},\"visibility\":\"public\"}",
+    "context": []
+}

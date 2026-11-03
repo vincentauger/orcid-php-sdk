@@ -1,0 +1,25 @@
+{
+    "statusCode": 400,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 13:16:24 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "316",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a54ba73b5e371508-YUL"
+    },
+    "data": "{\"response-code\":400,\"developer-message\":\"400 Bad Request: Invalid incoming message. Full validation error: Please specify an amount or remove the amount tag\",\"user-message\":\"Invalid incoming message.\",\"error-code\":9020,\"more-info\":\"https:\/\/members.orcid.org\/api\/resources\/troubleshooting\"}",
+    "context": []
+}

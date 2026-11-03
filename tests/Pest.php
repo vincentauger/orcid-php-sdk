@@ -8,10 +8,12 @@ use VincentAuger\OrcidSdk\Data\Affiliations\AffiliationInput;
 use VincentAuger\OrcidSdk\Data\Common\ExternalId;
 use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
 use VincentAuger\OrcidSdk\Data\Common\Title;
+use VincentAuger\OrcidSdk\Data\Fundings\FundingInput;
 use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
 use VincentAuger\OrcidSdk\Data\Organization\Organization;
 use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
 use VincentAuger\OrcidSdk\Data\Works\WorkInput;
+use VincentAuger\OrcidSdk\Enums\FundingType;
 use VincentAuger\OrcidSdk\Enums\WorkType;
 
 pest()->extend(BaseTest::class);
@@ -43,6 +45,25 @@ function testAffiliation(
         endDate: $endDate,
         externalIds: [new ExternalId('grant_number', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
     );
+}
+
+/**
+ * A funding for tests: its title starts with the test marker, and it has its own `self` external identifier, so
+ * ORCID never groups it with another funding.
+ */
+function testFunding(string $label, mixed ...$fields): FundingInput
+{
+    return new FundingInput(...[
+        'title' => new Title(OrcidFixture::TEST_MARKER.' '.$label),
+        'type' => FundingType::Grant,
+        'organization' => new Organization(
+            'Fisheries and Oceans Canada',
+            new OrganizationAddress('Ottawa', 'CA', 'ON'),
+            DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
+        ),
+        'externalIds' => [new ExternalId('grant_number', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
+        ...$fields,
+    ]);
 }
 
 /**

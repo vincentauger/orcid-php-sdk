@@ -19,6 +19,7 @@ use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Exceptions\MissingScopeException;
 use VincentAuger\OrcidSdk\Resources\AffiliationsResource;
+use VincentAuger\OrcidSdk\Resources\FundingsResource;
 use VincentAuger\OrcidSdk\Resources\RecordResource;
 use VincentAuger\OrcidSdk\Resources\WorksResource;
 use VincentAuger\OrcidSdk\Support\OrcidId;
@@ -138,6 +139,16 @@ final class Orcid extends Connector
     public function works(): WorksResource
     {
         return new WorksResource($this, $this->boundOrcid(__FUNCTION__));
+    }
+
+    /**
+     * The fundings of the record this connector is bound to
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function fundings(): FundingsResource
+    {
+        return new FundingsResource($this, $this->boundOrcid(__FUNCTION__));
     }
 
     /**

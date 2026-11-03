@@ -49,8 +49,13 @@ An item in the works section: a research output (article, data set, software, ..
 external identifier.
 _Avoid_: Publication, output
 
+**Funding**:
+An item in the fundings section: a grant, contract, award or salary award, from a funder (an organization),
+usually identified by its grant number.
+_Avoid_: Grant (for fundings in general), award
+
 **Contributor**:
-A person credited on a work: a credit name and, when they authenticated it, their ORCID iD.
+A person credited on a work or a funding: a credit name and, when they authenticated it, their ORCID iD.
 _Avoid_: Author (for contributors in general), collaborator
 
 **External identifier**:

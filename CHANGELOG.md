@@ -22,7 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   before sending (ADR 0002): `getMany(putCodes)` returns a `BulkRead` (works and failures keyed by put-code), also
   on `record($id)->works()`; `createMany(inputs)` returns a `BulkResult` (put-codes and failures keyed by input
   position, `hasFailures()`). Item failures are `OrcidError`s (`isDuplicate()`, `existingPutCode()`)
-- Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes
+- Fundings: `$orcid->fundings()->list|get|create|update|delete` on a bound member connector,
+  `record($id)->fundings()->list|get` on any connector. `Funding` (read) / `FundingInput` (write, validated before
+  sending: an external identifier, the funder's address and disambiguated organization, a start date with an end
+  date, no subtitle, lengths, roles), `FundingSummary`, `FundingGroup`, `FundingGroups`, `FundingContributor`;
+  enums `FundingType`, `FundingContributorRole` (ORCID's funding roles and CRediT)
+- Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes, and `Amount` (a decimal string and an ISO 4217
+  currency)
 - `OrcidConflictException::isDuplicate()` (error 9021) and `existingPutCode()`
 - `Visibility` enum, `Source` assertion-origin fields, `ExternalId::$normalizedValue`, `Affiliation::$displayIndex`,
   `Email::$source`

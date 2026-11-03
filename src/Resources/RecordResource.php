@@ -51,4 +51,9 @@ final readonly class RecordResource
     {
         return new ReadOnlyWorksResource($this->connector, $this->orcid);
     }
+
+    public function fundings(): ReadOnlyFundingsResource
+    {
+        return new ReadOnlyFundingsResource($this->connector, $this->orcid);
+    }
 }

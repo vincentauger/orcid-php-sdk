@@ -117,12 +117,12 @@ uses affiliations and OAuth). `1.0` = C8.
   tests replaying `a1/` are gone (the `a1/` fixtures stay as evidence). Errors recorded under `errors/`.
   Left: `PersonDataTest` still uses a hand-built payload, because the sandbox record has no other names,
   external identifiers or credit name; add them on the record, re-record `record/person-*`, then move it.
-- [ ] **C0. Shared groundwork** (#2 done: the items below marked [x])
+- [x] **C0. Shared groundwork** (#2, `Amount` with #7)
   - [x] Member connector bound to its record (ADR 0003); `record($id)` only reads
   - [x] `Visibility` enum (`public`, `limited`, `registered-only`, `private`) replacing `?string $visibility`
   - [x] `Source`: add `assertion-origin-*` fields (token delegation, Search & Link wizards)
   - [x] `ExternalId`: add the read-only `external-id-normalized` (works and peer reviews)
-  - [ ] New shared classes: `Amount` (with fundings). Done with works (#4): `Title` (title, subtitle,
+  - [x] New shared classes: `Amount` (with fundings, #7). Done with works (#4): `Title` (title, subtitle,
     translated title), `Contributor` (iD, credit name, role, sequence), `Url`
   - [x] A `ReadsPutCodeFromLocation` trait for every create request
   - [x] `OrcidFixture`: generalise the `TEST_MARKER` filter beyond `department-name` (work/funding/resource titles,
@@ -143,7 +143,8 @@ uses affiliations and OAuth). `1.0` = C8.
     (`created`: input index → put-code, `failed`: input index → error, `hasFailures()`)
   - v3.0 requires an external id with relationship `self`: check it in the sandbox, then validate in `WorkInput`
   - Sandbox: required fields, duplicate `self` id (409 → `OrcidConflictException`?), bulk partial failures
-- [ ] **C2. Fundings** — `Funding` / `FundingInput` / `FundingSummary` / `FundingGroup`, `FundingType` (`grant`, `contract`,
+- [x] **C2. Fundings** (#7; sandbox check in `c2/`, in `AGENTS.md`: a start date is required with an end date,
+  9050; any external id relationship will do) — `Funding` / `FundingInput` / `FundingSummary` / `FundingGroup`, `FundingType` (`grant`, `contract`,
   `award`, `salary-award`), `FundingContributorRole`, `Amount` (ISO 4217 currency); reuses `Organization`
   (disambiguated organization required). Sandbox: start date required when an end date is given.
 - [ ] **C3. Peer reviews** — `PeerReview` / `PeerReviewInput` / `PeerReviewSummary` / `PeerReviewGroup`,

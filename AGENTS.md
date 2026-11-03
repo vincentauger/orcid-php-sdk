@@ -165,6 +165,42 @@ above holds for works too.
   the whole request, 400, 9047, and creates nothing (`b03`). An unknown put-code on a bulk read is an item error
   400, 9034, not a 404 (`b06`). Above 100 items: 400, error 9042 on a read (`b07`), 9006 on a create (`b08`).
 
+## Fundings (verified against the sandbox, 2026-11-03)
+
+Evidence: `tests/Fixtures/Saloon/c2/` (no test replays these either). Everything under "ORCID API behaviour"
+above holds for fundings too.
+
+- **Required:** a title (400, error 9022, `f05`), a type (9047, `f06`), the organization (9047, `f08`) with a
+  name (9047, `g11`), an `address` (9047, `g10`) and a `disambiguated-organization` (9045, `f09`), and an
+  external id (9023, `f02`). Unlike works, any relationship will do: `part-of` (`f03`) and `funded-by` (`f04`)
+  alone are accepted. An unknown external id type is 9023 too (`g16`).
+- **Address:** city and country are optional, unlike education and employment: city only (`f11`), country
+  only (`f10`) and even `{}` (`g20`) are accepted. The SDK requires a city or a country, so it never sends `[]`.
+- **Dates:** an end date without a start date is 400, error 9050 (`f12`); a start date alone is fine (`f14`).
+  An end date before the start date is accepted (`f13`); the SDK refuses it, as for affiliations.
+- **Not in the funding schema** (9047): a title's `subtitle` (`f19`), a contributor's `contributor-sequence`
+  (`f18`). `contributor-email` is accepted but never returned (`f15`), so the SDK doesn't send it. A contributor
+  sent with an iD comes back with the record's credit name, not the one sent (`f15`).
+- **Roles:** `lead`, `co-lead`, `supported-by`, `other-contribution` and the CRediT URIs (`f15`, `f17`); a work
+  role is 400, error 9058, whose message lists them all (`f16`).
+- **Enums and lengths** (9047): an unknown type (`f07`) or currency (`f21`, and a lowercase one, `f34`), a
+  translated title's unknown language (`f30`), a blank title (`g12`) or credit name (`g19`), an address with an
+  unknown country (`g18`); a title over 1000 characters (`f26`), an organization-defined type over 255 (`f29`),
+  a short description over 5000 (`g17`).
+- **Amount:** both the value and the currency are required: a currency alone is 9020 (`f24`), a value alone 9047
+  (`f20`). The value is parsed as a decimal number: `1000`, `1e5`, `0`, `.5`, `-5`, 20 digits with decimals, 300 digits
+  are accepted (`g01`, `g02`, `g05`, `g07`, `f33`, `g08`, `g21`); `1,000,000`, `1 000`, `1000,50`, `1.000,50` and `a lot` are 400, error 9054
+  (`f23`, `g03`, `g04`, `g06`, `f22`). It is stored normalized: `125000.50` is read back as `125000.5` (`f15`).
+- **Blank strings:** a blank organization-defined type or URL is dropped, a blank short description stored as
+  sent (`g13`).
+- **Duplicates:** a POST whose `self` id this client already used is 409, error 9021, naming the existing
+  put-code (`f25`), and so is a PUT taking another funding's `self` id (`f37`). Two fundings sharing only a
+  `part-of` id are both created (`g14`, `g15`).
+- **PUT** needs the put-code in the body (400, error 9019, `f35`); an unknown put-code is 404, 9016 (`f36`).
+- **Lists** (`f38`): `{"group": [{"external-ids", "funding-summary": [...]}]}`, like works; a funding without a
+  `self` id is a group of its own with no external ids. A summary has no amount, contributors, description or
+  organization-defined type. A client's funding gets display index `"1"`.
+
 ## Agent skills
 
 ### Issue tracker

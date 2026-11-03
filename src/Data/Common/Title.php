@@ -7,7 +7,8 @@ namespace VincentAuger\OrcidSdk\Data\Common;
 use VincentAuger\OrcidSdk\Support\Json;
 
 /**
- * The title of a work or funding, with an optional subtitle and translation
+ * The title of a work or funding, with an optional subtitle and translation. A funding title has no subtitle:
+ * FundingInput refuses one (ORCID error 9047, `c2/f19`).
  */
 final readonly class Title implements \Stringable
 {

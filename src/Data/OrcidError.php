@@ -43,7 +43,7 @@ final readonly class OrcidError
     }
 
     /**
-     * Whether this client already added a work with the same `self` external identifier (error 9021)
+     * Whether this client already added an item (e.g. a work) with the same `self` external identifier (error 9021)
      */
     public function isDuplicate(): bool
     {

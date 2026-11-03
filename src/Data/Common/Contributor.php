@@ -11,8 +11,8 @@ use VincentAuger\OrcidSdk\Support\OrcidId;
 
 /**
  * A contributor to a work: a credit name and, when it was authenticated, their ORCID iD. Every field is
- * optional (ORCID accepts a contributor with none, `c1/p24`). Fundings have other roles: C2 generalises the
- * role when it needs to.
+ * optional (ORCID accepts a contributor with none, `c1/p24`). Fundings have their own roles and no sequence:
+ * see FundingContributor.
  *
  * Read items keep ORCID's raw role and sequence next to the enums, so a value ORCID adds later is not lost;
  * input classes only send the enums.

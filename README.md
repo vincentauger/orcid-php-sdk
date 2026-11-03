@@ -178,6 +178,60 @@ $read->works[123]->title?->title;                      // keyed by put-code
 $read->failed[456] ?? null;                            // an unknown put-code (error 9034), not a 404
 ```
 
+### Fundings
+
+A funding needs a title, a type, the funder (an organization with an address and a disambiguated organization, e.g.
+its ROR identifier) and an external identifier, usually the grant number. Unlike a work, the identifier may be
+`part-of` or `funded-by` only, but a `self` one is what ORCID uses to group fundings and to refuse duplicates. A
+start date is required whenever an end date is given. `FundingInput` checks this before anything is sent.
+
+```php
+use VincentAuger\OrcidSdk\Data\Common\Amount;
+use VincentAuger\OrcidSdk\Data\Common\ExternalId;
+use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
+use VincentAuger\OrcidSdk\Data\Common\Title;
+use VincentAuger\OrcidSdk\Data\Fundings\FundingContributor;
+use VincentAuger\OrcidSdk\Data\Fundings\FundingInput;
+use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
+use VincentAuger\OrcidSdk\Data\Organization\Organization;
+use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
+use VincentAuger\OrcidSdk\Enums\FundingContributorRole;
+use VincentAuger\OrcidSdk\Enums\FundingType;
+
+$fundings = Orcid::member(accessToken: $accessToken, orcid: $orcidId)->fundings();
+
+$input = new FundingInput(
+    title: new Title('Ocean acidification'),                     // no subtitle on fundings
+    type: FundingType::Grant,
+    organization: new Organization(
+        'Natural Sciences and Engineering Research Council',
+        new OrganizationAddress('Ottawa', 'CA'),
+        DisambiguatedOrganization::ror('https://ror.org/01h531d29'),
+    ),
+    externalIds: [new ExternalId('grant_number', 'RGPIN-2021-1234')], // self by default
+    organizationDefinedType: 'Discovery grant',                  // the funder's own name for the type
+    amount: new Amount('125000.50', 'CAD'),                       // a decimal string and an ISO 4217 currency
+    startDate: FuzzyDate::fromString('2021-04'),
+    endDate: FuzzyDate::fromString('2026-03'),
+    contributors: [new FundingContributor('Josiah Carberry', $orcidId, FundingContributorRole::Lead)],
+);
+
+$putCode = $fundings->create($input);    // a duplicate grant number throws OrcidConflictException, as with works
+
+$funding = $fundings->get($putCode);
+$funding->amount?->value;                // "125000.5": ORCID normalizes the number
+$funding->type;                          // FundingType, or null for a type ORCID added later...
+$funding->rawType;                       // ...whose value is kept here
+
+$fundings->update($putCode, $input);     // replaces the whole item
+$fundings->delete($putCode);
+
+$list = $fundings->list();               // groups, as for works: preferred() and summaries()
+Orcid::public()->record($orcidId)->fundings()->get($putCode); // reads only
+```
+
+Summaries in a list carry no amount, contributors or description: read the funding by put-code for those.
+
 ### Person and activities
 
 The bound member connector reads its own record (`$orcid->person()`, `$orcid->activities()`, including limited
@@ -197,7 +251,7 @@ $activities->workCount;
 $record->affiliations()->list(AffiliationType::Employment); // reads only: no create, update or delete
 ```
 
-Own-record calls (`affiliations()`, `works()`, `person()`, `activities()`) on a connector without an `orcid` throw a
+Own-record calls (`affiliations()`, `works()`, `fundings()`, `person()`, `activities()`) on a connector without an `orcid` throw a
 `LogicException` before anything is sent.
 
 ### Errors
