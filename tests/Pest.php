@@ -12,8 +12,11 @@ use VincentAuger\OrcidSdk\Data\Fundings\FundingInput;
 use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
 use VincentAuger\OrcidSdk\Data\Organization\Organization;
 use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
+use VincentAuger\OrcidSdk\Data\PeerReviews\PeerReviewInput;
 use VincentAuger\OrcidSdk\Data\Works\WorkInput;
 use VincentAuger\OrcidSdk\Enums\FundingType;
+use VincentAuger\OrcidSdk\Enums\PeerReviewRole;
+use VincentAuger\OrcidSdk\Enums\PeerReviewType;
 use VincentAuger\OrcidSdk\Enums\WorkType;
 
 pest()->extend(BaseTest::class);
@@ -62,6 +65,32 @@ function testFunding(string $label, mixed ...$fields): FundingInput
             DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
         ),
         'externalIds' => [new ExternalId('grant_number', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
+        ...$fields,
+    ]);
+}
+
+/**
+ * DFO's Canadian manuscript reports of fisheries and aquatic sciences (online): the review group of test peer reviews
+ */
+const TEST_REVIEW_GROUP = 'issn:1488-5387';
+
+/**
+ * An anonymous peer review for tests: its review identifier starts with the test marker (a summary has no subject
+ * name to mark) and is its own `self` identifier, so ORCID never groups it with another peer review.
+ */
+function testPeerReview(string $label, mixed ...$fields): PeerReviewInput
+{
+    return new PeerReviewInput(...[
+        'role' => PeerReviewRole::Reviewer,
+        'type' => PeerReviewType::Review,
+        'reviewIdentifiers' => [new ExternalId('source-work-id', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
+        'completionDate' => FuzzyDate::fromString('2025-03'),
+        'reviewGroupId' => TEST_REVIEW_GROUP,
+        'conveningOrganization' => new Organization(
+            'Fisheries and Oceans Canada',
+            new OrganizationAddress('Ottawa', 'CA', 'ON'),
+            DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
+        ),
         ...$fields,
     ]);
 }

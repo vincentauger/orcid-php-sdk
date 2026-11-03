@@ -126,7 +126,7 @@ uses affiliations and OAuth). `1.0` = C8.
     translated title), `Contributor` (iD, credit name, role, sequence), `Url`
   - [x] A `ReadsPutCodeFromLocation` trait for every create request
   - [x] `OrcidFixture`: generalise the `TEST_MARKER` filter beyond `department-name` (work/funding/resource titles,
-    peer review subject names, person item content), so each new list fixture only keeps test items
+    peer review identifiers, since a summary has no subject name; person item content), so each new list fixture only keeps test items
   - Typed resources per section, sharing request traits; no generic "section" class, because the payloads differ
   - [x] `Source::isClient()`; `Affiliation::$displayIndex`; unique `self` ids for test affiliations
   - [x] Sandbox: what ORCID does with `visibility` sent by a client (ignored on POST, 403 9035 on a change by PUT:
@@ -147,10 +147,11 @@ uses affiliations and OAuth). `1.0` = C8.
   9050; any external id relationship will do) — `Funding` / `FundingInput` / `FundingSummary` / `FundingGroup`, `FundingType` (`grant`, `contract`,
   `award`, `salary-award`), `FundingContributorRole`, `Amount` (ISO 4217 currency); reuses `Organization`
   (disambiguated organization required). Sandbox: start date required when an end date is given.
-- [ ] **C3. Peer reviews** — `PeerReview` / `PeerReviewInput` / `PeerReviewSummary` / `PeerReviewGroup`,
-  reusing `PeerReviewRole` / `PeerReviewType`, plus `PeerReviewSubjectType`. The convening organization is
-  required, and `review-group-id` must exist in ORCID's group-id registry: a valid `issn:` id is created
-  automatically (ORCID's peer review tutorial). Sandbox: the error for an invalid ISSN.
+- [x] **C3. Peer reviews** (#8; sandbox check in `c3/`, in `AGENTS.md`: the disambiguated organization is optional,
+  an ISSN group is created on first use, 9020 for an unknown group) — `PeerReview` / `PeerReviewInput` /
+  `PeerReviewSummary` / `PeerReviewGroup`, reusing `PeerReviewRole` / `PeerReviewType`, plus `PeerReviewSubjectType`.
+  ORCID nests groups in their review group: `PeerReviewGroups` keeps one flat list of groups, each with its review
+  group id, and `byReviewGroup()` nests them again.
 - [ ] **C4. Research resources** (lowest demand: infrastructure providers) — `ResearchResource` with a proposal
   (title, hosts, external ids, dates, URL) and resource items (name, `ResearchResourceType`, hosts, ids).
 - [ ] **C5. Person sections** (`/person/update`, Member API)

@@ -53,6 +53,8 @@ final class OrcidFixture extends Fixture
         'service-summary' => 'department-name',
         'work-summary' => 'title',
         'funding-summary' => 'title',
+        // a summary has no subject name: test peer reviews mark their review identifier
+        'peer-review-summary' => 'external-id-value',
         'research-resource-summary' => 'title',
     ];
 

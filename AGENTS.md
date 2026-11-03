@@ -66,7 +66,7 @@ Run these commands before committing:
 - Requests that depend on each other's results (e.g. get a token, then revoke it) must be re-recorded together:
   delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
 - Items created by tests must start a marker field with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`): the
-  department name for affiliations. List and activities fixtures only keep those items (a group holding one is
+  department name for affiliations, the review identifier's value for peer reviews. List and activities fixtures only keep those items (a group holding one is
   kept whole), so the record's real items never end up in fixtures, apart from the hand-added work grouped with a
   test work on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`). A new section adds its summary key and marker field to `OrcidFixture::TEST_MARKER_FIELDS`.
 - Each test item has its own `self` external identifier (`testAffiliation()` in `tests/Pest.php`), so ORCID never
@@ -200,6 +200,41 @@ above holds for fundings too.
 - **Lists** (`f38`): `{"group": [{"external-ids", "funding-summary": [...]}]}`, like works; a funding without a
   `self` id is a group of its own with no external ids. A summary has no amount, contributors, description or
   organization-defined type. A client's funding gets display index `"1"`.
+
+## Peer reviews (verified against the sandbox, 2026-11-03)
+
+Evidence: `tests/Fixtures/Saloon/c3/` (no test replays these either). Everything under "ORCID API behaviour"
+above holds for peer reviews too.
+
+- **Required** (all 400, 9047 schema errors): the reviewer role (`r02`), review identifiers (`r03`), the review type
+  (`r05`), the completion date (`r06`), the review group id (`r07`), the convening organization (`r08`) and its
+  `address` (`r11`). Like fundings, any relationship will do for the review identifier (`part-of` only, `r04`), and
+  a year alone is a valid date (`r27`).
+- **Convening organization:** unlike fundings, the `disambiguated-organization` is optional (`r09`), and a country
+  without a city is accepted (`r10`).
+- **Review group id:** must match `(ringgold|issn|orcid-generated|fundref|publons):` plus 2 characters or more, else
+  9047 (`r14`, a bare ISSN `r30`). An `issn:` group is created on first use (`r15`, then read from the registry,
+  `r15-registry`); ORCID only checks the ISSN's form and check digit: a wrong check digit (`r12`) or a placeholder
+  like `1488-XXXE` (`r37`) is 400, error 9053, but `0000-0019`, which no journal has, is accepted (`r28`). A
+  lowercase `x` is stored uppercase (`r29`). Any other group must exist: 400, error 9020 (`r13`).
+- **Group-id registry** (`/v3.0/group-id-record`, a `/group-id-record/read` client credentials token): reading an
+  unregistered ISSN creates its group too, and the sandbox's id sequence can collide (9008, seen once on
+  `1488-5379`, which a POST later created fine, `r38`).
+- **Enums:** an unknown role, review type or subject type is 400, 9047 (`r19`, `r20`, `r17`). The subject type
+  takes every work and funding type and `research-resource-proposal` (`grant`, `r18`).
+- **Subject:** its external identifier needs a relationship (400, 9023, `r31`), and an unknown identifier type is
+  9023 too (`r26`). A subject-name `subtitle` is dropped without an error (`r16-get`). A blank container name or
+  subject title is 9047 (`r22`, `r33`), and so is a container name over 1000 characters (`r32`).
+- **Duplicates:** a POST whose `self` review identifier this client already used is 409, error 9021, naming the
+  existing put-code (`r21`). A review identifier equal to another review's subject DOI is fine (`r34`).
+- **PUT** needs the put-code in the body (400, error 9019, `r23`); an unknown put-code is 404, 9016 (`r24`).
+- **Lists** (`r35`): `{"group": [{"external-ids": <the review group id, type "peer-review">, "peer-review-group":
+  [{"external-ids", "peer-review-summary": [...]}]}]}`: grouped by review group, then by `self` review identifier
+  (the subject groups nothing: `r16` and `r25` share a subject DOI but not a group). A peer review without a `self`
+  id is a group of its own with no external ids. A summary has nothing about the subject, names its review
+  identifiers `external-ids` and its date `completion-date`. A client's peer review gets display index `"1"`.
+- **Test marker:** a summary has no subject name, so test peer reviews start their review identifier's value with
+  `OrcidFixture::TEST_MARKER` (`testPeerReview()`), in the review group `TEST_REVIEW_GROUP` (a DFO series).
 
 ## Agent skills
 

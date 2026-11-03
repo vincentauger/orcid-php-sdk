@@ -56,4 +56,9 @@ final readonly class RecordResource
     {
         return new ReadOnlyFundingsResource($this->connector, $this->orcid);
     }
+
+    public function peerReviews(): ReadOnlyPeerReviewsResource
+    {
+        return new ReadOnlyPeerReviewsResource($this->connector, $this->orcid);
+    }
 }

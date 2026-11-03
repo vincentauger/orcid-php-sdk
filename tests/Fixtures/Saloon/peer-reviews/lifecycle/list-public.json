@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 14:37:24 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-papi-use2-a1",
+        "x-via": "a1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a54c1de17d99e09b-YUL"
+    },
+    "data": "{\"last-modified-date\":{\"value\":1793716643768},\"group\":[{\"last-modified-date\":{\"value\":1793716643768},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"peer-review\",\"external-id-value\":\"issn:1488-5387\",\"external-id-normalized\":null,\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":null}]},\"peer-review-group\":[{\"last-modified-date\":{\"value\":1793716643768},\"external-ids\":{\"external-id\":[{\"external-id-type\":\"source-work-id\",\"external-id-value\":\"orcid-php-sdk-lifecycle\",\"external-id-normalized\":{\"value\":\"orcid-php-sdk-lifecycle\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"peer-review-summary\":[{\"created-date\":{\"value\":1793716642878},\"last-modified-date\":{\"value\":1793716643768},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"reviewer-role\":\"reviewer\",\"external-ids\":{\"external-id\":[{\"external-id-type\":\"source-work-id\",\"external-id-value\":\"orcid-php-sdk-lifecycle\",\"external-id-normalized\":{\"value\":\"orcid-php-sdk-lifecycle\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"review-url\":null,\"review-type\":\"evaluation\",\"completion-date\":{\"year\":{\"value\":\"2025\"},\"month\":{\"value\":\"03\"},\"day\":null},\"review-group-id\":\"issn:1488-5387\",\"convening-organization\":{\"name\":\"Fisheries and Oceans Canada\",\"address\":{\"city\":\"Ottawa\",\"region\":\"ON\",\"country\":\"CA\"},\"disambiguated-organization\":{\"disambiguated-organization-identifier\":\"https:\/\/ror.org\/02qa1x782\",\"disambiguation-source\":\"ROR\"}},\"visibility\":\"public\",\"put-code\":21830,\"path\":\"\/0000-0002-1825-0097\/peer-review\/21830\",\"display-index\":\"1\"}]}]}],\"path\":\"\/0000-0002-1825-0097\/peer-reviews\"}",
+    "context": []
+}

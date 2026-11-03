@@ -54,6 +54,16 @@ An item in the fundings section: a grant, contract, award or salary award, from 
 usually identified by its grant number.
 _Avoid_: Grant (for fundings in general), award
 
+**Peer review**:
+An item in the peer reviews section: a review the researcher did (as reviewer, editor, chair, ...) of a subject (an
+article, a grant proposal, ...), within a review group and convened by an organization, usually the publisher.
+_Avoid_: Review (alone, for the item), referee report
+
+**Review group**:
+What a peer review was done for, usually a journal: ORCID's group id, e.g. `issn:0706-652X`. ORCID creates an ISSN
+group on first use; others come from its group-id registry. Not a **Group**: one review group holds many groups.
+_Avoid_: Group id (in prose), journal (for review groups in general)
+
 **Contributor**:
 A person credited on a work or a funding: a credit name and, when they authenticated it, their ORCID iD.
 _Avoid_: Author (for contributors in general), collaborator

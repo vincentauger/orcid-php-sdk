@@ -232,6 +232,62 @@ Orcid::public()->record($orcidId)->fundings()->get($putCode); // reads only
 
 Summaries in a list carry no amount, contributors or description: read the funding by put-code for those.
 
+### Peer reviews
+
+A peer review belongs to a review group, usually the journal: `issn:` and its ISSN. ORCID creates an ISSN group on
+first use; it only checks the check digit, not that a journal has that ISSN. Other groups (`ringgold:`,
+`orcid-generated:`, ...) must already exist in ORCID's group-id registry, or ORCID answers 400 (error 9020).
+A peer review also needs the reviewer's role, the review type, a review identifier (your own id for the review), the
+completion date and the convening organization (who organized the review, usually the publisher) with an address.
+`PeerReviewInput` checks this, the group id's shape and the ISSN's check digit, before anything is sent.
+
+How open the review is depends on the optional fields you send:
+
+- anonymous: the required fields only, so nothing names the reviewed item
+- named subject: add the subject (`subjectExternalId`, e.g. the article's DOI, `subjectName`, `subjectContainerName`,
+  `subjectType`, `subjectUrl`)
+- published review: give the review its public identifier (e.g. a `doi` review identifier) and its `reviewUrl`
+
+```php
+use VincentAuger\OrcidSdk\Data\Common\ExternalId;
+use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
+use VincentAuger\OrcidSdk\Data\Common\Title;
+use VincentAuger\OrcidSdk\Data\Organization\Organization;
+use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
+use VincentAuger\OrcidSdk\Data\PeerReviews\PeerReviewInput;
+use VincentAuger\OrcidSdk\Enums\PeerReviewRole;
+use VincentAuger\OrcidSdk\Enums\PeerReviewSubjectType;
+use VincentAuger\OrcidSdk\Enums\PeerReviewType;
+
+$peerReviews = Orcid::member(accessToken: $accessToken, orcid: $orcidId)->peerReviews();
+
+$input = new PeerReviewInput(
+    role: PeerReviewRole::Reviewer,                              // or Editor, Member, Chair, Organizer
+    type: PeerReviewType::Review,                                // Evaluation: after publication
+    reviewIdentifiers: [new ExternalId('source-work-id', 'review-1234')], // self by default
+    completionDate: FuzzyDate::fromString('2025-03'),
+    reviewGroupId: 'issn:0706-652X',
+    conveningOrganization: new Organization('Canadian Science Publishing', new OrganizationAddress('Ottawa', 'CA')),
+    // optional: name the reviewed item
+    subjectExternalId: new ExternalId('doi', '10.1139/cjfas-2024-0001'),
+    subjectType: PeerReviewSubjectType::JournalArticle,
+    subjectName: new Title('Salmon in a warming ocean'),       // no subtitle: ORCID drops it
+);
+
+$putCode = $peerReviews->create($input); // a duplicate review identifier throws OrcidConflictException
+
+$peerReview = $peerReviews->get($putCode);
+$peerReviews->update($putCode, $input);  // replaces the whole item
+$peerReviews->delete($putCode);
+
+$list = $peerReviews->list();            // groups, as for works: preferred() and summaries()
+$list->byReviewGroup();                  // the same groups by review group id, e.g. journal by journal
+Orcid::public()->record($orcidId)->peerReviews()->get($putCode); // reads only
+```
+
+ORCID groups peer reviews by review group, then by `self` review identifier: the subject's identifier groups nothing.
+Summaries in a list carry nothing about the subject: read the peer review by put-code for that.
+
 ### Person and activities
 
 The bound member connector reads its own record (`$orcid->person()`, `$orcid->activities()`, including limited

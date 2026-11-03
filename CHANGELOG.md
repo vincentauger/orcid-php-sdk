@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sending: an external identifier, the funder's address and disambiguated organization, a start date with an end
   date, no subtitle, lengths, roles), `FundingSummary`, `FundingGroup`, `FundingGroups`, `FundingContributor`;
   enums `FundingType`, `FundingContributorRole` (ORCID's funding roles and CRediT)
+- Peer reviews: `$orcid->peerReviews()->list|get|create|update|delete` on a bound member connector,
+  `record($id)->peerReviews()->list|get` on any connector. `PeerReview` (read) / `PeerReviewInput` (write, validated
+  before sending: a review identifier, the convening organization's address, the review group id's shape and an ISSN's
+  check digit, no subject subtitle, lengths), `PeerReviewSummary`, `PeerReviewGroup` (with its review group id),
+  `PeerReviewGroups` (`byReviewGroup()`); enum `PeerReviewSubjectType` (work and funding types, and
+  `research-resource-proposal`)
 - Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes, and `Amount` (a decimal string and an ISO 4217
   currency)
 - `OrcidConflictException::isDuplicate()` (error 9021) and `existingPutCode()`
