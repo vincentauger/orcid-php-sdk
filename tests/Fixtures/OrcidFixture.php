@@ -149,8 +149,11 @@ final class OrcidFixture extends Fixture
             if ($field !== null && is_array($value) && array_is_list($value)) {
                 $data[$key] = array_values(array_filter(
                     $value,
-                    fn (mixed $item): bool => $this->isMarked($field, $item)
-                        || (in_array($key, self::HAND_ADDED_ITEMS, true) && $this->isAddedByResearcher($item)),
+                    // person items are objects: a plain string is an expanded search result's other name, kept since
+                    // search fixtures only match the test record
+                    fn (mixed $item): bool => ($key === 'other-name' && is_string($item))
+                            || $this->isMarked($field, $item)
+                            || (in_array($key, self::HAND_ADDED_ITEMS, true) && $this->isAddedByResearcher($item)),
                 ));
             } elseif (is_array($value)) {
                 $data[$key] = $this->keepTestGroups($value);

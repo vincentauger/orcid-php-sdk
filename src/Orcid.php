@@ -19,10 +19,16 @@ use VincentAuger\OrcidSdk\Data\Person\Person;
 use VincentAuger\OrcidSdk\Data\Person\PersonalDetails;
 use VincentAuger\OrcidSdk\Data\Record\Record;
 use VincentAuger\OrcidSdk\Data\Record\RecordSummary;
+use VincentAuger\OrcidSdk\Data\Search\ExpandedSearchResults;
+use VincentAuger\OrcidSdk\Data\Search\SearchResults;
 use VincentAuger\OrcidSdk\Enums\ApiAccess;
+use VincentAuger\OrcidSdk\Enums\CsvSearchField;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Exceptions\MissingScopeException;
+use VincentAuger\OrcidSdk\Requests\Search\CsvSearch;
+use VincentAuger\OrcidSdk\Requests\Search\ExpandedSearch;
+use VincentAuger\OrcidSdk\Requests\Search\Search;
 use VincentAuger\OrcidSdk\Resources\AddressesResource;
 use VincentAuger\OrcidSdk\Resources\AffiliationsResource;
 use VincentAuger\OrcidSdk\Resources\ExternalIdentifiersResource;
@@ -60,6 +66,11 @@ final class Orcid extends Connector
      * instead of splitting the call into several requests (ADR 0002)
      */
     public const int BULK_LIMIT = 100;
+
+    /**
+     * The most results ORCID returns in one search page, and its default page size: page through more with `start`
+     */
+    public const int SEARCH_ROWS_LIMIT = 1000;
 
     protected int $connectTimeout = 10;
 
@@ -304,6 +315,54 @@ final class Orcid extends Connector
     public function recordSummary(): RecordSummary
     {
         return $this->record($this->boundOrcid(__FUNCTION__))->recordSummary();
+    }
+
+    /**
+     * Search the registry with a raw Solr query: one page of matching ORCID iDs, and the total found. Works on every
+     * connector, bound or not (e.g. a member connector with a /read-public client credentials token).
+     *
+     * @param  int  $start  The first result to return (0-based)
+     * @param  int  $rows  How many results to return, at most SEARCH_ROWS_LIMIT
+     *
+     * @throws \InvalidArgumentException on a blank query or a page ORCID would reject, before anything is sent
+     */
+    public function search(string $query, int $start = 0, int $rows = self::SEARCH_ROWS_LIMIT): SearchResults
+    {
+        $request = new Search($query, $start, $rows);
+
+        return $request->createDtoFromResponse($this->sendOrFail($request));
+    }
+
+    /**
+     * Search the registry, like search(), with each record's public names, emails and institutions
+     *
+     * @param  int  $start  The first result to return (0-based)
+     * @param  int  $rows  How many results to return, at most SEARCH_ROWS_LIMIT
+     *
+     * @throws \InvalidArgumentException on a blank query or a page ORCID would reject, before anything is sent
+     */
+    public function expandedSearch(string $query, int $start = 0, int $rows = self::SEARCH_ROWS_LIMIT): ExpandedSearchResults
+    {
+        $request = new ExpandedSearch($query, $start, $rows);
+
+        return $request->createDtoFromResponse($this->sendOrFail($request));
+    }
+
+    /**
+     * Search the registry, like search(), as CSV: a header row of the columns asked for, then one row per record.
+     * ORCID gives no total found here.
+     *
+     * @param  list<CsvSearchField>|null  $fields  The columns, in order; null for all of them
+     * @param  int  $start  The first result to return (0-based)
+     * @param  int  $rows  How many results to return, at most SEARCH_ROWS_LIMIT
+     *
+     * @throws \InvalidArgumentException on no columns, a blank query or a page ORCID would reject, before anything is sent
+     */
+    public function csvSearch(string $query, ?array $fields = null, int $start = 0, int $rows = self::SEARCH_ROWS_LIMIT): string
+    {
+        $request = new CsvSearch($query, $fields, $start, $rows);
+
+        return $request->createDtoFromResponse($this->sendOrFail($request));
     }
 
     /**

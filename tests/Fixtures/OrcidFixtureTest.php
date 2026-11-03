@@ -186,6 +186,12 @@ it('only keeps the affiliations created by tests in the record summary, by their
     'educations and qualifications' => ['education-qualifications', 'education-qualification'],
 ]);
 
+it('keeps the plain other names of expanded search results: search fixtures only match the test record', function (): void {
+    $results = ['expanded-result' => [['orcid-id' => '0000-0002-1825-0097', 'other-name' => ['JP Auger'], 'institution-name' => ['Fisheries and Oceans Canada']]], 'num-found' => 1];
+
+    expect(json_decode(storeThroughFixture([], $results)['data'], true))->toBe($results);
+});
+
 it('keeps every address: an address has only a country, nothing to mark', function (): void {
     $addresses = ['address' => [['put-code' => 1, 'country' => ['value' => 'CA']], ['put-code' => 2, 'country' => ['value' => 'AQ']]]];
 

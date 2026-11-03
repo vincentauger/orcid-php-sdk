@@ -68,6 +68,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `OrcidConflictException::isDuplicate()` (error 9021) and `existingPutCode()`
 - `Visibility` enum, `Source` assertion-origin fields, `ExternalId::$normalizedValue`, `Affiliation::$displayIndex`,
   `Email::$source`
+- Search, on every connector: `search($query, start, rows)` (`SearchResults`: the iDs and `numFound`),
+  `expandedSearch()` (`ExpandedSearchResults` of `ExpandedSearchResult`: names, public emails, institutions) and
+  `csvSearch($query, fields)` (the CSV string; enum `CsvSearchField`). The query is raw Solr; a blank query, a
+  negative `start` or `rows` outside 0 to `Orcid::SEARCH_ROWS_LIMIT` (1000) throws before sending
 
 ### Changed
 

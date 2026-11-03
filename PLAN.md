@@ -171,12 +171,11 @@ uses affiliations and OAuth). `1.0` = C8.
     `$orcid->wholeRecord()` / `->recordSummary()`, and the same on `record($id)`
   - [x] `ActivitiesSummary` gets typed work, funding, peer review and research resource groups; counts stay
     as methods
-- [ ] **C7. Search** (on the connector: `$orcid->search(...)`, not under a record)
-  - `search($solrQuery, start, rows)` → iDs and `numFound`; `expandedSearch()` (names, institutions);
-    `csvSearch()` maybe. Raw Solr query string for now, no query builder.
-  - The guide says 1000 results by default and `rows` up to 200: check in the sandbox.
-  - Fixtures only query our own test record (by iD or marker keyword): other sandbox users' names must not be
-    recorded.
+- [x] **C7. Search** (#14; sandbox check in `c8/`: `rows` is 0 to 1000, the default too, and `start` has no upper
+  bound) — on the connector, not under a record: `search($solrQuery, start, rows)` → `SearchResults` (iDs and
+  `numFound`); `expandedSearch()` → `ExpandedSearchResults` (names, emails, institutions); `csvSearch()` → the CSV
+  string, with `CsvSearchField` columns. Raw Solr query string, no query builder. Fixtures only query the test
+  record by its iD.
 - [ ] **C8. `1.0`** — README section per resource, every call covered by a fixture test and a `live` test,
   OSP has run `0.x` in production, public API frozen.
 

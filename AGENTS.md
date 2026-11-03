@@ -356,6 +356,33 @@ Evidence: `tests/Fixtures/Saloon/c7/` (no test replays these either).
 - **Test marker:** a summary affiliation has no department name, so tests that read the summary mark the role title
   too (`OrcidFixture::TEST_MARKER_ITEMS`). The counts include the items fixtures leave out.
 
+## Search (verified against the sandbox, 2026-11-03)
+
+Evidence: `tests/Fixtures/Saloon/c8/` (no test replays these either).
+
+- **APIs:** `/v3.0/search/`, `/v3.0/expanded-search/` and `/v3.0/csv-search/` answer the same on the Member API with
+  a `/read-public` client credentials token (`q01`, `e01`, `x01`) or a 3-legged one (`m01`), and on the Public API
+  with a token or none (`p04`, `p01`, `p02`).
+- **Bodies:** `{"result": [{"orcid-identifier": {uri, path, host}}], "num-found"}`; expanded:
+  `{"expanded-result": [{"orcid-id", "given-names", "family-names", "credit-name", "other-name": [...], "email":
+  [...], "institution-name": [...]}], "num-found"}`, the lists of plain strings. A page without results has `null`
+  instead of the list (`q06`, `e04`). Only public items are indexed: the researcher's limited email is not in `email`.
+- **Paging:** `rows` defaults to 1000 (`q20`: 1000 results of 115217); 0 to 1000 are accepted (`q09`, `q04`), so 201
+  is fine (`q03`, `e02`); above 1000, negative or not a number is 400, error 9012 ("The rows parameter must be an
+  integer between 0 and 1,000", `q05`, `q10`, `q11`, `e03`, `p03`). `start` has no upper bound: 10001 and 100000 on a
+  large result still return results (`q18`, `q19`), and past the last result the page is empty with `num-found`
+  (`q07`). A negative `start` is a 500 from Solr (`q08`). The SDK refuses both before sending.
+- **Query:** a missing `q` returns an empty page, `num-found` 0 (`q12`), so the SDK requires a non-blank query; a
+  query Solr can't parse is a 500 (`q13`).
+- **CSV:** needs `Accept: text/csv` (JSON is 406, `x06`). Without `fl`, ORCID returns its 9 columns (`x02`); an unknown
+  column is silently dropped (`x03`), hence `CsvSearchField`. No total found. `rows` above 1000 is a 500 HTML page
+  (`x05`): ORCID can't write its 9012 error as CSV.
+- **Fixtures:** search fixtures only query the test record by its iD (`orcid:<id>`); a keyword query (`q17`) matched
+  nothing, so the iD is the only selector used. Broad probes (`q15`, `q16`,
+  `q18` to `q21`) used the basic search, which returns iDs only, all replaced by the placeholder. `OrcidFixture` keeps
+  the plain strings of an expanded result's `other-name` (person items there are objects); `c8/e01`, `e02` and `p02`
+  were recorded before that, with `other-name` emptied.
+
 ## Agent skills
 
 ### Issue tracker

@@ -479,6 +479,41 @@ one); a non-blank type, value and URL, type and value of at most 255 characters 
 an other name with the same content, a website with the same URL, an identifier with the same type and value.
 ORCID accepts the same country twice.
 
+### Search
+
+Search is on the connector, not under a record: every connector can search, bound or not. The query is a raw
+[Solr query](https://info.orcid.org/documentation/api-tutorials/api-tutorial-searching-the-orcid-registry/) (no
+query builder). ORCID recommends the Member API with a `/read-public` client credentials token (higher limits); the
+Public API, with or without a token, works the same way.
+
+```php
+use VincentAuger\OrcidSdk\Enums\CsvSearchField;
+
+$token = $oauth->clientCredentials([Scope::ReadPublic]);
+$orcid = Orcid::member(accessToken: $token->accessToken);
+
+$results = $orcid->search('family-name:Carberry AND affiliation-org-name:"Brown University"');
+$results->orcids;    // list<string>: the iDs on this page
+$results->numFound;  // every match, across all pages
+
+$expanded = $orcid->expandedSearch('ringgold-org-id:5884', start: 0, rows: 200);
+foreach ($expanded->results as $result) {  // ExpandedSearchResult
+    $result->orcid;
+    $result->displayName();    // the credit name, else the given and family names
+    $result->otherNames;
+    $result->emails;           // public emails only
+    $result->institutionNames; // current and past affiliations
+}
+
+// a CSV string: a header row, then one row per record (no total found)
+$csv = $orcid->csvSearch('orcid:0000-0002-1825-0097', [CsvSearchField::Orcid, CsvSearchField::FamilyName]);
+```
+
+A page holds at most `Orcid::SEARCH_ROWS_LIMIT` (1000) results, ORCID's default and largest page: page through more
+with `start` (ORCID sets no upper bound on it). A blank query, a negative `start` or `rows` outside 0 to 1000 throws an
+`InvalidArgumentException` before anything is sent. A query Solr can't parse (e.g. `orcid:(`) is a 500 from ORCID,
+so an `OrcidServerException` whose `isRetryable()` is true: retrying won't help, fix the query.
+
 ### Errors
 
 Every convenience method throws a `VincentAuger\OrcidSdk\Exceptions\OrcidException`. Use `isRetryable()` to

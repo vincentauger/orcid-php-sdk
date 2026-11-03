@@ -1,0 +1,20 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 18:16:34 GMT",
+        "Content-Type": "application\/json;charset=UTF-8",
+        "Content-Length": "0",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "oauth_token_validation": "ON",
+        "cf-cache-status": "DYNAMIC",
+        "Set-Cookie": [
+            "AWSALB=JixgXdbC6vR2MtCw\/c6MnvXw+Jbw0sQPM9CoaNBC7q83T9gjjtTvscK6zS\/sJpp6vkVIvR25QUx8PvlV8f6l0WZCMIa0URf07JUtO0uMo3BfXX4\/X4K1zXG\/xLnj; Expires=Tue, 10 Nov 2026 18:16:34 GMT; Path=\/",
+            "AWSALBCORS=JixgXdbC6vR2MtCw\/c6MnvXw+Jbw0sQPM9CoaNBC7q83T9gjjtTvscK6zS\/sJpp6vkVIvR25QUx8PvlV8f6l0WZCMIa0URf07JUtO0uMo3BfXX4\/X4K1zXG\/xLnj; Expires=Tue, 10 Nov 2026 18:16:34 GMT; Path=\/; SameSite=None; Secure",
+            "__cf_bm=QR8tNffZWlYV5QuEO8GQEym6WVxa_90exTtjFrPW5bQ-1793729794.2342126-1.0.1.1-pugPSpG9nx7cgT4yTOOk7wKgbWzTRUI6UVvkr0Jz_qGnjE9F1kdsO6nFUoWcpgT8rQbHcGE_mACYf3HTywn4eh70UA1nag36qNWAgzSRBfN1VQxVuHYDq0_zabL3WPL_; HttpOnly; SameSite=None; Secure; Path=\/; Domain=sandbox.orcid.org; Expires=Tue, 03 Nov 2026 18:46:34 GMT"
+        ],
+        "CF-RAY": "a54d5eedfae8a2b2-YUL"
+    },
+    "data": "",
+    "context": []
+}
