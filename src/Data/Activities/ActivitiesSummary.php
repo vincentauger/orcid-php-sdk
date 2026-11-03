@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace VincentAuger\OrcidSdk\Data\Activities;
 
 use VincentAuger\OrcidSdk\Data\Affiliations\Affiliation;
+use VincentAuger\OrcidSdk\Data\Fundings\FundingGroups;
+use VincentAuger\OrcidSdk\Data\PeerReviews\PeerReviewGroups;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceGroups;
+use VincentAuger\OrcidSdk\Data\Works\WorkGroups;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
 use VincentAuger\OrcidSdk\Support\Json;
 
 /**
- * Summary of every activity on a record (GET /{orcid}/activities).
+ * Summary of every activity on a record (GET /{orcid}/activities, and the activities section of the whole record).
  *
- * Affiliations are fully typed. Works, fundings, peer reviews and research
- * resources are only counted for now: each count is the number of groups,
- * i.e. distinct items once ORCID has merged duplicates from different sources.
+ * Each section is the same class as its own list(): affiliations by type, and the groups of works, fundings, peer
+ * reviews and research resources. Each count is the number of ORCID's groups, i.e. distinct items once ORCID has
+ * merged duplicates from different sources (review groups, for peer reviews).
  */
 final readonly class ActivitiesSummary
 {
@@ -22,10 +26,10 @@ final readonly class ActivitiesSummary
      */
     public function __construct(
         private array $affiliations = [],
-        public int $workCount = 0,
-        public int $fundingCount = 0,
-        public int $peerReviewCount = 0,
-        public int $researchResourceCount = 0,
+        public WorkGroups $works = new WorkGroups,
+        public FundingGroups $fundings = new FundingGroups,
+        public PeerReviewGroups $peerReviews = new PeerReviewGroups,
+        public ResearchResourceGroups $researchResources = new ResearchResourceGroups,
         public ?\DateTimeImmutable $lastModifiedAt = null,
     ) {}
 
@@ -42,10 +46,10 @@ final readonly class ActivitiesSummary
 
         return new self(
             affiliations: $affiliations,
-            workCount: self::groupCount($data, 'works'),
-            fundingCount: self::groupCount($data, 'fundings'),
-            peerReviewCount: self::groupCount($data, 'peer-reviews'),
-            researchResourceCount: self::groupCount($data, 'research-resources'),
+            works: WorkGroups::fromArray(Json::object($data, 'works') ?? []),
+            fundings: FundingGroups::fromArray(Json::object($data, 'fundings') ?? []),
+            peerReviews: PeerReviewGroups::fromArray(Json::object($data, 'peer-reviews') ?? []),
+            researchResources: ResearchResourceGroups::fromArray(Json::object($data, 'research-resources') ?? []),
             lastModifiedAt: Json::timestamp($data, 'last-modified-date'),
         );
     }
@@ -58,11 +62,27 @@ final readonly class ActivitiesSummary
         return $this->affiliations[$type->value] ?? [];
     }
 
-    /**
-     * @param  array<array-key, mixed>  $data
-     */
-    private static function groupCount(array $data, string $section): int
+    public function workCount(): int
     {
-        return count(Json::list(Json::object($data, $section) ?? [], 'group'));
+        return count($this->works->groups);
+    }
+
+    public function fundingCount(): int
+    {
+        return count($this->fundings->groups);
+    }
+
+    /**
+     * The number of review groups (e.g. journals), ORCID's top-level groups of peer reviews; count
+     * peerReviews->groups for the number of distinct peer reviews
+     */
+    public function peerReviewCount(): int
+    {
+        return count($this->peerReviews->byReviewGroup());
+    }
+
+    public function researchResourceCount(): int
+    {
+        return count($this->researchResources->groups);
     }
 }

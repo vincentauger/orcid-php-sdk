@@ -71,6 +71,10 @@ final class OrcidFixture extends Fixture
         // test websites are named; the URL itself can't start with the marker
         'researcher-url' => 'url-name',
         'external-identifier' => 'external-id-value',
+        // the record summary's affiliations have no department name: test affiliations there mark their role title
+        'employment' => 'role',
+        'professional-activity' => 'role',
+        'education-qualification' => 'role',
     ];
 
     /**

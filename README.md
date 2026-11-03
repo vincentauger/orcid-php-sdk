@@ -345,7 +345,7 @@ Orcid::public()->record($orcidId)->researchResources()->get($putCode); // reads 
 
 Summaries in a list only carry the proposal: read the research resource by put-code for its items.
 
-### Person and activities
+### Person, activities and the whole record
 
 The bound member connector reads its own record (`$orcid->person()`, `$orcid->activities()`, including limited
 items with `/read-limited`). Every connector reads any record's public items through `record($id)`:
@@ -375,16 +375,50 @@ $orcid->emails();             // own record (bound member connector): limited on
 $details = $record->personalDetails(); // PersonalDetails: name, otherNames, biography
 $details->name?->displayName();
 
+// every activity section, as the same classes as each section's list()
 $activities = $record->activities();
-$activities->affiliations(AffiliationType::Education);
-$activities->workCount;
+$activities->affiliations(AffiliationType::Education); // list<Affiliation>
+$activities->works->preferred();                       // WorkGroups, as works()->list()
+$activities->fundings->summaries();                    // FundingGroups
+$activities->peerReviews->byReviewGroup();             // PeerReviewGroups
+$activities->researchResources->groups;                // ResearchResourceGroups
+$activities->workCount();                              // the number of groups (review groups for peerReviewCount())
+
+// the whole record in one call: the same Person and ActivitiesSummary
+$whole = $record->wholeRecord();                       // or $orcid->wholeRecord() for the bound record
+$whole->person->keywords;
+$whole->activities->works->preferred();
+$whole->history?->claimed;
 
 $record->affiliations()->list(AffiliationType::Employment); // reads only: no create, update or delete
 ```
 
+The record summary is ORCID's short overview of a record: counts by section, split into validated (added by a
+client) and self-asserted (added by the researcher), the affiliations in a short form and the person external
+identifiers. ORCID only serves it on the Member API, with any token that reads the record (a 3-legged one or a
+`/read-public` client credentials one); on a Public API connector, `recordSummary()` throws a `LogicException` before
+sending.
+
+```php
+$summary = Orcid::member(accessToken: $readPublicToken)->record($orcidId)->recordSummary(); // or $orcid->recordSummary()
+
+$summary->works->validated;           // ActivityCounts: validated, selfAsserted, total()
+$summary->peerReviews->total();
+$summary->employmentCount;            // ORCID's count
+foreach ($summary->employments as $employment) { // RecordSummaryAffiliation: no department or source
+    $employment->organizationName;
+    $employment->role;
+    $employment->validated;
+}
+$summary->educationQualifications;    // educations and qualifications
+$summary->professionalActivities;     // invited positions, distinctions, memberships and services
+$summary->externalIdentifiers;        // RecordSummaryExternalIdentifier (type, value, url, validated)
+```
+
 Own-record calls (`affiliations()`, `works()`, `fundings()`, `peerReviews()`, `researchResources()`, `keywords()`,
 `otherNames()`, `researcherUrls()`, `externalIdentifiers()`, `addresses()`, `person()`, `biography()`, `emails()`,
-`personalDetails()`, `activities()`) on a connector without an `orcid` throw a `LogicException` before anything is sent.
+`personalDetails()`, `activities()`, `wholeRecord()`, `recordSummary()`) on a connector without an `orcid` throw a
+`LogicException` before anything is sent.
 
 ### Keywords
 

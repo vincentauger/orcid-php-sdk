@@ -1,12 +1,12 @@
 {
     "statusCode": 201,
     "headers": {
-        "Date": "Tue, 03 Nov 2026 15:16:22 GMT",
+        "Date": "Tue, 03 Nov 2026 17:55:02 GMT",
         "Content-Length": "0",
         "Connection": "keep-alive",
         "Server": "cloudflare",
         "access-control-allow-origin": "*",
-        "location": "https:\/\/api.sandbox.orcid.org\/v3.0\/0000-0002-1825-0097\/service\/129126",
+        "location": "https:\/\/api.sandbox.orcid.org\/v3.0\/0000-0002-1825-0097\/service\/129144",
         "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
         "pragma": "no-cache",
         "expires": "0",
@@ -18,7 +18,7 @@
         "x-via": "b1",
         "cf-cache-status": "DYNAMIC",
         "set-cookie": "Redacted",
-        "CF-RAY": "a54c56f40ed8d043-YUL"
+        "CF-RAY": "a54d3f628fa9fbd3-YUL"
     },
     "data": "",
     "context": []

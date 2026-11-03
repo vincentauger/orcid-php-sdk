@@ -84,7 +84,7 @@ it('refuses own-record calls on a connector without a record, before sending', f
         ->toThrow(LogicException::class, "Orcid::{$method}() needs a connector bound to a record");
 
     $mockClient->assertNothingSent();
-})->with(['affiliations', 'keywords', 'person', 'biography', 'emails', 'personalDetails', 'activities']);
+})->with(['affiliations', 'keywords', 'person', 'biography', 'emails', 'personalDetails', 'activities', 'wholeRecord', 'recordSummary']);
 
 it('only binds member connectors to a record', function (): void {
     new Orcid(ApiAccess::Public, orcid: '0000-0002-1825-0097');

@@ -50,6 +50,16 @@ class BaseTest extends TestCase
     }
 
     /**
+     * The iDs a response can carry: the placeholder once replayed from a fixture, the sandbox record's while recording
+     *
+     * @return list<string>
+     */
+    public function recordedIds(): array
+    {
+        return [OrcidFixture::PLACEHOLDER_ID, $this->orcidId()];
+    }
+
+    /**
      * Whether an item was added by the sandbox member client: a response replayed from a fixture carries the
      * placeholder client id, a live one (while recording) the real one
      */

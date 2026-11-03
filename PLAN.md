@@ -166,10 +166,10 @@ uses affiliations and OAuth). `1.0` = C8.
     biography), also on `record($id)`, returning the same classes as `person()`
   - [x] `Person` exposes typed items (with put-codes and visibility) instead of plain strings (breaking); the same
     item classes (`Keyword`, ...) are returned by `person()` and by `->keywords()->list()`
-- [ ] **C6. Whole record and summary**
-  - whole record → `Record` (person + activities); record summary → `RecordSummary`, on both connector shapes. The guide calls
-    `/summary` both "Member API only" and `/read-public`: check both in the sandbox.
-  - `ActivitiesSummary` gets typed work, funding, peer review and research resource summaries; counts stay
+- [x] **C6. Whole record and summary** (#13; sandbox check in `c7/`: `/summary` is Member API only, with any token)
+  - [x] whole record → `Record` (person + activities); record summary → `RecordSummary`, on both connector shapes:
+    `$orcid->wholeRecord()` / `->recordSummary()`, and the same on `record($id)`
+  - [x] `ActivitiesSummary` gets typed work, funding, peer review and research resource groups; counts stay
     as methods
 - [ ] **C7. Search** (on the connector: `$orcid->search(...)`, not under a record)
   - `search($solrQuery, start, rows)` → iDs and `numFound`; `expandedSearch()` (names, institutions);

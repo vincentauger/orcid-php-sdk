@@ -114,3 +114,18 @@ _Avoid_: Preview, list item
 **Activities summary**:
 The summaries of every activity section of a record, read in one call.
 _Avoid_: Activities (alone), record summary
+
+**Whole record**:
+The person section and the activities summary of a record, read in one call.
+_Avoid_: Full record, profile
+
+**Record summary**:
+ORCID's short overview of a record (Member API only): how many items each activity section holds, validated or
+self-asserted, the affiliations in a short form, and the person external identifiers. Not the activities summary,
+which holds the items themselves.
+_Avoid_: Summary (alone), activities summary
+
+**Validated**:
+Said of an item added by a client: its source vouches for it. An item the researcher added themselves is
+**self-asserted**.
+_Avoid_: Verified, trusted

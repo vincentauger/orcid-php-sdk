@@ -170,6 +170,22 @@ it('only keeps the other names, websites and external identifiers created by tes
     'external identifiers' => ['external-identifier', 'external-id-value'],
 ]);
 
+it('only keeps the affiliations created by tests in the record summary, by their role', function (string $section, string $list): void {
+    $summary = [$section => ['count' => 2, $list => [
+        ['put-code' => 1, 'organization-name' => 'Real organization', 'role' => 'Programmer'],
+        ['put-code' => 2, 'organization-name' => 'Fisheries and Oceans Canada', 'role' => OrcidFixture::TEST_MARKER.' summary'],
+    ]]];
+
+    $stored = json_decode(storeThroughFixture([], $summary)['data'], true);
+
+    expect(array_column($stored[$section][$list], 'put-code'))->toBe([2])
+        ->and($stored[$section]['count'])->toBe(2);
+})->with([
+    'employments' => ['employments', 'employment'],
+    'professional activities' => ['professional-activities', 'professional-activity'],
+    'educations and qualifications' => ['education-qualifications', 'education-qualification'],
+]);
+
 it('keeps every address: an address has only a country, nothing to mark', function (): void {
     $addresses = ['address' => [['put-code' => 1, 'country' => ['value' => 'CA']], ['put-code' => 2, 'country' => ['value' => 'AQ']]]];
 

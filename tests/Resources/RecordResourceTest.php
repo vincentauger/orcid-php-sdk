@@ -4,16 +4,32 @@ declare(strict_types=1);
 
 use Saloon\Http\Faking\MockClient;
 use Tests\Fixtures\OrcidFixture;
+use VincentAuger\OrcidSdk\Data\Activities\ActivitiesSummary;
 use VincentAuger\OrcidSdk\Data\Affiliations\Affiliation;
+use VincentAuger\OrcidSdk\Data\Fundings\FundingGroups;
+use VincentAuger\OrcidSdk\Data\Fundings\FundingSummary;
+use VincentAuger\OrcidSdk\Data\PeerReviews\PeerReviewGroups;
+use VincentAuger\OrcidSdk\Data\PeerReviews\PeerReviewSummary;
 use VincentAuger\OrcidSdk\Data\Person\Address;
 use VincentAuger\OrcidSdk\Data\Person\Biography;
 use VincentAuger\OrcidSdk\Data\Person\Email;
 use VincentAuger\OrcidSdk\Data\Person\Keyword;
 use VincentAuger\OrcidSdk\Data\Person\OtherName;
+use VincentAuger\OrcidSdk\Data\Person\Person;
 use VincentAuger\OrcidSdk\Data\Person\PersonalDetails;
 use VincentAuger\OrcidSdk\Data\Person\PersonExternalIdentifier;
+use VincentAuger\OrcidSdk\Data\Person\PersonExternalIdentifierInput;
 use VincentAuger\OrcidSdk\Data\Person\PersonName;
 use VincentAuger\OrcidSdk\Data\Person\ResearcherUrl;
+use VincentAuger\OrcidSdk\Data\Record\ActivityCounts;
+use VincentAuger\OrcidSdk\Data\Record\Record;
+use VincentAuger\OrcidSdk\Data\Record\RecordSummary;
+use VincentAuger\OrcidSdk\Data\Record\RecordSummaryAffiliation;
+use VincentAuger\OrcidSdk\Data\Record\RecordSummaryExternalIdentifier;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceGroups;
+use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceSummary;
+use VincentAuger\OrcidSdk\Data\Works\WorkGroups;
+use VincentAuger\OrcidSdk\Data\Works\WorkSummary;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
@@ -138,27 +154,166 @@ it('reads the personal details: the name, other names and biography, as the same
     }
 });
 
-it('summarises the activities of its own record', function (): void {
-    $mockClient = new MockClient([
-        new OrcidFixture('record/activities/create'),
-        new OrcidFixture('record/activities/summary'),
-        new OrcidFixture('record/activities/delete'),
-    ]);
+/**
+ * The test items of withTestActivities() in an activities summary, as the same classes as each section's own list()
+ *
+ * @param  array{work: int, funding: int, peerReview: int, researchResource: int, service: int}  $putCodes
+ */
+function expectTestActivities(ActivitiesSummary $activities, array $putCodes, string $label): void
+{
+    $ours = static fn (array $summaries, int $putCode): array => array_values(array_filter($summaries, fn (object $summary): bool => $summary->putCode === $putCode));
+    $marked = OrcidFixture::TEST_MARKER.' '.$label;
 
+    expect($activities->works)->toBeInstanceOf(WorkGroups::class)
+        ->and($ours($activities->works->summaries(), $putCodes['work'])[0])->toBeInstanceOf(WorkSummary::class)
+        ->and($ours($activities->works->summaries(), $putCodes['work'])[0]->title?->title)->toBe($marked)
+        ->and($activities->fundings)->toBeInstanceOf(FundingGroups::class)
+        ->and($ours($activities->fundings->summaries(), $putCodes['funding'])[0])->toBeInstanceOf(FundingSummary::class)
+        ->and($ours($activities->fundings->summaries(), $putCodes['funding'])[0]->title?->title)->toBe($marked)
+        ->and($activities->peerReviews)->toBeInstanceOf(PeerReviewGroups::class)
+        ->and($ours($activities->peerReviews->summaries(), $putCodes['peerReview'])[0])->toBeInstanceOf(PeerReviewSummary::class)
+        ->and($ours($activities->peerReviews->summaries(), $putCodes['peerReview'])[0]->reviewGroupId)->toBe(TEST_REVIEW_GROUP)
+        ->and(array_keys($activities->peerReviews->byReviewGroup()))->toContain(TEST_REVIEW_GROUP)
+        ->and($activities->researchResources)->toBeInstanceOf(ResearchResourceGroups::class)
+        ->and($ours($activities->researchResources->summaries(), $putCodes['researchResource'])[0])->toBeInstanceOf(ResearchResourceSummary::class)
+        ->and($ours($activities->researchResources->summaries(), $putCodes['researchResource'])[0]->proposal?->title?->title)->toBe($marked)
+        ->and($ours($activities->affiliations(AffiliationType::Service), $putCodes['service'])[0]->departmentName)->toBe($marked)
+        // the counts still count ORCID's groups: at least the test item's
+        ->and($activities->workCount())->toBeGreaterThanOrEqual(1)
+        ->and($activities->fundingCount())->toBeGreaterThanOrEqual(1)
+        ->and($activities->peerReviewCount())->toBeGreaterThanOrEqual(1)
+        ->and($activities->researchResourceCount())->toBeGreaterThanOrEqual(1)
+        ->and($activities->lastModifiedAt)->toBeInstanceOf(DateTimeImmutable::class);
+}
+
+it('summarises the activities of its own record, with the typed summaries of every section', function (): void {
+    $mockClient = new MockClient(testActivityFixtures('record/activities', new OrcidFixture('record/activities/summary')));
     $orcid = $this->getMemberApiClient()->withMockClient($mockClient);
 
-    $putCode = $orcid->affiliations()->create(AffiliationType::Service, testAffiliation('activities'));
+    [$activities, $putCodes] = withTestActivities($orcid, 'activities', fn (array $putCodes): array => [$orcid->activities(), $putCodes]);
 
-    $summary = $orcid->activities();
-
-    $orcid->affiliations()->delete(AffiliationType::Service, $putCode);
-
-    $services = array_map(fn (Affiliation $affiliation): int => $affiliation->putCode, $summary->affiliations(AffiliationType::Service));
-
-    expect($services)->toContain($putCode)
-        ->and($summary->workCount)->toBeGreaterThanOrEqual(0)
-        ->and($summary->lastModifiedAt)->toBeInstanceOf(DateTimeImmutable::class);
+    expectTestActivities($activities, $putCodes, 'activities');
 });
+
+it('reads the whole record of its own record: the person and activities sections in one call', function (): void {
+    $folder = 'record/whole-member';
+    $mockClient = new MockClient(testActivityFixtures($folder, ...testPersonItemFixtures($folder, 'record')));
+    $orcid = $this->getMemberApiClient()->withMockClient($mockClient);
+
+    [$record, $activityPutCodes, $personPutCodes] = withTestActivities($orcid, 'whole record', fn (array $activityPutCodes): array => withTestPersonItems(
+        $orcid,
+        'whole record',
+        fn (array $personPutCodes): array => [$orcid->wholeRecord(), $activityPutCodes, $personPutCodes],
+    ));
+
+    expect($record)->toBeInstanceOf(Record::class)
+        ->and($record->orcid)->toBeIn($this->recordedIds())
+        ->and($record->person)->toBeInstanceOf(Person::class)
+        ->and($record->person->name?->familyName)->toBe('Auger')
+        ->and(array_map(fn (Keyword $keyword): int => $keyword->putCode, $record->person->keywords))->toContain($personPutCodes['keyword'])
+        ->and(array_map(fn (Address $address): int => $address->putCode, $record->person->addresses))->toContain($personPutCodes['address'])
+        // /read-limited: the limited email too
+        ->and($record->person->emails[0]->visibility)->toBe(Visibility::Limited)
+        ->and($record->history?->claimed)->toBeTrue()
+        ->and($record->history?->submittedAt)->toBeInstanceOf(DateTimeImmutable::class)
+        ->and($record->history?->lastModifiedAt)->toBeInstanceOf(DateTimeImmutable::class)
+        ->and($record->locale)->toBe('fr');
+
+    expectTestActivities($record->activities, $activityPutCodes, 'whole record');
+});
+
+it('reads the whole record of any record, through the Public API', function (): void {
+    $mockClient = new MockClient(testActivityFixtures('record/whole-public', new OrcidFixture('record/whole-public/record')));
+    $owner = $this->getMemberApiClient()->withMockClient($mockClient);
+    $public = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId());
+
+    [$record, $putCodes] = withTestActivities($owner, 'public whole record', fn (array $putCodes): array => [$public->wholeRecord(), $putCodes]);
+
+    // public items only: the limited email is not returned
+    expect($record->orcid)->toBeIn($this->recordedIds())
+        ->and($record->person->biography?->content)->toBe('A test bio.')
+        ->and($record->person->emails)->toBeEmpty();
+
+    expectTestActivities($record->activities, $putCodes, 'public whole record');
+});
+
+it('reads the record summary of its own record', function (): void {
+    $folder = 'record/summary';
+    // one test item in every activity section, so each count has a validated item
+    $mockClient = new MockClient(testActivityFixtures(
+        $folder,
+        new OrcidFixture("{$folder}/create-employment"),
+        new OrcidFixture("{$folder}/create-education"),
+        new OrcidFixture("{$folder}/create-marked-service"),
+        new OrcidFixture("{$folder}/create-external-identifier"),
+        new OrcidFixture("{$folder}/summary"),
+        new OrcidFixture("{$folder}/delete-employment"),
+        new OrcidFixture("{$folder}/delete-education"),
+        new OrcidFixture("{$folder}/delete-marked-service"),
+        new OrcidFixture("{$folder}/delete-external-identifier"),
+    ));
+    $orcid = $this->getMemberApiClient()->withMockClient($mockClient);
+
+    // the summary's affiliations have no department name: these mark their role title instead
+    $role = static fn (string $label): string => OrcidFixture::TEST_MARKER.' summary '.$label;
+
+    [$summary, $employment, $education, $service, $identifier] = withTestActivities($orcid, 'summary', function () use ($orcid, $role): array {
+        $employment = $orcid->affiliations()->create(AffiliationType::Employment, testAffiliation('summary employment', roleTitle: $role('employment')));
+        $education = $orcid->affiliations()->create(AffiliationType::Education, testAffiliation('summary education', roleTitle: $role('education')));
+        $service = $orcid->affiliations()->create(AffiliationType::Service, testAffiliation('summary service', roleTitle: $role('service')));
+        $identifier = $orcid->externalIdentifiers()->create(new PersonExternalIdentifierInput('Scopus Author ID', 'orcid-php-sdk-summary', 'https://example.org/orcid-php-sdk-summary'));
+
+        try {
+            return [$orcid->recordSummary(), $employment, $education, $service, $identifier];
+        } finally {
+            $orcid->affiliations()->delete(AffiliationType::Employment, $employment);
+            $orcid->affiliations()->delete(AffiliationType::Education, $education);
+            $orcid->affiliations()->delete(AffiliationType::Service, $service);
+            $orcid->externalIdentifiers()->delete($identifier);
+        }
+    });
+
+    $ours = static fn (array $items, int $putCode): ?object => array_values(array_filter($items, fn (object $item): bool => $item->putCode === $putCode))[0] ?? null;
+    $ourIdentifier = $ours($summary->externalIdentifiers, $identifier);
+
+    expect($summary)->toBeInstanceOf(RecordSummary::class)
+        ->and($summary->orcid)->toBeIn($this->recordedIds())
+        ->and($summary->creditName)->toBe('V JP Auger')
+        ->and($summary->createdAt)->toBeInstanceOf(DateTimeImmutable::class)
+        ->and($summary->lastModifiedAt)->toBeInstanceOf(DateTimeImmutable::class)
+        ->and($ours($summary->employments, $employment)?->type)->toBe(AffiliationType::Employment)
+        ->and($ours($summary->employments, $employment)?->role)->toBe($role('employment'))
+        ->and($ours($summary->employments, $employment)?->organizationName)->toBe('Fisheries and Oceans Canada')
+        ->and($ours($summary->employments, $employment)?->startDate?->year)->toBe(2021)
+        // added by a client: validated, unlike the researcher's own (self-asserted)
+        ->and($ours($summary->employments, $employment)?->validated)->toBeTrue()
+        ->and($ours($summary->educationQualifications, $education)?->type)->toBe(AffiliationType::Education)
+        ->and($ours($summary->professionalActivities, $service)?->type)->toBe(AffiliationType::Service)
+        // ORCID's counts include the items fixtures leave out
+        ->and($summary->employmentCount)->toBeGreaterThanOrEqual(1)
+        ->and($summary->educationQualificationCount)->toBeGreaterThanOrEqual(1)
+        ->and($summary->professionalActivityCount)->toBeGreaterThanOrEqual(1)
+        ->and($ourIdentifier)->toBeInstanceOf(RecordSummaryExternalIdentifier::class)
+        ->and($ourIdentifier?->type)->toBe('Scopus Author ID')
+        ->and($ourIdentifier?->value)->toBe('orcid-php-sdk-summary')
+        ->and($ourIdentifier?->url)->toBe('https://example.org/orcid-php-sdk-summary')
+        ->and($ourIdentifier?->validated)->toBeTrue()
+        // the test items are validated; the hand-added work (issue #3) is self-asserted
+        ->and($summary->works)->toBeInstanceOf(ActivityCounts::class)
+        ->and($summary->works->validated)->toBeGreaterThanOrEqual(1)
+        ->and($summary->works->selfAsserted)->toBeGreaterThanOrEqual(1)
+        ->and($summary->fundings->validated)->toBeGreaterThanOrEqual(1)
+        // peer reviews come as a total and a self-asserted count: the rest is validated
+        ->and($summary->peerReviews->validated)->toBeGreaterThanOrEqual(1)
+        ->and($summary->peerReviewPublicationGrants)->toBeGreaterThanOrEqual(1)
+        ->and($summary->researchResources->validated)->toBeGreaterThanOrEqual(1)
+        ->and($summary->emailDomainCount)->toBe(0);
+});
+
+it('refuses the record summary on the Public API before sending: ORCID only serves it on the Member API', function (): void {
+    // nothing is sent: the c7/ probe shows the Public API answers 404 (error 9001), even with a /read-public token
+    $this->getPublicApiClient()->withMockClient(new MockClient([]))->record($this->orcidId())->recordSummary();
+})->throws(LogicException::class, 'requires the Member API');
 
 it('only reads other records, through the Public API', function (): void {
     $mockClient = new MockClient([
@@ -192,13 +347,15 @@ it('reads a record through the Member API with a /read-public token, without bin
         new OrcidFixture("{$folder}/client-credentials"),
         new OrcidFixture("{$folder}/person"),
         new OrcidFixture("{$folder}/activities"),
+        new OrcidFixture("{$folder}/summary"),
         new OrcidFixture("{$folder}/services"),
         new OrcidFixture("{$folder}/revoke"),
         new OrcidFixture("{$folder}/delete"),
     ]);
 
     $owner = $this->getMemberApiClient()->withMockClient($mockClient);
-    $putCode = $owner->affiliations()->create(AffiliationType::Service, testAffiliation('read public'));
+    // a marked role title: the record summary's affiliations have no department name
+    $putCode = $owner->affiliations()->create(AffiliationType::Service, testAffiliation('read public', roleTitle: OrcidFixture::TEST_MARKER.' read public'));
 
     $oauth = $this->getOAuthClient()->withMockClient($mockClient);
     $token = $oauth->clientCredentials([Scope::ReadPublic]);
@@ -208,6 +365,8 @@ it('reads a record through the Member API with a /read-public token, without bin
         ->record($this->orcidId());
     $person = $record->person();
     $activities = $record->activities();
+    // the record summary needs the Member API, not a bound record: a /read-public token reads any record's
+    $summary = $record->recordSummary();
     $listed = $record->affiliations()->list(AffiliationType::Service);
 
     $oauth->revoke($token->accessToken);
@@ -220,6 +379,8 @@ it('reads a record through the Member API with a /read-public token, without bin
         ->and($person->emails)->toBeEmpty()
         ->and(array_map(fn (Affiliation $affiliation): int => $affiliation->putCode, $services))->toContain($putCode)
         ->and($services[0]->visibility)->toBe(Visibility::Public)
+        ->and($summary->orcid)->toBeIn($this->recordedIds())
+        ->and(array_map(fn (RecordSummaryAffiliation $item): int => $item->putCode, $summary->professionalActivities))->toContain($putCode)
         ->and($record->affiliations())->toBeInstanceOf(ReadOnlyAffiliationsResource::class)
         ->and(array_map(fn (Affiliation $affiliation): int => $affiliation->putCode, $listed))->toContain($putCode);
 });

@@ -52,6 +52,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Read-only person sections, on a bound member connector and on `record($id)`: `biography()` (`?Biography`),
   `emails()` (`list<Email>`, limited ones with `/read-limited`) and `personalDetails()` (`PersonalDetails`: name,
   other names and biography), returning the same classes as `person()`
+- Whole record and record summary, on a bound member connector and on `record($id)`: `wholeRecord()` (`Record`: the
+  same `Person` and `ActivitiesSummary` as `person()` and `activities()`, with `RecordHistory` and the locale) and
+  `recordSummary()` (`RecordSummary`, Member API only: `ActivityCounts` per activity section, validated or
+  self-asserted, `RecordSummaryAffiliation` and `RecordSummaryExternalIdentifier` items)
+- `ActivitiesSummary` has typed `works` (`WorkGroups`), `fundings` (`FundingGroups`), `peerReviews`
+  (`PeerReviewGroups`) and `researchResources` (`ResearchResourceGroups`), the same classes as each section's `list()`
 - Typed person items, each with its put-code, visibility, source and display index: `Keyword`, `OtherName`,
   `ResearcherUrl`, `Address`, `PersonExternalIdentifier`; and `Biography`
 - `OrcidConflictException::DUPLICATE_CONTENT` (error 9030, a person item with the same content: a keyword
@@ -73,6 +79,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** `Person` returns typed items instead of strings: `otherNames` (`OtherName`), `keywords`
   (`Keyword`), `biography` (`Biography`), `externalIdentifiers` (`PersonExternalIdentifier`, the identifier under
   `externalId`); `countries` is replaced by `addresses` (`Address`, with `country`); `ResearcherUrl` has a put-code
+- **Breaking:** `ActivitiesSummary`'s counts are methods: `workCount()`, `fundingCount()`, `peerReviewCount()` (review
+  groups, as before), `researchResourceCount()`. A group without summaries is no longer counted
 
 ## [0.1.0] - 2026-10-22
 

@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 17:50:41 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a54d39047809a2a8-YUL"
+    },
+    "data": "{\"created-date\":{\"value\":1709821748344},\"last-modified-date\":{\"value\":1793728240627},\"credit-name\":\"V JP Auger\",\"orcid-identifier\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"external-identifiers\":{\"external-identifier\":[{\"put-code\":8688,\"external-id-type\":\"Scopus Author ID\",\"external-id-value\":\"orcid-php-sdk-summary\",\"external-id-url\":\"https:\/\/example.org\/orcid-php-sdk-summary\",\"validated\":true}]},\"employments\":{\"count\":3,\"employment\":[{\"put-code\":129135,\"type\":\"employment\",\"organization-name\":\"Fisheries and Oceans Canada\",\"role\":\"orcid-php-sdk summary employment\",\"url\":null,\"start-date\":{\"year\":{\"value\":\"2021\"},\"month\":{\"value\":\"01\"},\"day\":{\"value\":\"05\"}},\"end-date\":null,\"validated\":true}]},\"professional-activities\":{\"count\":1,\"professional-activity\":[{\"put-code\":129137,\"type\":\"service\",\"organization-name\":\"Fisheries and Oceans Canada\",\"role\":\"orcid-php-sdk summary service\",\"url\":null,\"start-date\":{\"year\":{\"value\":\"2021\"},\"month\":{\"value\":\"01\"},\"day\":{\"value\":\"05\"}},\"end-date\":null,\"validated\":true}]},\"fundings\":{\"self-asserted-count\":0,\"validated-count\":0},\"works\":{\"self-asserted-count\":1,\"validated-count\":0},\"peer-reviews\":{\"peer-review-publication-grants\":0,\"self-asserted-count\":0,\"total\":0},\"email-domains\":{\"count\":0,\"email-domain\":null},\"education-qualifications\":{\"count\":1,\"education-qualification\":[{\"put-code\":129136,\"type\":\"education\",\"organization-name\":\"Fisheries and Oceans Canada\",\"role\":\"orcid-php-sdk summary education\",\"url\":null,\"start-date\":{\"year\":{\"value\":\"2021\"},\"month\":{\"value\":\"01\"},\"day\":{\"value\":\"05\"}},\"end-date\":null,\"validated\":true}]},\"research-resources\":{\"self-asserted-count\":0,\"validated-count\":0}}",
+    "context": []
+}

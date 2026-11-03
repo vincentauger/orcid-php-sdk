@@ -91,7 +91,11 @@ it('reads an empty activities summary', function (): void {
         'fundings' => ['group' => []],
     ]);
 
-    expect($summary->workCount)->toBe(2)
-        ->and($summary->fundingCount)->toBe(0)
+    // a group without summaries is not a group, as in works()->list()
+    expect($summary->workCount())->toBe(0)
+        ->and($summary->works->groups)->toBe([])
+        ->and($summary->fundingCount())->toBe(0)
+        ->and($summary->peerReviewCount())->toBe(0)
+        ->and($summary->researchResources->summaries())->toBe([])
         ->and($summary->affiliations(AffiliationType::Employment))->toBe([]);
 });

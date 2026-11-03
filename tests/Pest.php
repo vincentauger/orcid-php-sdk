@@ -22,6 +22,7 @@ use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceInput;
 use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceItemInput;
 use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceProposalInput;
 use VincentAuger\OrcidSdk\Data\Works\WorkInput;
+use VincentAuger\OrcidSdk\Enums\AffiliationType;
 use VincentAuger\OrcidSdk\Enums\FundingType;
 use VincentAuger\OrcidSdk\Enums\PeerReviewRole;
 use VincentAuger\OrcidSdk\Enums\PeerReviewType;
@@ -149,6 +150,52 @@ function testWork(string $label, mixed ...$fields): WorkInput
         'externalIds' => [new ExternalId('other-id', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
         ...$fields,
     ]);
+}
+
+/**
+ * The fixtures of withTestActivities(), in the order it sends them, around the fixtures of the read in between
+ *
+ * @return list<OrcidFixture>
+ */
+function testActivityFixtures(string $folder, OrcidFixture ...$read): array
+{
+    $sections = ['work', 'funding', 'peer-review', 'research-resource', 'service'];
+
+    return [
+        ...array_map(fn (string $section): OrcidFixture => new OrcidFixture("{$folder}/create-{$section}"), $sections),
+        ...array_values($read),
+        ...array_map(fn (string $section): OrcidFixture => new OrcidFixture("{$folder}/delete-{$section}"), $sections),
+    ];
+}
+
+/**
+ * Add one test item to the works, fundings, peer reviews, research resources and services of the record, run the
+ * read, then delete them all (even when the read fails)
+ *
+ * @template T
+ *
+ * @param  callable(array{work: int, funding: int, peerReview: int, researchResource: int, service: int}): T  $read
+ * @return T
+ */
+function withTestActivities(Orcid $owner, string $label, callable $read): mixed
+{
+    $putCodes = [
+        'work' => $owner->works()->create(testWork($label)),
+        'funding' => $owner->fundings()->create(testFunding($label)),
+        'peerReview' => $owner->peerReviews()->create(testPeerReview($label)),
+        'researchResource' => $owner->researchResources()->create(testResearchResource($label)),
+        'service' => $owner->affiliations()->create(AffiliationType::Service, testAffiliation($label)),
+    ];
+
+    try {
+        return $read($putCodes);
+    } finally {
+        $owner->works()->delete($putCodes['work']);
+        $owner->fundings()->delete($putCodes['funding']);
+        $owner->peerReviews()->delete($putCodes['peerReview']);
+        $owner->researchResources()->delete($putCodes['researchResource']);
+        $owner->affiliations()->delete(AffiliationType::Service, $putCodes['service']);
+    }
 }
 
 /**

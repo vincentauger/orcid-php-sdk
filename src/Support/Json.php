@@ -38,6 +38,18 @@ final class Json
     }
 
     /**
+     * A boolean at `$key`, unwrapping {"value": ...}; null when missing or not a boolean
+     *
+     * @param  array<array-key, mixed>  $data
+     */
+    public static function bool(array $data, string $key): ?bool
+    {
+        $value = self::unwrap($data[$key] ?? null);
+
+        return is_bool($value) ? $value : null;
+    }
+
+    /**
      * A backed enum case from the string at `$key`; null when missing or unknown to the SDK
      *
      * @template T of \BackedEnum

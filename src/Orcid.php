@@ -17,6 +17,8 @@ use VincentAuger\OrcidSdk\Data\Person\Biography;
 use VincentAuger\OrcidSdk\Data\Person\Email;
 use VincentAuger\OrcidSdk\Data\Person\Person;
 use VincentAuger\OrcidSdk\Data\Person\PersonalDetails;
+use VincentAuger\OrcidSdk\Data\Record\Record;
+use VincentAuger\OrcidSdk\Data\Record\RecordSummary;
 use VincentAuger\OrcidSdk\Enums\ApiAccess;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
@@ -282,6 +284,26 @@ final class Orcid extends Connector
     public function activities(): ActivitiesSummary
     {
         return $this->record($this->boundOrcid(__FUNCTION__))->activities();
+    }
+
+    /**
+     * The whole record this connector is bound to: its person and activities sections in one call
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function wholeRecord(): Record
+    {
+        return $this->record($this->boundOrcid(__FUNCTION__))->wholeRecord();
+    }
+
+    /**
+     * ORCID's short overview of the record this connector is bound to: counts by section, validated or self-asserted
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function recordSummary(): RecordSummary
+    {
+        return $this->record($this->boundOrcid(__FUNCTION__))->recordSummary();
     }
 
     /**

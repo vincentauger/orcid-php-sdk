@@ -66,13 +66,15 @@ Run these commands before committing:
 - Requests that depend on each other's results (e.g. get a token, then revoke it) must be re-recorded together:
   delete all of their fixtures first, or a replayed (redacted) value ends up in a live call.
 - Items created by tests must start a marker field with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`): the
-  department name for affiliations, the review identifier's value for peer reviews, the title otherwise (the
-  proposal's for research resources). List and activities fixtures only keep those items (a group holding one is
-  kept whole), so the record's real items never end up in fixtures, apart from the hand-made test content of issue #3:
-  the hand-added work grouped with a test work on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`), and the other
-  names and websites the researcher added (`OrcidFixture::HAND_ADDED_ITEMS`). A new section adds its summary key and
-  marker field to `OrcidFixture::TEST_MARKER_FIELDS`; a person section, whose items are filtered one by one (in its
-  list and in the person section), its item key to `OrcidFixture::TEST_MARKER_ITEMS`. Addresses are the exception:
+  department name for affiliations (and the role title too, for an affiliation read in the record summary), the
+  review identifier's value for peer reviews, the title otherwise (the proposal's for research resources). List and
+  activities fixtures only keep those items (a group holding one is kept whole), so the record's real items never
+  end up in fixtures, apart from the hand-made test content of issue #3: the hand-added work grouped with a test work
+  on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`), and the other names and websites the researcher added
+  (`OrcidFixture::HAND_ADDED_ITEMS`). A new section adds its summary key and marker field to
+  `OrcidFixture::TEST_MARKER_FIELDS`; a person section, whose items are filtered one by one (in its list and in the
+  person section), its item key to `OrcidFixture::TEST_MARKER_ITEMS`, and so do the record summary's affiliation
+  lists (`employment`, `education-qualification`, `professional-activity`, by `role`). Addresses are the exception:
   an address has only a country, nothing to mark, so they are not filtered and tests use countries the researcher
   doesn't list (`AQ`, `BV`).
 - Each test item has its own `self` external identifier (`testAffiliation()` in `tests/Pest.php`), so ORCID never
@@ -328,6 +330,31 @@ above holds for these too, and so does what keywords showed for PUT (put-code in
   URLs, issue #3) are kept in fixtures too (`OrcidFixture::HAND_ADDED_ITEMS`), so the person fixtures replay them;
   keywords stay strict. Addresses are not filtered: an address has nothing to mark, so test addresses use countries
   the researcher doesn't list (`AQ`, `BV`).
+
+## Whole record and record summary (verified against the sandbox, 2026-11-03)
+
+Evidence: `tests/Fixtures/Saloon/c7/` (no test replays these either).
+
+- **`/summary` is Member API only**, whatever ORCID's guide says: 200 with a 3-legged token (`s01`) and with a
+  `/read-public` client credentials token on the Member API (`s02`, the same body); the Public API answers 404, error
+  9001, without a token (`p01`) and with a `/read-public` one (`p03`). So `GetRecordSummary` is `RequiresMemberApi`.
+- **`/record`** returns `{"orcid-identifier", "preferences": {"locale"}, "history", "person", "activities-summary",
+  "path"}`: the person and activities sections are the same bodies as `/person` and `/activities` (`m02`). It answers
+  200 on both APIs, with any of these tokens or none (`m05`, `p02`, `p04`); the Public API only returns public items. The
+  record's root, `/v3.0/{orcid}`, returns the same body (`m03`).
+- **Summary shape** (`s01`): counts, not items, for works, fundings and research resources (`validated-count`,
+  `self-asserted-count`) and peer reviews (`total`, `self-asserted-count`, `peer-review-publication-grants`).
+  Affiliations come in three lists, `employments`, `education-qualifications` (educations and qualifications) and
+  `professional-activities` (the other four), each `{"count", "<item>": [...]}` with a short item: put-code, type,
+  `organization-name`, `role` (the role title), url, dates, `validated`. `external-identifiers` is `null` without one,
+  else `{"external-identifier": [{put-code, type, value, url, validated}]}`; `email-domains` is
+  `{"count", "email-domain": null}` on the sandbox record.
+- **Validated** means added by a client: the test items are `true` and counted `validated-count`, the hand-added work
+  `self-asserted-count` (`record/summary/summary`, with one test item in every activity section). Peer reviews have
+  no validated count: one test peer review gives `total` 1, `self-asserted-count` 0, `peer-review-publication-grants`
+  1, so the SDK reads the validated count as the difference.
+- **Test marker:** a summary affiliation has no department name, so tests that read the summary mark the role title
+  too (`OrcidFixture::TEST_MARKER_ITEMS`). The counts include the items fixtures leave out.
 
 ## Agent skills
 
