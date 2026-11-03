@@ -34,7 +34,7 @@ function funding(mixed ...$fields): FundingInput
         'title' => new Title('Ocean acidification'),
         'type' => FundingType::Grant,
         'organization' => funder(),
-        'externalIds' => [new ExternalId('grant_number', 'RGPIN-2021-1234')],
+        'externalIds' => [ExternalId::grantNumber('RGPIN-2021-1234')],
         ...$fields,
     ]);
 }
@@ -45,7 +45,7 @@ describe('FundingInput', function (): void {
             title: new Title('Ocean acidification'),
             type: FundingType::Grant,
             organization: funder(),
-            externalIds: [new ExternalId('grant_number', 'RGPIN-2021-1234')],
+            externalIds: [ExternalId::grantNumber('RGPIN-2021-1234')],
         );
 
         expect($input->toArray())->toBe([
@@ -70,8 +70,8 @@ describe('FundingInput', function (): void {
             type: FundingType::Grant,
             organization: funder(),
             externalIds: [
-                new ExternalId('grant_number', 'RGPIN-2021-1234', url: 'https://example.org/grants/1234'),
-                new ExternalId('grant_number', 'RGPIN-2021', ExternalIdRelationship::PartOf),
+                ExternalId::grantNumber('RGPIN-2021-1234', url: 'https://example.org/grants/1234'),
+                ExternalId::grantNumber('RGPIN-2021', ExternalIdRelationship::PartOf),
             ],
             organizationDefinedType: 'Discovery grant',
             shortDescription: 'What happens to the oceans',
@@ -133,7 +133,7 @@ describe('FundingInput', function (): void {
     });
 
     it('takes an external identifier of any relationship, unlike a work (c2/f03, f04)', function (ExternalIdRelationship $relationship): void {
-        $input = funding(externalIds: [new ExternalId('grant_number', 'RGPIN-2021', $relationship)]);
+        $input = funding(externalIds: [ExternalId::grantNumber('RGPIN-2021', $relationship)]);
 
         expect($input->externalIds[0]->relationship)->toBe($relationship);
     })->with([ExternalIdRelationship::PartOf, ExternalIdRelationship::FundedBy]);

@@ -27,7 +27,7 @@ function work(mixed ...$fields): WorkInput
     return new WorkInput(...[
         'title' => new Title('Ocean acidification'),
         'type' => WorkType::JournalArticle,
-        'externalIds' => [new ExternalId('doi', '10.5555/abc')],
+        'externalIds' => [ExternalId::doi('10.5555/abc')],
         ...$fields,
     ]);
 }
@@ -37,7 +37,7 @@ describe('WorkInput', function (): void {
         $input = new WorkInput(
             title: new Title('Ocean acidification'),
             type: WorkType::JournalArticle,
-            externalIds: [new ExternalId('doi', '10.5555/abc')],
+            externalIds: [ExternalId::doi('10.5555/abc')],
         );
 
         expect($input->toArray())->toBe([
@@ -46,6 +46,7 @@ describe('WorkInput', function (): void {
             'external-ids' => ['external-id' => [[
                 'external-id-type' => 'doi',
                 'external-id-value' => '10.5555/abc',
+                'external-id-url' => ['value' => 'https://doi.org/10.5555/abc'],
                 'external-id-relationship' => 'self',
             ]]],
         ]);
@@ -55,8 +56,8 @@ describe('WorkInput', function (): void {
         new WorkInput(new Title('Ocean acidification'), WorkType::JournalArticle, $externalIds);
     })->with([
         'none' => [[]],
-        'only part-of' => [[new ExternalId('issn', '1234-5679', ExternalIdRelationship::PartOf)]],
-        'only version-of' => [[new ExternalId('doi', '10.5555/abc', ExternalIdRelationship::VersionOf)]],
+        'only part-of' => [[ExternalId::issn('1234-5679')]],
+        'only version-of' => [[ExternalId::doi('10.5555/abc', ExternalIdRelationship::VersionOf)]],
     ])->throws(InvalidArgumentException::class, "relationship 'self'");
 
     it('sends every field, dates in the {value} form', function (): void {
@@ -64,8 +65,8 @@ describe('WorkInput', function (): void {
             title: new Title('Ocean acidification', 'A review', new TranslatedTitle('Acidification des océans', 'fr')),
             type: WorkType::JournalArticle,
             externalIds: [
-                new ExternalId('doi', '10.5555/abc', url: 'https://doi.org/10.5555/abc'),
-                new ExternalId('issn', '1234-5679', ExternalIdRelationship::PartOf),
+                ExternalId::doi('10.5555/abc'),
+                ExternalId::issn('1234-5679'),
             ],
             journalTitle: 'Journal of Oceans',
             shortDescription: 'What happens to the oceans',
@@ -102,6 +103,7 @@ describe('WorkInput', function (): void {
                 [
                     'external-id-type' => 'issn',
                     'external-id-value' => '1234-5679',
+                    'external-id-url' => ['value' => 'https://portal.issn.org/resource/ISSN/1234-5679'],
                     'external-id-relationship' => 'part-of',
                 ],
             ]],

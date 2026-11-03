@@ -66,7 +66,7 @@ it('groups a work with the hand-added work sharing its DOI on the sandbox', func
     $this->requiresSandbox();
 
     $works = $this->getMemberApiClient()->works();
-    $putCode = $works->create(testWork('live list', externalIds: [new ExternalId('doi', strtoupper(HAND_ADDED_DOI))]));
+    $putCode = $works->create(testWork('live list', externalIds: [ExternalId::doi(strtoupper(HAND_ADDED_DOI))]));
 
     try {
         $list = $works->list();

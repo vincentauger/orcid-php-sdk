@@ -34,7 +34,7 @@ function peerReview(mixed ...$fields): PeerReviewInput
     return new PeerReviewInput(...[
         'role' => PeerReviewRole::Reviewer,
         'type' => PeerReviewType::Review,
-        'reviewIdentifiers' => [new ExternalId('source-work-id', 'review-1234')],
+        'reviewIdentifiers' => [ExternalId::sourceWorkId('review-1234')],
         'completionDate' => FuzzyDate::fromString('2025-03'),
         'reviewGroupId' => 'issn:0706-652X',
         'conveningOrganization' => convener(),
@@ -47,7 +47,7 @@ describe('PeerReviewInput', function (): void {
         $input = new PeerReviewInput(
             role: PeerReviewRole::Reviewer,
             type: PeerReviewType::Review,
-            reviewIdentifiers: [new ExternalId('source-work-id', 'review-1234')],
+            reviewIdentifiers: [ExternalId::sourceWorkId('review-1234')],
             completionDate: FuzzyDate::fromString('2025-03'),
             reviewGroupId: 'issn:0706-652X',
             conveningOrganization: convener(),
@@ -74,12 +74,12 @@ describe('PeerReviewInput', function (): void {
         $input = new PeerReviewInput(
             role: PeerReviewRole::Editor,
             type: PeerReviewType::Evaluation,
-            reviewIdentifiers: [new ExternalId('source-work-id', 'review-1234', url: 'https://example.org/reviews/1234')],
+            reviewIdentifiers: [ExternalId::sourceWorkId('review-1234', url: 'https://example.org/reviews/1234')],
             completionDate: FuzzyDate::fromString('2024-11-05'),
             reviewGroupId: 'issn:0706-652X',
             conveningOrganization: new Organization('Canadian Science Publishing', new OrganizationAddress('Ottawa', 'CA', 'ON'), DisambiguatedOrganization::ror('https://ror.org/03xm8nn72')),
             reviewUrl: new Url('https://example.org/reviews/1234'),
-            subjectExternalId: new ExternalId('doi', '10.1139/cjfas-2024-0001'),
+            subjectExternalId: ExternalId::doi('10.1139/cjfas-2024-0001'),
             subjectContainerName: 'Canadian Journal of Fisheries and Aquatic Sciences',
             subjectType: PeerReviewSubjectType::JournalArticle,
             subjectName: new Title('Salmon in a warming ocean', translatedTitle: new TranslatedTitle('Le saumon dans un océan qui se réchauffe', 'fr')),
@@ -102,6 +102,7 @@ describe('PeerReviewInput', function (): void {
             'subject-external-identifier' => [
                 'external-id-type' => 'doi',
                 'external-id-value' => '10.1139/cjfas-2024-0001',
+                'external-id-url' => ['value' => 'https://doi.org/10.1139/cjfas-2024-0001'],
                 'external-id-relationship' => 'self',
             ],
             'subject-container-name' => ['value' => 'Canadian Journal of Fisheries and Aquatic Sciences'],
@@ -141,7 +142,7 @@ describe('PeerReviewInput', function (): void {
         expect($input())->toBeInstanceOf(PeerReviewInput::class);
     })->with([
         // c3/r04: unlike a work, any relationship will do
-        'a part-of review identifier only' => [fn (): PeerReviewInput => peerReview(reviewIdentifiers: [new ExternalId('source-work-id', 'review-1234', ExternalIdRelationship::PartOf)])],
+        'a part-of review identifier only' => [fn (): PeerReviewInput => peerReview(reviewIdentifiers: [ExternalId::sourceWorkId('review-1234', ExternalIdRelationship::PartOf)])],
         // c3/r09, c3/r10
         'an organization with a country only and no disambiguated organization' => [fn (): PeerReviewInput => peerReview(conveningOrganization: new Organization('Canadian Science Publishing', new OrganizationAddress(null, 'CA')))],
         // c3/r29: stored as issn:0706-652X

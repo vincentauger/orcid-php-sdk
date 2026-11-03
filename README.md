@@ -84,6 +84,12 @@ A work needs a title, a type and an external identifier with the relationship `s
 identifies it: ORCID refuses a second work from your client with the same one. `WorkInput` checks what ORCID
 would reject before anything is sent.
 
+`ExternalId` has a named constructor for the common types: `doi()`, `isbn()`, `issn()`, `pmid()`, `pmc()`, `arxiv()`,
+`handle()`, `rrid()`, `uri()`, `grantNumber()`, `proposalId()` and `sourceWorkId()`; `new ExternalId($type, ...)` takes
+any other type ORCID knows. Pass the value bare (`10.5555/x`) or as its resolver URL (`https://doi.org/10.5555/x`):
+it is sent as written and linked to ORCID's resolver for the type. Any other URL as the value throws; pass another
+resolver of the same identifier as `url:`, and a landing page as the work's own `url`.
+
 ```php
 use VincentAuger\OrcidSdk\Data\Common\Contributor;
 use VincentAuger\OrcidSdk\Data\Common\ExternalId;
@@ -100,7 +106,10 @@ $works = Orcid::member(accessToken: $accessToken, orcid: $orcidId)->works();
 $input = new WorkInput(
     title: new Title('Ocean acidification', subtitle: 'A review'),
     type: WorkType::JournalArticle,
-    externalIds: [new ExternalId('doi', '10.5555/12345678', url: 'https://doi.org/10.5555/12345678')], // self by default
+    externalIds: [
+        ExternalId::doi('10.5555/12345678'), // self, linked to https://doi.org/10.5555/12345678
+        ExternalId::issn('1234-5679'),       // part-of by default: the journal's ISSN
+    ],
     journalTitle: 'Journal of Oceans',
     publicationDate: FuzzyDate::fromString('2021-03'),
     url: new Url('https://example.org/articles/12345678'),
@@ -208,7 +217,7 @@ $input = new FundingInput(
         new OrganizationAddress('Ottawa', 'CA'),
         DisambiguatedOrganization::ror('https://ror.org/01h531d29'),
     ),
-    externalIds: [new ExternalId('grant_number', 'RGPIN-2021-1234')], // self by default
+    externalIds: [ExternalId::grantNumber('RGPIN-2021-1234')], // self by default
     organizationDefinedType: 'Discovery grant',                  // the funder's own name for the type
     amount: new Amount('125000.50', 'CAD'),                       // a decimal string and an ISO 4217 currency
     startDate: FuzzyDate::fromString('2021-04'),
@@ -264,12 +273,12 @@ $peerReviews = Orcid::member(accessToken: $accessToken, orcid: $orcidId)->peerRe
 $input = new PeerReviewInput(
     role: PeerReviewRole::Reviewer,                              // or Editor, Member, Chair, Organizer
     type: PeerReviewType::Review,                                // Evaluation: after publication
-    reviewIdentifiers: [new ExternalId('source-work-id', 'review-1234')], // self by default
+    reviewIdentifiers: [ExternalId::sourceWorkId('review-1234')], // self by default
     completionDate: FuzzyDate::fromString('2025-03'),
     reviewGroupId: 'issn:0706-652X',
     conveningOrganization: new Organization('Canadian Science Publishing', new OrganizationAddress('Ottawa', 'CA')),
     // optional: name the reviewed item
-    subjectExternalId: new ExternalId('doi', '10.1139/cjfas-2024-0001'),
+    subjectExternalId: ExternalId::doi('10.1139/cjfas-2024-0001'),
     subjectType: PeerReviewSubjectType::JournalArticle,
     subjectName: new Title('Salmon in a warming ocean'),       // no subtitle: ORCID drops it
 );
@@ -321,7 +330,7 @@ $input = new ResearchResourceInput(
     proposal: new ResearchResourceProposalInput(
         title: new Title('Ship time on the CCGS Amundsen'),
         hosts: [$host],                                           // who granted the access
-        externalIds: [new ExternalId('proposal-id', 'AMD-2021-07')], // self by default
+        externalIds: [ExternalId::proposalId('AMD-2021-07')], // self by default
         startDate: FuzzyDate::fromString('2021-07'),              // an end date needs a start date
         endDate: FuzzyDate::fromString('2021-08'),
     ),
@@ -329,7 +338,7 @@ $input = new ResearchResourceInput(
         name: 'CCGS Amundsen',
         type: ResearchResourceType::Infrastructures,              // or Collections, Equipment, Services
         hosts: [$host],                                           // who provides the resource
-        externalIds: [new ExternalId('source-work-id', 'amundsen')],
+        externalIds: [ExternalId::sourceWorkId('amundsen')],
     )],
 );
 

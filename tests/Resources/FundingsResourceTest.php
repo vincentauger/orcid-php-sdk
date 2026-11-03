@@ -50,8 +50,8 @@ it('creates, reads, updates, lists and deletes a funding', function (): void {
         'lifecycle',
         title: new Title(OrcidFixture::TEST_MARKER.' lifecycle', translatedTitle: new TranslatedTitle('Cycle de vie', 'fr')),
         externalIds: [
-            new ExternalId('grant_number', OrcidFixture::TEST_MARKER.'-lifecycle', url: 'https://example.org/orcid-php-sdk/grants/lifecycle'),
-            new ExternalId('grant_number', OrcidFixture::TEST_MARKER.'-lifecycle-programme', ExternalIdRelationship::PartOf),
+            ExternalId::grantNumber(OrcidFixture::TEST_MARKER.'-lifecycle', url: 'https://example.org/orcid-php-sdk/grants/lifecycle'),
+            ExternalId::grantNumber(OrcidFixture::TEST_MARKER.'-lifecycle-programme', ExternalIdRelationship::PartOf),
         ],
         organizationDefinedType: 'Discovery grant',
         shortDescription: 'A funding created by the SDK tests',

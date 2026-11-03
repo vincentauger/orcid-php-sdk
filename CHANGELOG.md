@@ -72,6 +72,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `expandedSearch()` (`ExpandedSearchResults` of `ExpandedSearchResult`: names, public emails, institutions) and
   `csvSearch($query, fields)` (the CSV string; enum `CsvSearchField`). The query is raw Solr; a blank query, a
   negative `start` or `rows` outside 0 to `Orcid::SEARCH_ROWS_LIMIT` (1000) throws before sending
+- `ExternalId` named constructors for the common types: `doi()`, `isbn()`, `issn()` (`part-of` by default), `pmid()`,
+  `pmc()`, `arxiv()`, `handle()`, `rrid()`, `uri()`, `grantNumber()`, `proposalId()`, `sourceWorkId()`. The value is
+  kept as sent; without a `$url`, a bare value is linked to ORCID's resolver for the type, a value written as the
+  resolver URL is its own URL, and any other URL as the value throws
 
 ### Changed
 

@@ -22,7 +22,7 @@ it('creates, reads, updates, lists and deletes a peer review on the sandbox', fu
     $peerReviews = $this->getMemberApiClient()->peerReviews();
     $putCode = $peerReviews->create(testPeerReview(
         'live lifecycle',
-        subjectExternalId: new ExternalId('doi', '10.5555/orcid-php-sdk-live-lifecycle'),
+        subjectExternalId: ExternalId::doi('10.5555/orcid-php-sdk-live-lifecycle'),
         subjectType: PeerReviewSubjectType::Report,
     ));
 

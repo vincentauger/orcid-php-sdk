@@ -57,7 +57,7 @@ function testAffiliation(
         roleTitle: $roleTitle,
         startDate: FuzzyDate::fromString('2021-01-05'),
         endDate: $endDate,
-        externalIds: [new ExternalId('grant_number', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
+        externalIds: [ExternalId::grantNumber(OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
     );
 }
 
@@ -75,7 +75,7 @@ function testFunding(string $label, mixed ...$fields): FundingInput
             new OrganizationAddress('Ottawa', 'CA', 'ON'),
             DisambiguatedOrganization::ror('https://ror.org/02qa1x782'),
         ),
-        'externalIds' => [new ExternalId('grant_number', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
+        'externalIds' => [ExternalId::grantNumber(OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
         ...$fields,
     ]);
 }
@@ -94,7 +94,7 @@ function testPeerReview(string $label, mixed ...$fields): PeerReviewInput
     return new PeerReviewInput(...[
         'role' => PeerReviewRole::Reviewer,
         'type' => PeerReviewType::Review,
-        'reviewIdentifiers' => [new ExternalId('source-work-id', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
+        'reviewIdentifiers' => [ExternalId::sourceWorkId(OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
         'completionDate' => FuzzyDate::fromString('2025-03'),
         'reviewGroupId' => TEST_REVIEW_GROUP,
         'conveningOrganization' => new Organization(
@@ -126,14 +126,14 @@ function testResearchResource(string $label, ?array $items = null, mixed ...$fie
         new ResearchResourceProposalInput(...[
             'title' => new Title(OrcidFixture::TEST_MARKER.' '.$label),
             'hosts' => [$host],
-            'externalIds' => [new ExternalId('proposal-id', $slug)],
+            'externalIds' => [ExternalId::proposalId($slug)],
             ...$fields,
         ]),
         $items ?? [new ResearchResourceItemInput(
             OrcidFixture::TEST_MARKER.' vessel',
             ResearchResourceType::Infrastructures,
             [$host],
-            [new ExternalId('source-work-id', $slug.'-vessel')],
+            [ExternalId::sourceWorkId($slug.'-vessel')],
         )],
     );
 }

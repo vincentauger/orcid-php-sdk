@@ -32,7 +32,7 @@ function proposal(mixed ...$fields): ResearchResourceProposalInput
     return new ResearchResourceProposalInput(...[
         'title' => new Title('Ship time on the CCGS Amundsen'),
         'hosts' => [resourceHost()],
-        'externalIds' => [new ExternalId('proposal-id', 'AMD-2021-07')],
+        'externalIds' => [ExternalId::proposalId('AMD-2021-07')],
         ...$fields,
     ]);
 }
@@ -46,7 +46,7 @@ function resourceItem(mixed ...$fields): ResearchResourceItemInput
         'name' => 'CCGS Amundsen',
         'type' => ResearchResourceType::Infrastructures,
         'hosts' => [resourceHost()],
-        'externalIds' => [new ExternalId('source-work-id', 'amundsen')],
+        'externalIds' => [ExternalId::sourceWorkId('amundsen')],
         ...$fields,
     ]);
 }
@@ -63,13 +63,13 @@ describe('ResearchResourceInput', function (): void {
             proposal: new ResearchResourceProposalInput(
                 title: new Title('Ship time on the CCGS Amundsen'),
                 hosts: [resourceHost()],
-                externalIds: [new ExternalId('proposal-id', 'AMD-2021-07')],
+                externalIds: [ExternalId::proposalId('AMD-2021-07')],
             ),
             items: [new ResearchResourceItemInput(
                 name: 'CCGS Amundsen',
                 type: ResearchResourceType::Infrastructures,
                 hosts: [resourceHost()],
-                externalIds: [new ExternalId('source-work-id', 'amundsen')],
+                externalIds: [ExternalId::sourceWorkId('amundsen')],
             )],
         );
 
@@ -102,8 +102,8 @@ describe('ResearchResourceInput', function (): void {
                 title: new Title('Ship time on the CCGS Amundsen', translatedTitle: new TranslatedTitle('Temps navire', 'fr')),
                 hosts: [resourceHost(), new Organization('Amundsen Science', new OrganizationAddress('Québec', 'ca', 'QC'), DisambiguatedOrganization::ror('https://ror.org/04sjchr03'))],
                 externalIds: [
-                    new ExternalId('proposal-id', 'AMD-2021-07', url: 'https://example.org/proposals/7'),
-                    new ExternalId('proposal-id', 'AMD-2021', ExternalIdRelationship::PartOf),
+                    ExternalId::proposalId('AMD-2021-07', url: 'https://example.org/proposals/7'),
+                    ExternalId::proposalId('AMD-2021', ExternalIdRelationship::PartOf),
                 ],
                 startDate: FuzzyDate::fromString('2021-07-01'),
                 endDate: FuzzyDate::fromString('2021-08'),
@@ -111,7 +111,7 @@ describe('ResearchResourceInput', function (): void {
             ),
             items: [
                 resourceItem(url: new Url('https://example.org/amundsen')),
-                resourceItem(name: 'Rosette sampler', type: ResearchResourceType::Equipment, externalIds: [new ExternalId('source-work-id', 'rosette', ExternalIdRelationship::PartOf)]),
+                resourceItem(name: 'Rosette sampler', type: ResearchResourceType::Equipment, externalIds: [ExternalId::sourceWorkId('rosette', ExternalIdRelationship::PartOf)]),
             ],
         );
 
@@ -177,10 +177,10 @@ describe('ResearchResourceInput', function (): void {
         $input = new ResearchResourceInput(
             proposal(
                 hosts: [new Organization('DFO', new OrganizationAddress(null, 'CA'), DisambiguatedOrganization::ror('https://ror.org/02qa1x782'))],
-                externalIds: [new ExternalId('proposal-id', 'AMD-2021', ExternalIdRelationship::PartOf)],
+                externalIds: [ExternalId::proposalId('AMD-2021', ExternalIdRelationship::PartOf)],
                 startDate: FuzzyDate::fromString('2021'),
             ),
-            [resourceItem(externalIds: [new ExternalId('source-work-id', 'amundsen', ExternalIdRelationship::PartOf)])],
+            [resourceItem(externalIds: [ExternalId::sourceWorkId('amundsen', ExternalIdRelationship::PartOf)])],
         );
 
         expect($input->toArray()['proposal'])->toHaveKey('start-date')

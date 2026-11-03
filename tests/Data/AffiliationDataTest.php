@@ -10,7 +10,6 @@ use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
 use VincentAuger\OrcidSdk\Data\Organization\Organization;
 use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
-use VincentAuger\OrcidSdk\Enums\ExternalIdRelationship;
 use VincentAuger\OrcidSdk\Support\OrcidId;
 
 function dfo(?string $city = 'Ottawa', ?string $country = 'CA', ?DisambiguatedOrganization $id = null): Organization
@@ -88,7 +87,7 @@ describe('AffiliationInput', function (): void {
             departmentName: 'Science',
             roleTitle: '  ',
             startDate: FuzzyDate::fromString('2021-01-05'),
-            externalIds: [new ExternalId('grant_number', 'ABC-1', ExternalIdRelationship::Self, 'https://example.org/abc')],
+            externalIds: [ExternalId::grantNumber('ABC-1', url: 'https://example.org/abc')],
         );
 
         expect($input->roleTitle)->toBeNull()

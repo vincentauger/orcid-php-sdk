@@ -50,7 +50,7 @@ it('creates, reads, updates, lists and deletes a peer review', function (): void
         role: PeerReviewRole::Editor,
         reviewUrl: new Url('https://example.org/orcid-php-sdk/reviews/lifecycle'),
         completionDate: FuzzyDate::fromString('2024-11-05'),
-        subjectExternalId: new ExternalId('doi', '10.5555/orcid-php-sdk-lifecycle', url: 'https://doi.org/10.5555/orcid-php-sdk-lifecycle'),
+        subjectExternalId: ExternalId::doi('10.5555/orcid-php-sdk-lifecycle'),
         subjectContainerName: 'Canadian Manuscript Report of Fisheries and Aquatic Sciences',
         subjectType: PeerReviewSubjectType::Report,
         subjectName: new Title('orcid-php-sdk reviewed report', translatedTitle: new TranslatedTitle('Rapport évalué', 'fr')),
