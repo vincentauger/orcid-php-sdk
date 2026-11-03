@@ -115,8 +115,7 @@ uses affiliations and OAuth). `1.0` = C8.
 
 - [x] **Test cleanup** (before C0): every call is tested through the typed requests; `RawRequest` and the
   tests replaying `a1/` are gone (the `a1/` fixtures stay as evidence). Errors recorded under `errors/`.
-  Left: `PersonDataTest` still uses a hand-built payload, because the sandbox record has no other names,
-  external identifiers or credit name; add them on the record, re-record `record/person-*`, then move it.
+  `PersonDataTest` replays the recorded person fixture since #11.
 - [x] **C0. Shared groundwork** (#2, `Amount` with #7)
   - [x] Member connector bound to its record (ADR 0003); `record($id)` only reads
   - [x] `Visibility` enum (`public`, `limited`, `registered-only`, `private`) replacing `?string $visibility`
@@ -158,8 +157,10 @@ uses affiliations and OAuth). `1.0` = C8.
   `ResearchResourceInput` nests `ResearchResourceProposalInput` and `ResearchResourceItemInput`, as ORCID does.
   `ResearchResourceSummary` (the proposal only) / `ResearchResourceGroup`.
 - [ ] **C5. Person sections** (`/person/update`, Member API). Typed items and keywords done (#10; sandbox check in
-  `c5/`, in `AGENTS.md`: a duplicate keyword is 409, error 9030, without the existing put-code)
-  - Writable: other names, keywords (done), researcher URLs, external identifiers, addresses:
+  `c5/`, in `AGENTS.md`: a duplicate keyword is 409, error 9030, without the existing put-code). Other names,
+  researcher URLs, external identifiers and addresses done (#11; sandbox check in `c6/`: a blank other name is
+  stored, addresses have no duplicate check, a person identifier's URL is required)
+  - [x] Writable: other names, keywords, researcher URLs, external identifiers, addresses:
     `$orcid->keywords()->list|get|create|update|delete`, etc.
   - Read only: `$orcid->biography()`, `->emails()`, `->personalDetails()`
   - [x] `Person` exposes typed items (with put-codes and visibility) instead of plain strings (breaking); the same

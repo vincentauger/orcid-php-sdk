@@ -47,6 +47,26 @@ final readonly class RecordResource
         return new ReadOnlyKeywordsResource($this->connector, $this->orcid);
     }
 
+    public function otherNames(): ReadOnlyOtherNamesResource
+    {
+        return new ReadOnlyOtherNamesResource($this->connector, $this->orcid);
+    }
+
+    public function researcherUrls(): ReadOnlyResearcherUrlsResource
+    {
+        return new ReadOnlyResearcherUrlsResource($this->connector, $this->orcid);
+    }
+
+    public function externalIdentifiers(): ReadOnlyExternalIdentifiersResource
+    {
+        return new ReadOnlyExternalIdentifiersResource($this->connector, $this->orcid);
+    }
+
+    public function addresses(): ReadOnlyAddressesResource
+    {
+        return new ReadOnlyAddressesResource($this->connector, $this->orcid);
+    }
+
     public function affiliations(): ReadOnlyAffiliationsResource
     {
         return new ReadOnlyAffiliationsResource($this->connector, $this->orcid);

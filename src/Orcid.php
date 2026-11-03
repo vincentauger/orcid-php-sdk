@@ -18,11 +18,15 @@ use VincentAuger\OrcidSdk\Enums\ApiAccess;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Exceptions\MissingScopeException;
+use VincentAuger\OrcidSdk\Resources\AddressesResource;
 use VincentAuger\OrcidSdk\Resources\AffiliationsResource;
+use VincentAuger\OrcidSdk\Resources\ExternalIdentifiersResource;
 use VincentAuger\OrcidSdk\Resources\FundingsResource;
 use VincentAuger\OrcidSdk\Resources\KeywordsResource;
+use VincentAuger\OrcidSdk\Resources\OtherNamesResource;
 use VincentAuger\OrcidSdk\Resources\PeerReviewsResource;
 use VincentAuger\OrcidSdk\Resources\RecordResource;
+use VincentAuger\OrcidSdk\Resources\ResearcherUrlsResource;
 use VincentAuger\OrcidSdk\Resources\ResearchResourcesResource;
 use VincentAuger\OrcidSdk\Resources\WorksResource;
 use VincentAuger\OrcidSdk\Support\OrcidId;
@@ -182,6 +186,47 @@ final class Orcid extends Connector
     public function keywords(): KeywordsResource
     {
         return new KeywordsResource($this, $this->boundOrcid(__FUNCTION__));
+    }
+
+    /**
+     * The other names of the record this connector is bound to. Writes need the /person/update scope.
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function otherNames(): OtherNamesResource
+    {
+        return new OtherNamesResource($this, $this->boundOrcid(__FUNCTION__));
+    }
+
+    /**
+     * The researcher URLs (websites) of the record this connector is bound to. Writes need the /person/update scope.
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function researcherUrls(): ResearcherUrlsResource
+    {
+        return new ResearcherUrlsResource($this, $this->boundOrcid(__FUNCTION__));
+    }
+
+    /**
+     * The person external identifiers (identifiers in other systems) of the record this connector is bound to.
+     * Writes need the /person/update scope.
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function externalIdentifiers(): ExternalIdentifiersResource
+    {
+        return new ExternalIdentifiersResource($this, $this->boundOrcid(__FUNCTION__));
+    }
+
+    /**
+     * The addresses (countries) of the record this connector is bound to. Writes need the /person/update scope.
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function addresses(): AddressesResource
+    {
+        return new AddressesResource($this, $this->boundOrcid(__FUNCTION__));
     }
 
     /**

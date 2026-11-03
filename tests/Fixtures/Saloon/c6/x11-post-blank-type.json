@@ -1,0 +1,25 @@
+{
+    "statusCode": 400,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 15:31:33 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "524",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a54c6d37797a3773-YYZ"
+    },
+    "data": "{\"response-code\":400,\"developer-message\":\"400 Bad request: invalid JSON - ${error} Full validation error: cvc-pattern-valid: Value ' ' is not facet-valid with respect to pattern '[\\\\s\\\\S]*[^\\\\s\\\\n\\\\r]+[\\\\s\\\\S]*' for type 'non-empty-string'. (cvc-pattern-valid: Value ' ' is not facet-valid with respect to pattern '[\\\\s\\\\S]*[^\\\\s\\\\n\\\\r]+[\\\\s\\\\S]*' for type 'non-empty-string'.)\",\"user-message\":\"Invalid JSON.\",\"error-code\":9047,\"more-info\":\"https:\/\/members.orcid.org\/api\/resources\/troubleshooting\"}",
+    "context": []
+}

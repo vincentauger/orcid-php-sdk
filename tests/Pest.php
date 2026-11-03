@@ -13,6 +13,11 @@ use VincentAuger\OrcidSdk\Data\Organization\DisambiguatedOrganization;
 use VincentAuger\OrcidSdk\Data\Organization\Organization;
 use VincentAuger\OrcidSdk\Data\Organization\OrganizationAddress;
 use VincentAuger\OrcidSdk\Data\PeerReviews\PeerReviewInput;
+use VincentAuger\OrcidSdk\Data\Person\AddressInput;
+use VincentAuger\OrcidSdk\Data\Person\KeywordInput;
+use VincentAuger\OrcidSdk\Data\Person\OtherNameInput;
+use VincentAuger\OrcidSdk\Data\Person\PersonExternalIdentifierInput;
+use VincentAuger\OrcidSdk\Data\Person\ResearcherUrlInput;
 use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceInput;
 use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceItemInput;
 use VincentAuger\OrcidSdk\Data\ResearchResources\ResearchResourceProposalInput;
@@ -22,6 +27,7 @@ use VincentAuger\OrcidSdk\Enums\PeerReviewRole;
 use VincentAuger\OrcidSdk\Enums\PeerReviewType;
 use VincentAuger\OrcidSdk\Enums\ResearchResourceType;
 use VincentAuger\OrcidSdk\Enums\WorkType;
+use VincentAuger\OrcidSdk\Orcid;
 
 pest()->extend(BaseTest::class);
 
@@ -143,4 +149,52 @@ function testWork(string $label, mixed ...$fields): WorkInput
         'externalIds' => [new ExternalId('other-id', OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label))],
         ...$fields,
     ]);
+}
+
+/**
+ * The fixtures of withTestPersonItems(), in the order it sends them, around the read in between
+ *
+ * @return list<OrcidFixture>
+ */
+function testPersonItemFixtures(string $folder, string $read): array
+{
+    $sections = ['keyword', 'other-name', 'researcher-url', 'external-identifier', 'address'];
+
+    return [
+        ...array_map(fn (string $section): OrcidFixture => new OrcidFixture("{$folder}/create-{$section}"), $sections),
+        new OrcidFixture("{$folder}/{$read}"),
+        ...array_map(fn (string $section): OrcidFixture => new OrcidFixture("{$folder}/delete-{$section}"), $sections),
+    ];
+}
+
+/**
+ * Add one test item to every writable person section of the record, run the read, then delete them all (even when
+ * the read fails). Test addresses use Antarctica (AQ): an address has only a country, nothing to mark.
+ *
+ * @template T
+ *
+ * @param  callable(array{keyword: int, otherName: int, researcherUrl: int, externalIdentifier: int, address: int}): T  $read
+ * @return T
+ */
+function withTestPersonItems(Orcid $owner, string $label, callable $read): mixed
+{
+    $marked = OrcidFixture::TEST_MARKER.' '.$label;
+    $slug = OrcidFixture::TEST_MARKER.'-'.str_replace(' ', '-', $label);
+    $putCodes = [
+        'keyword' => $owner->keywords()->create(new KeywordInput($marked)),
+        'otherName' => $owner->otherNames()->create(new OtherNameInput($marked)),
+        'researcherUrl' => $owner->researcherUrls()->create(new ResearcherUrlInput('https://example.org/'.$slug, $marked)),
+        'externalIdentifier' => $owner->externalIdentifiers()->create(new PersonExternalIdentifierInput('Scopus Author ID', $slug, 'https://example.org/'.$slug)),
+        'address' => $owner->addresses()->create(new AddressInput('AQ')),
+    ];
+
+    try {
+        return $read($putCodes);
+    } finally {
+        $owner->keywords()->delete($putCodes['keyword']);
+        $owner->otherNames()->delete($putCodes['otherName']);
+        $owner->researcherUrls()->delete($putCodes['researcherUrl']);
+        $owner->externalIdentifiers()->delete($putCodes['externalIdentifier']);
+        $owner->addresses()->delete($putCodes['address']);
+    }
 }

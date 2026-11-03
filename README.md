@@ -376,7 +376,7 @@ $record->affiliations()->list(AffiliationType::Employment); // reads only: no cr
 ```
 
 Own-record calls (`affiliations()`, `works()`, `fundings()`, `peerReviews()`, `researchResources()`, `keywords()`,
-`person()`, `activities()`) on a connector without an `orcid` throw a `LogicException` before anything is sent.
+`otherNames()`, `researcherUrls()`, `externalIdentifiers()`, `addresses()`, `person()`, `activities()`) on a connector without an `orcid` throw a `LogicException` before anything is sent.
 
 ### Keywords
 
@@ -406,6 +406,36 @@ Orcid::public()->record($orcidId)->keywords()->list();          // reads only
 ```
 
 ORCID ignores a visibility or display index sent by a client: a new keyword gets the researcher's default visibility.
+
+### Other names, websites, external identifiers and countries
+
+The other writable person sections work like keywords (`/person/update`, `list|get|create|update|delete`, reads
+only through `record($id)`), each returning the same items as `person()`:
+
+```php
+use VincentAuger\OrcidSdk\Data\Person\AddressInput;
+use VincentAuger\OrcidSdk\Data\Person\OtherNameInput;
+use VincentAuger\OrcidSdk\Data\Person\PersonExternalIdentifierInput;
+use VincentAuger\OrcidSdk\Data\Person\ResearcherUrlInput;
+
+$orcid = Orcid::member(accessToken: $accessToken, orcid: $orcidId);
+
+$orcid->otherNames()->create(new OtherNameInput('J. Carberry'));                      // OtherName
+$orcid->researcherUrls()->create(new ResearcherUrlInput('https://example.org', 'Lab')); // ResearcherUrl; the name is optional
+$orcid->externalIdentifiers()->create(new PersonExternalIdentifierInput(              // PersonExternalIdentifier
+    'Scopus Author ID',                                                                // free text
+    '1234567',
+    'https://www.scopus.com/authid/detail.uri?authorId=1234567',                       // required
+));
+$orcid->addresses()->create(new AddressInput('CA'));                                   // Address: ORCID only stores the country
+```
+
+What the inputs check before sending: a non-blank other name of at most 255 characters (ORCID would store a blank
+one); a non-blank URL of at most 2000 characters and a name of at most 350 (ORCID does not check that the URL is
+one); a non-blank type, value and URL, type and value of at most 255 characters (always sent as `self`); an ISO
+3166-1 alpha-2 country (uppercased; only its form is checked, ORCID refuses a code it doesn't know). A duplicate is a 409 `OrcidConflictException` with `isDuplicate()` (error 9030):
+an other name with the same content, a website with the same URL, an identifier with the same type and value.
+ORCID accepts the same country twice.
 
 ### Errors
 

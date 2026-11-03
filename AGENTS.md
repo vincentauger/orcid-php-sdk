@@ -68,10 +68,13 @@ Run these commands before committing:
 - Items created by tests must start a marker field with `OrcidFixture::TEST_MARKER` (`orcid-php-sdk`): the
   department name for affiliations, the review identifier's value for peer reviews, the title otherwise (the
   proposal's for research resources). List and activities fixtures only keep those items (a group holding one is
-  kept whole), so the record's real items never end up in fixtures, apart from the hand-added work grouped with a
-  test work on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`). A new section adds its summary key and marker field to `OrcidFixture::TEST_MARKER_FIELDS`;
-  a person section, whose items are filtered one by one (in its list and in the person section), its item key to
-  `OrcidFixture::TEST_MARKER_ITEMS`.
+  kept whole), so the record's real items never end up in fixtures, apart from the hand-made test content of issue #3:
+  the hand-added work grouped with a test work on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`), and the other
+  names and websites the researcher added (`OrcidFixture::HAND_ADDED_ITEMS`). A new section adds its summary key and
+  marker field to `OrcidFixture::TEST_MARKER_FIELDS`; a person section, whose items are filtered one by one (in its
+  list and in the person section), its item key to `OrcidFixture::TEST_MARKER_ITEMS`. Addresses are the exception:
+  an address has only a country, nothing to mark, so they are not filtered and tests use countries the researcher
+  doesn't list (`AQ`, `BV`).
 - Each test item has its own `self` external identifier (`testAffiliation()` in `tests/Pest.php`), so ORCID never
   groups test items together. Only the works list tests share one, `HAND_ADDED_DOI`, to join the hand-added work.
 - While recording, responses are live and carry real ids; once replayed, the placeholders. Assertions that run
@@ -290,6 +293,41 @@ above holds for keywords too. Writes need `/person/update`.
   list under `keywords`. A client's keyword gets display index `"1"`.
 - **Test marker:** test keywords start their content with `OrcidFixture::TEST_MARKER` (case-sensitive): the
   researcher's own keywords never end up in fixtures, even in the person section's.
+
+## Other names, researcher URLs, external identifiers, addresses (verified against the sandbox, 2026-11-03)
+
+Evidence: `tests/Fixtures/Saloon/c6/` (no test replays these either). Everything under "ORCID API behaviour"
+above holds for these too, and so does what keywords showed for PUT (put-code in the body, 9019: `o13`, `u18`,
+`x19`, `a12`; unknown put-code 404, 9016: `o14`, `u20`, `x20`, `a13`). Writes need `/person/update`.
+
+- **Other names** (`/other-names`, `o*`): `{"content": "..."}`, a plain string (`{"value"}` is 9047, `o09`); missing
+  or `null` is 9047 (`o04`; `o02` sent `[]`, not an object), at most 255 characters (`o05`; 256 is 9047, `o06`). **A blank name is accepted**
+  and stored as sent, on a POST and a PUT (`o03`, `o15`), and so is padding (`o11-get`): `OtherNameInput` trims and
+  refuses blank. Duplicates: 409, 9030, case-sensitive (`o07`, `o08`); the researcher's own name added by this
+  client is fine (`o10`).
+- **Researcher URLs** (`/researcher-urls`, `u*`): `{"url-name", "url": {"value"}}`. The URL is required (9047,
+  `u03`), a blank one 400, error 9020 (`u04`), at most 2000 characters (9020, `u13`, `u14`); it is not checked:
+  `not a url`, no scheme, `ftp://` are stored (`u05`, `u06`, `u15`). The name is optional (`u01`), a blank one 9047
+  (`u07`), at most 350 characters (`string-350`, `u08`). Duplicates: 409, 9030 on the URL, case-sensitive (`u10`,
+  `u16`); a name may repeat (`u11`). A PUT without the name clears it (`u19`).
+- **External identifiers** (`/external-identifiers`, `x*`): type, value and URL are required (9047 for a missing
+  type or value, `x02`, `x03`; 400, error 9020 for the URL, `x05`); the relationship must be `self` (9020, missing
+  `x04` or `part-of` `x07`). The type is free text (`x06`, `x16`), type and value at most 255 characters (9020,
+  `x17`; `x22` accepted, `x23` refused: ORCID calls the value "Reference field", as for the missing URL in `x05`),
+  blank ones 9047 (`x10`, `x11`); the URL is not checked (`x14`) and 2000 characters are accepted (`x24`, `x25`). Duplicates: 409, 9030 on the type and
+  value, whatever the URL (`x08`, `x15`; the message names the URL); the same value with another type is fine (`x09`). The researcher can't add
+  one on the sandbox website (issue #3).
+- **Addresses** (`/address`, singular; `/addresses` is 404, 9001, `a15`; `a*`): `{"country": {"value"}}`, required
+  (`a03`; `a02` sent `[]`, not an object), an uppercase ISO 3166-1 alpha-2 code: unknown, lowercase, alpha-3, blank and plain-string values
+  are 400, 9047 (`a04`, `a05`, `a09`, `a10`, `a06`). **No duplicate check**: the same country twice, or the
+  researcher's own, is accepted (`a07`, `a08`).
+- **Lists** (`o16`, `u21`, `x21`, `a14`): `{"last-modified-date", "<item>": [...], "path"}`, not grouped, like
+  keywords. A client's item gets display index `"1"`.
+- **Test marker:** other names by their content, researcher URLs by their name (`url-name`), external identifiers by
+  their value (`OrcidFixture::TEST_MARKER_ITEMS`). Items the researcher added by hand on the website (other names and
+  URLs, issue #3) are kept in fixtures too (`OrcidFixture::HAND_ADDED_ITEMS`), so the person fixtures replay them;
+  keywords stay strict. Addresses are not filtered: an address has nothing to mark, so test addresses use countries
+  the researcher doesn't list (`AQ`, `BV`).
 
 ## Agent skills
 

@@ -149,3 +149,29 @@ it('only keeps the keywords created by tests, in the person section and in keywo
     expect(array_column($person['keywords']['keyword'], 'put-code'))->toBe([2])
         ->and(array_column($list['keyword'], 'put-code'))->toBe([2]);
 });
+
+it('only keeps the other names, websites and external identifiers created by tests or by the researcher', function (string $list, string $field): void {
+    $researcher = ['source-orcid' => ['path' => '0000-0002-1825-0097'], 'source-client-id' => null];
+    $client = ['source-orcid' => null, 'source-client-id' => ['path' => 'APP-0000000000000000']];
+    $items = [$list => [
+        ['put-code' => 1, $field => 'Jo Carberry', 'source' => $client],
+        ['put-code' => 2, $field => OrcidFixture::TEST_MARKER.' item', 'source' => $client],
+        // hand-added on the sandbox record (issue #3)
+        ['put-code' => 3, $field => 'Josiah', 'source' => $researcher],
+    ]];
+
+    $stored = json_decode(storeThroughFixture([], $items)['data'], true);
+
+    expect(array_column($stored[$list], 'put-code'))->toBe($list === 'external-identifier' ? [2] : [2, 3]);
+})->with([
+    'other names' => ['other-name', 'content'],
+    'researcher URLs' => ['researcher-url', 'url-name'],
+    // the researcher can't add one on the sandbox website: only test items are kept
+    'external identifiers' => ['external-identifier', 'external-id-value'],
+]);
+
+it('keeps every address: an address has only a country, nothing to mark', function (): void {
+    $addresses = ['address' => [['put-code' => 1, 'country' => ['value' => 'CA']], ['put-code' => 2, 'country' => ['value' => 'AQ']]]];
+
+    expect(json_decode(storeThroughFixture([], $addresses)['data'], true))->toBe($addresses);
+});

@@ -1,0 +1,62 @@
+<?php
+
+declare(strict_types=1);
+
+namespace VincentAuger\OrcidSdk\Requests\Addresses;
+
+use Saloon\Contracts\Body\HasBody;
+use Saloon\Enums\Method;
+use Saloon\Http\Request;
+use Saloon\Http\Response;
+use Saloon\Traits\Body\HasJsonBody;
+use VincentAuger\OrcidSdk\Contracts\RequiresMemberApi;
+use VincentAuger\OrcidSdk\Contracts\RequiresScopes;
+use VincentAuger\OrcidSdk\Data\Person\Address;
+use VincentAuger\OrcidSdk\Data\Person\AddressInput;
+use VincentAuger\OrcidSdk\Enums\Scope;
+use VincentAuger\OrcidSdk\Traits\Requests\HasRecordEndpoint;
+
+/**
+ * Replace an address (PUT /{orcid}/address/{put-code}). Only the client that created the item can update it.
+ */
+final class UpdateAddress extends Request implements HasBody, RequiresMemberApi, RequiresScopes
+{
+    use HasJsonBody;
+    use HasRecordEndpoint;
+
+    protected Method $method = Method::PUT;
+
+    public function __construct(
+        private readonly string $orcid,
+        private readonly int $putCode,
+        private readonly AddressInput $input,
+    ) {}
+
+    public function resolveEndpoint(): string
+    {
+        return $this->recordEndpoint($this->orcid, 'address/'.$this->putCode);
+    }
+
+    /**
+     * ORCID requires the put-code in the body too (400, error 9019 without it)
+     *
+     * @return array<string, mixed>
+     */
+    protected function defaultBody(): array
+    {
+        return $this->input->toArray($this->putCode);
+    }
+
+    public function requiredScopes(): array
+    {
+        return [Scope::PersonUpdate];
+    }
+
+    public function createDtoFromResponse(Response $response): Address
+    {
+        /** @var array<string, mixed> $data */
+        $data = $response->json();
+
+        return Address::fromArray($data) ?? throw new \UnexpectedValueException('ORCID returned an address without a country');
+    }
+}

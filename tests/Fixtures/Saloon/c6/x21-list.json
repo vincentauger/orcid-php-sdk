@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 15:31:34 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a54c6d3eafb73773-YYZ"
+    },
+    "data": "{\"last-modified-date\":{\"value\":1793719894527},\"external-identifier\":[{\"created-date\":{\"value\":1793719892517},\"last-modified-date\":{\"value\":1793719894527},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"external-id-type\":\"Scopus Author ID\",\"external-id-value\":\"orcid-php-sdk-x01-updated\",\"external-id-url\":{\"value\":\"https:\/\/example.org\/orcid-php-sdk\/x01-updated\"},\"external-id-relationship\":\"self\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/external-identifiers\/8675\",\"put-code\":8675,\"display-index\":1},{\"created-date\":{\"value\":1793719893166},\"last-modified-date\":{\"value\":1793719893166},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"external-id-type\":\"orcid-php-sdk free type\",\"external-id-value\":\"orcid-php-sdk-x06\",\"external-id-url\":{\"value\":\"https:\/\/example.org\/orcid-php-sdk\/x06\"},\"external-id-relationship\":\"self\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/external-identifiers\/8676\",\"put-code\":8676,\"display-index\":1},{\"created-date\":{\"value\":1793719893502},\"last-modified-date\":{\"value\":1793719893502},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"external-id-type\":\"ResearcherID\",\"external-id-value\":\"orcid-php-sdk-x01\",\"external-id-url\":{\"value\":\"https:\/\/example.org\/orcid-php-sdk\/x01\"},\"external-id-relationship\":\"self\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/external-identifiers\/8677\",\"put-code\":8677,\"display-index\":1},{\"created-date\":{\"value\":1793719894066},\"last-modified-date\":{\"value\":1793719894066},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"external-id-type\":\"Scopus Author ID\",\"external-id-value\":\"orcid-php-sdk-x14\",\"external-id-url\":{\"value\":\"not a url\"},\"external-id-relationship\":\"self\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/external-identifiers\/8678\",\"put-code\":8678,\"display-index\":1},{\"created-date\":{\"value\":1793719894292},\"last-modified-date\":{\"value\":1793719894292},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"external-id-type\":\"doi\",\"external-id-value\":\"orcid-php-sdk-x16\",\"external-id-url\":{\"value\":\"https:\/\/example.org\/orcid-php-sdk\/x16\"},\"external-id-relationship\":\"self\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/external-identifiers\/8679\",\"put-code\":8679,\"display-index\":1}],\"path\":\"\/0000-0002-1825-0097\/external-identifiers\"}",
+    "context": []
+}

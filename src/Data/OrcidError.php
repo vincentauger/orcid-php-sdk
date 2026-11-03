@@ -18,7 +18,8 @@ final readonly class OrcidError
     public const int DUPLICATE = 9021;
 
     /**
-     * This client already added a person item (e.g. a keyword) with the same content. ORCID does not name it.
+     * This client already added a person item with the same content (a keyword or other name's text, a website's
+     * URL, an external identifier's type and value). ORCID does not name it.
      */
     public const int DUPLICATE_CONTENT = 9030;
 

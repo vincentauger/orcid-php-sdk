@@ -43,9 +43,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keywords: `$orcid->keywords()->list|get|create|update|delete` on a bound member connector (writes need
   `/person/update`), `record($id)->keywords()->list|get` on any connector. `Keyword` (read, the same class as
   `Person::$keywords`) / `KeywordInput` (write, validated before sending: non-blank, at most 255 characters, trimmed)
+- Other names, researcher URLs, external identifiers and addresses: `$orcid->otherNames()`, `researcherUrls()`,
+  `externalIdentifiers()` and `addresses()` with `list|get|create|update|delete` on a bound member connector (writes
+  need `/person/update`), and `list|get` on `record($id)`, returning the same items as `Person`. `OtherNameInput`
+  (non-blank, at most 255 characters, trimmed), `ResearcherUrlInput` (URL non-blank, at most 2000 characters; name
+  optional, at most 350), `PersonExternalIdentifierInput` (type, value and URL required, at most 255 characters, always
+  `self`), `AddressInput` (ISO 3166-1 alpha-2 country, uppercased)
 - Typed person items, each with its put-code, visibility, source and display index: `Keyword`, `OtherName`,
   `ResearcherUrl`, `Address`, `PersonExternalIdentifier`; and `Biography`
-- `OrcidConflictException::DUPLICATE_CONTENT` (error 9030, a person item with the same content), covered by
+- `OrcidConflictException::DUPLICATE_CONTENT` (error 9030, a person item with the same content: a keyword
+  or other name, a website's URL, an external identifier's type and value), covered by
   `isDuplicate()`
 - Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes, and `Amount` (a decimal string and an ISO 4217
   currency)

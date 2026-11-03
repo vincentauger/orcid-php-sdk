@@ -11,8 +11,9 @@ use VincentAuger\OrcidSdk\Data\OrcidError;
  *
  * - 9021: this client already added an item with the same `self` external identifier (on create, or on an
  *   update that would give the item another one's identifier). The item is "already there": `existingPutCode()`
- * - 9030: this client already added a person item (e.g. a keyword) with the same content, on create or update.
- *   ORCID does not name the existing item: `existingPutCode()` is null
+ * - 9030: this client already added a person item with the same content, on create or update: a keyword or other
+ *   name with the same text, a website with the same URL, an external identifier with the same type and value
+ *   (addresses are never duplicates). ORCID does not name the existing item: `existingPutCode()` is null
  */
 final class OrcidConflictException extends OrcidRequestException
 {

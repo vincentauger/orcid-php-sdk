@@ -60,13 +60,26 @@ final class OrcidFixture extends Fixture
 
     /**
      * The person items kept in fixtures only when created by tests, by the key of their list, with their field that
-     * starts with TEST_MARKER. Unlike summaries, each item of the list is kept or dropped on its own.
+     * starts with TEST_MARKER. Unlike summaries, each item of the list is kept or dropped on its own. Addresses are
+     * not filtered: an address has only a country, nothing to mark.
      *
      * @var array<string, string>
      */
     public const array TEST_MARKER_ITEMS = [
         'keyword' => 'content',
+        'other-name' => 'content',
+        // test websites are named; the URL itself can't start with the marker
+        'researcher-url' => 'url-name',
+        'external-identifier' => 'external-id-value',
     ];
+
+    /**
+     * The person lists whose items added by the researcher (on the website, not through a client) are kept too: the
+     * hand-made test content of issue #3. The researcher's own keywords never end up in fixtures.
+     *
+     * @var list<string>
+     */
+    public const array HAND_ADDED_ITEMS = ['other-name', 'researcher-url'];
 
     private const string ORCID_ID_PATTERN = '/\d{4}-\d{4}-\d{4}-\d{3}[\dX]/';
 
@@ -130,7 +143,11 @@ final class OrcidFixture extends Fixture
             $field = is_string($key) ? self::TEST_MARKER_ITEMS[$key] ?? null : null;
 
             if ($field !== null && is_array($value) && array_is_list($value)) {
-                $data[$key] = array_values(array_filter($value, fn (mixed $item): bool => $this->isMarked($field, $item)));
+                $data[$key] = array_values(array_filter(
+                    $value,
+                    fn (mixed $item): bool => $this->isMarked($field, $item)
+                        || (in_array($key, self::HAND_ADDED_ITEMS, true) && $this->isAddedByResearcher($item)),
+                ));
             } elseif (is_array($value)) {
                 $data[$key] = $this->keepTestGroups($value);
             }
@@ -167,6 +184,17 @@ final class OrcidFixture extends Fixture
         $pattern = '/"'.preg_quote($field, '/').'":(?:\{"value":)?"'.preg_quote(self::TEST_MARKER, '/').'/';
 
         return preg_match($pattern, (string) json_encode($value, JSON_UNESCAPED_SLASHES)) === 1;
+    }
+
+    /**
+     * Whether a person item was added by the researcher, not through a client
+     */
+    private function isAddedByResearcher(mixed $item): bool
+    {
+        return is_array($item)
+            && is_array($item['source'] ?? null)
+            && ($item['source']['source-client-id'] ?? null) === null
+            && ($item['source']['source-orcid'] ?? null) !== null;
     }
 
     /**
