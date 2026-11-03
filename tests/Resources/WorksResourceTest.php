@@ -55,7 +55,7 @@ it('creates, reads, updates and deletes a work', function (): void {
         title: new Title(OrcidFixture::TEST_MARKER.' lifecycle', 'A subtitle', new TranslatedTitle('Cycle de vie', 'fr')),
         externalIds: [
             new ExternalId('other-id', OrcidFixture::TEST_MARKER.'-lifecycle'),
-            new ExternalId('issn', '1234-5679', ExternalIdRelationship::PartOf),
+            ExternalId::issn('1234-5679'),
         ],
         journalTitle: 'Journal of SDK Testing',
         shortDescription: 'A work created by the SDK tests',
@@ -91,6 +91,7 @@ it('creates, reads, updates and deletes a work', function (): void {
         ->and($created->externalIds[0]->value)->toBe('orcid-php-sdk-lifecycle')
         ->and($created->externalIds[0]->relationship)->toBe(ExternalIdRelationship::Self)
         ->and($created->externalIds[1]->relationship)->toBe(ExternalIdRelationship::PartOf)
+        ->and($created->externalIds[1]->url)->toBe('https://portal.issn.org/resource/ISSN/1234-5679')
         ->and($created->contributors)->toHaveCount(2)
         // the placeholder once replayed, the sandbox record while recording
         ->and($created->contributors[0]->orcid)->toBeIn([OrcidFixture::PLACEHOLDER_ID, $this->orcidId()])
@@ -169,7 +170,7 @@ it('lists works as groups, with the preferred summary and every summary', functi
     $works = $this->getMemberApiClient()->withMockClient($mockClient)->works();
 
     // the same DOI as the work added by hand on the sandbox record (in another form), so ORCID groups the two
-    $putCode = $works->create(testWork('list', externalIds: [new ExternalId('doi', 'https://doi.org/'.strtoupper(HAND_ADDED_DOI))]));
+    $putCode = $works->create(testWork('list', externalIds: [ExternalId::doi('https://doi.org/'.strtoupper(HAND_ADDED_DOI))]));
 
     // read before the cleanup, asserted after it, so a failed assertion never leaves the work behind
     $list = $works->list();
@@ -182,8 +183,8 @@ it('lists works as groups, with the preferred summary and every summary', functi
 
     $group = $list->groups[0];
     [$ours, $handAdded] = $this->isOurs($group->summaries[0]->source) ? $group->summaries : array_reverse($group->summaries);
-    // recorded before the researcher chose the hand-added work as preferred on the website (works/preferred): until
-    // then it keeps display index 0, and a client's work (1) is the preferred one; afterwards it holds 2
+    // the researcher chose the hand-added work as preferred on the website (works/preferred), so it holds display
+    // index 2 and is preferred; before that it kept 0, and a client's work (1) was the preferred one
     $preferred = ($handAdded->displayIndex ?? 0) > 1 ? $handAdded : $ours;
 
     expect($group->summaries)->toHaveCount(2)
@@ -197,6 +198,7 @@ it('lists works as groups, with the preferred summary and every summary', functi
         ->and($ours->type)->toBe(WorkType::JournalArticle)
         ->and($ours->externalIds[0]->value)->toBe('https://doi.org/'.strtoupper(HAND_ADDED_DOI))
         ->and($ours->externalIds[0]->normalizedValue)->toBe(HAND_ADDED_DOI)
+        ->and($ours->externalIds[0]->url)->toBe('https://doi.org/'.strtoupper(HAND_ADDED_DOI))
         ->and($ours->visibility)->toBe(Visibility::Public)
         ->and($handAdded->source?->isRecordOwner())->toBeTrue()
         ->and($handAdded->displayIndex)->toBeIn([0, 2])

@@ -1,7 +1,7 @@
 {
     "statusCode": 200,
     "headers": {
-        "Date": "Mon, 02 Nov 2026 19:46:04 GMT",
+        "Date": "Tue, 03 Nov 2026 18:57:20 GMT",
         "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
         "Content-Length": "1359",
         "Connection": "keep-alive",
@@ -18,8 +18,8 @@
         "x-via": "b1",
         "cf-cache-status": "DYNAMIC",
         "set-cookie": "Redacted",
-        "CF-RAY": "a545a4ab19eeade0-YYZ"
+        "CF-RAY": "a54d9aa7085aa450-YYZ"
     },
-    "data": "{\"created-date\":{\"value\":1793648763961},\"last-modified-date\":{\"value\":1793648764793},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"put-code\":2556398,\"path\":null,\"title\":{\"title\":{\"value\":\"orcid-php-sdk lifecycle\"},\"subtitle\":null,\"translated-title\":null},\"journal-title\":null,\"short-description\":null,\"citation\":null,\"type\":\"preprint\",\"publication-date\":null,\"external-ids\":{\"external-id\":[{\"external-id-type\":\"other-id\",\"external-id-value\":\"orcid-php-sdk-lifecycle\",\"external-id-normalized\":{\"value\":\"orcid-php-sdk-lifecycle\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"url\":null,\"contributors\":{\"contributor\":[]},\"language-code\":null,\"country\":null,\"visibility\":\"public\"}",
+    "data": "{\"created-date\":{\"value\":1793732239833},\"last-modified-date\":{\"value\":1793732240593},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"put-code\":2557372,\"path\":null,\"title\":{\"title\":{\"value\":\"orcid-php-sdk lifecycle\"},\"subtitle\":null,\"translated-title\":null},\"journal-title\":null,\"short-description\":null,\"citation\":null,\"type\":\"preprint\",\"publication-date\":null,\"external-ids\":{\"external-id\":[{\"external-id-type\":\"other-id\",\"external-id-value\":\"orcid-php-sdk-lifecycle\",\"external-id-normalized\":{\"value\":\"orcid-php-sdk-lifecycle\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"url\":null,\"contributors\":{\"contributor\":[]},\"language-code\":null,\"country\":null,\"visibility\":\"public\"}",
     "context": []
 }
