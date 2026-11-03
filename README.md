@@ -355,7 +355,18 @@ $record = Orcid::public()->record('https://orcid.org/0000-0002-1825-0097'); // b
 
 $person = $record->person();
 $person->name?->displayName();
-$person->keywords;
+$person->biography?->content;
+foreach ($person->keywords as $keyword) {
+    $keyword->content;      // "psychoceramics"
+    $keyword->putCode;      // every item has its put-code, visibility and source
+    $keyword->visibility;   // Visibility::Public
+    $keyword->source?->isClient($myClientId);
+}
+$person->otherNames;          // OtherName (content)
+$person->researcherUrls;      // ResearcherUrl (url, name)
+$person->addresses;           // Address (country)
+$person->externalIdentifiers; // PersonExternalIdentifier (externalId: type, value, url)
+$person->emails;              // Email (email, primary, verified)
 
 $activities = $record->activities();
 $activities->affiliations(AffiliationType::Education);
@@ -364,8 +375,37 @@ $activities->workCount;
 $record->affiliations()->list(AffiliationType::Employment); // reads only: no create, update or delete
 ```
 
-Own-record calls (`affiliations()`, `works()`, `fundings()`, `peerReviews()`, `researchResources()`, `person()`, `activities()`) on a connector without an `orcid` throw a
-`LogicException` before anything is sent.
+Own-record calls (`affiliations()`, `works()`, `fundings()`, `peerReviews()`, `researchResources()`, `keywords()`,
+`person()`, `activities()`) on a connector without an `orcid` throw a `LogicException` before anything is sent.
+
+### Keywords
+
+Writes need the `/person/update` scope (Member API). `keywords()->list()` returns the same `Keyword` items as
+`person()->keywords`. ORCID refuses a blank keyword or one over 255 characters, which `KeywordInput` checks before
+sending (it also trims the content: ORCID would store `"ocean "` and `"ocean"` as two keywords), and a keyword whose
+content this client already added (compared case-sensitively).
+
+```php
+use VincentAuger\OrcidSdk\Data\Person\KeywordInput;
+use VincentAuger\OrcidSdk\Exceptions\OrcidConflictException;
+
+$keywords = Orcid::member(accessToken: $accessToken, orcid: $orcidId)->keywords();
+
+try {
+    $putCode = $keywords->create(new KeywordInput('fisheries science'));
+} catch (OrcidConflictException $exception) {
+    $exception->isDuplicate(); // true (error 9030); ORCID does not give the existing put-code
+}
+
+$keywords->get($putCode);                                       // Keyword
+$keywords->update($putCode, new KeywordInput('fish science'));  // returns the updated Keyword
+$keywords->delete($putCode);
+$keywords->list();                                              // list<Keyword>, in the researcher's order
+
+Orcid::public()->record($orcidId)->keywords()->list();          // reads only
+```
+
+ORCID ignores a visibility or display index sent by a client: a new keyword gets the researcher's default visibility.
 
 ### Errors
 

@@ -18,6 +18,11 @@ final readonly class OrcidError
     public const int DUPLICATE = 9021;
 
     /**
+     * This client already added a person item (e.g. a keyword) with the same content. ORCID does not name it.
+     */
+    public const int DUPLICATE_CONTENT = 9030;
+
+    /**
      * @param  int|null  $responseCode  The HTTP status ORCID would have answered for this item alone (e.g. 409)
      */
     public function __construct(
@@ -43,20 +48,22 @@ final readonly class OrcidError
     }
 
     /**
-     * Whether this client already added an item (e.g. a work) with the same `self` external identifier (error 9021)
+     * Whether this client already added the item: an activity (e.g. a work) with the same `self` external
+     * identifier (error 9021), or a person item (e.g. a keyword) with the same content (9030)
      */
     public function isDuplicate(): bool
     {
-        return $this->errorCode === self::DUPLICATE;
+        return $this->errorCode === self::DUPLICATE || $this->errorCode === self::DUPLICATE_CONTENT;
     }
 
     /**
      * The put-code of the existing item, for a duplicate. ORCID only gives it in the developer message
-     * ("... please see element with put-code 2556381 ..."), so this is null if ORCID changes that text.
+     * ("... please see element with put-code 2556381 ..."), so this is null if ORCID changes that text, and
+     * for a duplicate person item (9030), whose message has no put-code.
      */
     public function existingPutCode(): ?int
     {
-        if (! $this->isDuplicate() || preg_match('/put-code (\d+)/', $this->developerMessage ?? '', $matches) !== 1) {
+        if ($this->errorCode !== self::DUPLICATE || preg_match('/put-code (\d+)/', $this->developerMessage ?? '', $matches) !== 1) {
             return null;
         }
 

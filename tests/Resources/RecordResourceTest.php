@@ -5,12 +5,13 @@ declare(strict_types=1);
 use Saloon\Http\Faking\MockClient;
 use Tests\Fixtures\OrcidFixture;
 use VincentAuger\OrcidSdk\Data\Affiliations\Affiliation;
+use VincentAuger\OrcidSdk\Data\Person\Keyword;
+use VincentAuger\OrcidSdk\Data\Person\KeywordInput;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Enums\Visibility;
 use VincentAuger\OrcidSdk\Orcid;
-use VincentAuger\OrcidSdk\Requests\Person\GetPerson;
 use VincentAuger\OrcidSdk\Resources\ReadOnlyAffiliationsResource;
 
 /*
@@ -19,22 +20,51 @@ use VincentAuger\OrcidSdk\Resources\ReadOnlyAffiliationsResource;
  * Tests with several fixtures are a chain: to re-record, delete the whole folder.
  */
 
-it('reads the person section of its own record through the Member API', function (): void {
-    $mockClient = new MockClient([GetPerson::class => new OrcidFixture('record/person-member')]);
+it('reads the person section of its own record through the Member API, as typed items', function (): void {
+    $folder = 'record/person-member';
+    $mockClient = new MockClient([
+        new OrcidFixture("{$folder}/create-keyword"),
+        new OrcidFixture("{$folder}/person"),
+        new OrcidFixture("{$folder}/delete-keyword"),
+    ]);
 
-    $person = $this->getMemberApiClient()->withMockClient($mockClient)->person();
+    $orcid = $this->getMemberApiClient()->withMockClient($mockClient);
+    $putCode = $orcid->keywords()->create(new KeywordInput(OrcidFixture::TEST_MARKER.' person'));
+
+    try {
+        $person = $orcid->person();
+    } finally {
+        $orcid->keywords()->delete($putCode);
+    }
 
     expect($person->name?->givenNames)->toBe('Vincent')
         ->and($person->name?->familyName)->toBe('Auger')
-        ->and($person->name?->displayName())->toBe('Vincent Auger')
         ->and($person->name?->visibility)->toBe(Visibility::Public)
-        ->and($person->biography)->toBe('A test bio.')
+        ->and($person->otherNames)->toHaveCount(1)
+        ->and($person->otherNames[0]->content)->toBe('JP Auger')
+        ->and($person->otherNames[0]->putCode)->toBe(19146)
+        ->and($person->otherNames[0]->visibility)->toBe(Visibility::Public)
+        ->and($person->otherNames[0]->displayIndex)->toBe(2)
+        ->and($person->biography?->content)->toBe('A test bio.')
+        ->and($person->biography?->visibility)->toBe(Visibility::Public)
         ->and($person->researcherUrls)->toHaveCount(1)
         ->and($person->researcherUrls[0]->name)->toBe('DFO')
         ->and($person->researcherUrls[0]->url)->toBe('https://dfo-mpo.gc.ca')
-        ->and($person->countries)->toBe(['CA'])
-        ->and($person->keywords)->toBe(['test', 'fun'])
+        ->and($person->researcherUrls[0]->putCode)->toBe(48660)
+        ->and($person->researcherUrls[0]->visibility)->toBe(Visibility::Public)
+        ->and($person->researcherUrls[0]->source?->isRecordOwner())->toBeTrue()
+        ->and($person->addresses)->toHaveCount(1)
+        ->and($person->addresses[0]->country)->toBe('CA')
+        ->and($person->addresses[0]->putCode)->toBe(8230)
         ->and($person->lastModifiedAt)->toBeInstanceOf(DateTimeImmutable::class);
+
+    // the same Keyword as keywords()->list(); the fixture only keeps the test keyword, not the researcher's own
+    $ours = array_values(array_filter($person->keywords, fn (Keyword $keyword): bool => $keyword->putCode === $putCode));
+
+    expect($ours)->toHaveCount(1)
+        ->and($ours[0]->content)->toBe('orcid-php-sdk person')
+        ->and($ours[0]->visibility)->toBe(Visibility::Public)
+        ->and($this->isOurs($ours[0]->source))->toBeTrue();
 
     // /read-limited also returns limited items, like the email, which the researcher added
     expect($person->emails)->toHaveCount(1)
@@ -46,13 +76,29 @@ it('reads the person section of its own record through the Member API', function
 });
 
 it('reads the person section through the Public API without a token', function (): void {
-    $mockClient = new MockClient([GetPerson::class => new OrcidFixture('record/person-public')]);
+    $folder = 'record/person-public';
+    $mockClient = new MockClient([
+        new OrcidFixture("{$folder}/create-keyword"),
+        new OrcidFixture("{$folder}/person"),
+        new OrcidFixture("{$folder}/delete-keyword"),
+    ]);
 
-    $person = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId())->person();
+    $owner = $this->getMemberApiClient()->withMockClient($mockClient);
+    $putCode = $owner->keywords()->create(new KeywordInput(OrcidFixture::TEST_MARKER.' public person'));
+
+    try {
+        $person = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId())->person();
+    } finally {
+        $owner->keywords()->delete($putCode);
+    }
 
     // public items only: the limited email is not returned
-    expect($person->name?->displayName())->toBe('Vincent Auger')
-        ->and($person->keywords)->toBe(['test', 'fun'])
+    $ours = array_values(array_filter($person->keywords, fn (Keyword $keyword): bool => $keyword->putCode === $putCode));
+
+    expect($ours)->toHaveCount(1)
+        ->and($ours[0]->visibility)->toBe(Visibility::Public)
+        ->and($person->addresses[0]->putCode)->toBe(8230)
+        ->and($person->addresses[0]->visibility)->toBe(Visibility::Public)
         ->and($person->emails)->toBeEmpty();
 });
 
@@ -134,8 +180,7 @@ it('reads a record through the Member API with a /read-public token, without bin
     $services = $activities->affiliations(AffiliationType::Service);
 
     // public items only: the limited email seen with /read-limited is not returned
-    expect($person->name?->displayName())->toBe('V JP Auger')
-        ->and($person->keywords)->toBe(['test', 'fun'])
+    expect($person->name?->familyName)->toBe('Auger')
         ->and($person->emails)->toBeEmpty()
         ->and(array_map(fn (Affiliation $affiliation): int => $affiliation->putCode, $services))->toContain($putCode)
         ->and($services[0]->visibility)->toBe(Visibility::Public)

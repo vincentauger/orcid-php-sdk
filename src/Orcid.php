@@ -20,6 +20,7 @@ use VincentAuger\OrcidSdk\Enums\Scope;
 use VincentAuger\OrcidSdk\Exceptions\MissingScopeException;
 use VincentAuger\OrcidSdk\Resources\AffiliationsResource;
 use VincentAuger\OrcidSdk\Resources\FundingsResource;
+use VincentAuger\OrcidSdk\Resources\KeywordsResource;
 use VincentAuger\OrcidSdk\Resources\PeerReviewsResource;
 use VincentAuger\OrcidSdk\Resources\RecordResource;
 use VincentAuger\OrcidSdk\Resources\ResearchResourcesResource;
@@ -171,6 +172,16 @@ final class Orcid extends Connector
     public function researchResources(): ResearchResourcesResource
     {
         return new ResearchResourcesResource($this, $this->boundOrcid(__FUNCTION__));
+    }
+
+    /**
+     * The keywords of the record this connector is bound to. Writes need the /person/update scope.
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function keywords(): KeywordsResource
+    {
+        return new KeywordsResource($this, $this->boundOrcid(__FUNCTION__));
     }
 
     /**

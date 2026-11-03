@@ -130,9 +130,22 @@ it('replaces OAuth tokens', function (): void {
 it('keeps profile content', function (): void {
     $body = [
         'name' => ['given-names' => ['value' => 'Jane'], 'family-name' => ['value' => 'Doe']],
-        'keywords' => ['keyword' => [['content' => 'ceramics']]],
+        'biography' => ['content' => 'A test bio.'],
         'organization' => ['name' => 'Fisheries and Oceans Canada'],
     ];
 
     expect(json_decode(storeThroughFixture([], $body)['data'], true))->toBe($body);
+});
+
+it('only keeps the keywords created by tests, in the person section and in keyword lists', function (): void {
+    $keywords = ['keyword' => [
+        ['put-code' => 1, 'content' => 'ceramics'],
+        ['put-code' => 2, 'content' => OrcidFixture::TEST_MARKER.' keyword'],
+    ]];
+
+    $person = json_decode(storeThroughFixture([], ['keywords' => $keywords])['data'], true);
+    $list = json_decode(storeThroughFixture([], $keywords)['data'], true);
+
+    expect(array_column($person['keywords']['keyword'], 'put-code'))->toBe([2])
+        ->and(array_column($list['keyword'], 'put-code'))->toBe([2]);
 });

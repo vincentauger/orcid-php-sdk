@@ -1,7 +1,7 @@
 {
     "statusCode": 200,
     "headers": {
-        "Date": "Mon, 02 Nov 2026 19:22:57 GMT",
+        "Date": "Tue, 03 Nov 2026 15:16:23 GMT",
         "Content-Type": "application\/json;charset=UTF-8",
         "Content-Length": "0",
         "Connection": "keep-alive",
@@ -9,11 +9,11 @@
         "oauth_token_validation": "ON",
         "cf-cache-status": "DYNAMIC",
         "Set-Cookie": [
-            "AWSALB=lrqLSbRpCSmsoo9x8SVNshne2XTDZLOPdk9nK4uiL+eSTnEMM8V9E7B4Gn+X13zCgJXGk35eOazFRuc9uWFByqYcxi4LeEI79Nu+duYTv\/c0oJgpHdJQdYU6nWPB; Expires=Mon, 09 Nov 2026 19:22:57 GMT; Path=\/",
-            "AWSALBCORS=lrqLSbRpCSmsoo9x8SVNshne2XTDZLOPdk9nK4uiL+eSTnEMM8V9E7B4Gn+X13zCgJXGk35eOazFRuc9uWFByqYcxi4LeEI79Nu+duYTv\/c0oJgpHdJQdYU6nWPB; Expires=Mon, 09 Nov 2026 19:22:57 GMT; Path=\/; SameSite=None; Secure",
-            "__cf_bm=EAuFUvO9HHxMVvugewlTzekma5NjYMEPu0go6pwJtJU-1793647377.4379482-1.0.1.1-MNhn_VIccinuFFiF6md8Xuj6xuVHqU10nKlvgUCeYaVuQxcQqNxGlZ.irH2Dvl2Al9hwQt2leTf.ZTwzkJGid._BUy8EhUvVI0klN655QZe519txyWkaQjByJirq4F9v; HttpOnly; SameSite=None; Secure; Path=\/; Domain=sandbox.orcid.org; Expires=Mon, 02 Nov 2026 19:52:57 GMT"
+            "AWSALB=H4xp27ZwmiPbCE+Kze+m9xn61hCYXYBTUYUDxxT5kAKGAemveB6PmwsSeMLpnnMTFIH1UrqnJHkGCf+2n+6nolP\/+R2yuL6S6p1r3xGDZaLYW78JJAuAJXHDX9J2; Expires=Tue, 10 Nov 2026 15:16:23 GMT; Path=\/",
+            "AWSALBCORS=H4xp27ZwmiPbCE+Kze+m9xn61hCYXYBTUYUDxxT5kAKGAemveB6PmwsSeMLpnnMTFIH1UrqnJHkGCf+2n+6nolP\/+R2yuL6S6p1r3xGDZaLYW78JJAuAJXHDX9J2; Expires=Tue, 10 Nov 2026 15:16:23 GMT; Path=\/; SameSite=None; Secure",
+            "__cf_bm=ZrGywk9au48.K.cVr4fZIoVdgQgddImVSAA9m6UDR7o-1793718982.9957266-1.0.1.1-fO_rs2TdpkxmA8xuNezY3KVrlBo3lF52SQX7lE0FyTE7fRkYwVaI0cag1j5yi2ohBhTnJ_IQ32E0FjHxVXkStf4Syl4OZaFDPcsdN418V9teZPb4OKZ_O3MF.7RDnRw2; HttpOnly; SameSite=None; Secure; Path=\/; Domain=sandbox.orcid.org; Expires=Tue, 03 Nov 2026 15:46:23 GMT"
         ],
-        "CF-RAY": "a54582ccf8d4a290-YUL"
+        "CF-RAY": "a54c56fbbc9028bf-YUL"
     },
     "data": "",
     "context": []

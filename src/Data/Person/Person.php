@@ -4,30 +4,34 @@ declare(strict_types=1);
 
 namespace VincentAuger\OrcidSdk\Data\Person;
 
-use VincentAuger\OrcidSdk\Data\Common\ExternalId;
 use VincentAuger\OrcidSdk\Support\Json;
 
 /**
  * The person section of a record (GET /{orcid}/person). Only data visible to
  * the token is returned: public data, plus limited data with /read-limited.
+ *
+ * Each item has its put-code, visibility and source, and is the same class a
+ * section's own resource returns (e.g. Keyword, from keywords()->list()). The
+ * name and biography have no put-code or source (only the researcher edits
+ * them), and ORCID returns emails with a null put-code.
  */
 final readonly class Person
 {
     /**
-     * @param  list<string>  $otherNames
+     * @param  list<OtherName>  $otherNames
      * @param  list<ResearcherUrl>  $researcherUrls
      * @param  list<Email>  $emails
-     * @param  list<string>  $countries  ISO 3166-1 alpha-2 codes
-     * @param  list<string>  $keywords
-     * @param  list<ExternalId>  $externalIdentifiers  Identifiers in other systems (Scopus Author ID, ResearcherID, ...)
+     * @param  list<Address>  $addresses  The countries the researcher lists
+     * @param  list<Keyword>  $keywords
+     * @param  list<PersonExternalIdentifier>  $externalIdentifiers  Identifiers in other systems (Scopus Author ID, ResearcherID, ...)
      */
     public function __construct(
         public ?PersonName $name = null,
         public array $otherNames = [],
-        public ?string $biography = null,
+        public ?Biography $biography = null,
         public array $researcherUrls = [],
         public array $emails = [],
-        public array $countries = [],
+        public array $addresses = [],
         public array $keywords = [],
         public array $externalIdentifiers = [],
         public ?\DateTimeImmutable $lastModifiedAt = null,
@@ -40,22 +44,16 @@ final readonly class Person
     {
         return new self(
             name: PersonName::fromArray(Json::object($data, 'name')),
-            otherNames: self::strings($data, 'other-names', 'other-name', 'content'),
-            biography: Json::string(Json::object($data, 'biography') ?? [], 'content'),
-            researcherUrls: array_values(array_filter(array_map(
-                ResearcherUrl::fromArray(...),
-                Json::list(Json::object($data, 'researcher-urls') ?? [], 'researcher-url'),
-            ))),
+            otherNames: OtherName::listFromArray(Json::object($data, 'other-names')),
+            biography: Biography::fromArray(Json::object($data, 'biography')),
+            researcherUrls: ResearcherUrl::listFromArray(Json::object($data, 'researcher-urls')),
             emails: array_values(array_filter(array_map(
                 Email::fromArray(...),
                 Json::list(Json::object($data, 'emails') ?? [], 'email'),
             ))),
-            countries: self::strings($data, 'addresses', 'address', 'country'),
-            keywords: self::strings($data, 'keywords', 'keyword', 'content'),
-            externalIdentifiers: array_values(array_filter(array_map(
-                ExternalId::fromArray(...),
-                Json::list(Json::object($data, 'external-identifiers') ?? [], 'external-identifier'),
-            ))),
+            addresses: Address::listFromArray(Json::object($data, 'addresses')),
+            keywords: Keyword::listFromArray(Json::object($data, 'keywords')),
+            externalIdentifiers: PersonExternalIdentifier::listFromArray(Json::object($data, 'external-identifiers')),
             lastModifiedAt: Json::timestamp($data, 'last-modified-date'),
         );
     }
@@ -69,21 +67,5 @@ final readonly class Person
         }
 
         return null;
-    }
-
-    /**
-     * A list of strings from {"<section>": {"<item>": [{"<field>": ...}]}}
-     *
-     * @param  array<array-key, mixed>  $data
-     * @return list<string>
-     */
-    private static function strings(array $data, string $section, string $item, string $field): array
-    {
-        $values = array_map(
-            static fn (array $entry): ?string => Json::string($entry, $field),
-            Json::list(Json::object($data, $section) ?? [], $item),
-        );
-
-        return array_values(array_filter($values, is_string(...)));
     }
 }

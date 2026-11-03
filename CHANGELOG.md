@@ -40,6 +40,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a disambiguated organization, an external identifier, at least one item, a start date with an end date, no subtitle,
   lengths), `ResearchResourceSummary`, `ResearchResourceGroup`, `ResearchResourceGroups`; enum `ResearchResourceType`;
   `Organization::listFromArray()` / `listToArray()`
+- Keywords: `$orcid->keywords()->list|get|create|update|delete` on a bound member connector (writes need
+  `/person/update`), `record($id)->keywords()->list|get` on any connector. `Keyword` (read, the same class as
+  `Person::$keywords`) / `KeywordInput` (write, validated before sending: non-blank, at most 255 characters, trimmed)
+- Typed person items, each with its put-code, visibility, source and display index: `Keyword`, `OtherName`,
+  `ResearcherUrl`, `Address`, `PersonExternalIdentifier`; and `Biography`
+- `OrcidConflictException::DUPLICATE_CONTENT` (error 9030, a person item with the same content), covered by
+  `isDuplicate()`
 - Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes, and `Amount` (a decimal string and an ISO 4217
   currency)
 - `OrcidConflictException::isDuplicate()` (error 9021) and `existingPutCode()`
@@ -53,6 +60,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** `record($id)` only reads: `record($id)->affiliations()` returns a `ReadOnlyAffiliationsResource`
   (`list()`, `get()`). Write through the bound connector: `Orcid::member(accessToken: ..., orcid: ...)->affiliations()`
 - **Breaking:** read classes expose `visibility` as a `Visibility` enum instead of a string
+- **Breaking:** `Person` returns typed items instead of strings: `otherNames` (`OtherName`), `keywords`
+  (`Keyword`), `biography` (`Biography`), `externalIdentifiers` (`PersonExternalIdentifier`, the identifier under
+  `externalId`); `countries` is replaced by `addresses` (`Address`, with `country`); `ResearcherUrl` has a put-code
 
 ## [0.1.0] - 2026-10-22
 

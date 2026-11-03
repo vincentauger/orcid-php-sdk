@@ -58,6 +58,16 @@ final class OrcidFixture extends Fixture
         'research-resource-summary' => 'title',
     ];
 
+    /**
+     * The person items kept in fixtures only when created by tests, by the key of their list, with their field that
+     * starts with TEST_MARKER. Unlike summaries, each item of the list is kept or dropped on its own.
+     *
+     * @var array<string, string>
+     */
+    public const array TEST_MARKER_ITEMS = [
+        'keyword' => 'content',
+    ];
+
     private const string ORCID_ID_PATTERN = '/\d{4}-\d{4}-\d{4}-\d{3}[\dX]/';
 
     private const string CLIENT_ID_PATTERN = '/APP-[A-Z0-9]{16}/';
@@ -117,7 +127,11 @@ final class OrcidFixture extends Fixture
         }
 
         foreach ($data as $key => $value) {
-            if (is_array($value)) {
+            $field = is_string($key) ? self::TEST_MARKER_ITEMS[$key] ?? null : null;
+
+            if ($field !== null && is_array($value) && array_is_list($value)) {
+                $data[$key] = array_values(array_filter($value, fn (mixed $item): bool => $this->isMarked($field, $item)));
+            } elseif (is_array($value)) {
                 $data[$key] = $this->keepTestGroups($value);
             }
         }
@@ -137,14 +151,22 @@ final class OrcidFixture extends Fixture
         }
 
         foreach ($summaries as [$field, $summary]) {
-            $pattern = '/"'.preg_quote($field, '/').'":(?:\{"value":)?"'.preg_quote(self::TEST_MARKER, '/').'/';
-
-            if (preg_match($pattern, (string) json_encode($summary, JSON_UNESCAPED_SLASHES)) === 1) {
+            if ($this->isMarked($field, $summary)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Whether a field of the value starts with TEST_MARKER (plain or wrapped as {"value": ...}, at any depth)
+     */
+    private function isMarked(string $field, mixed $value): bool
+    {
+        $pattern = '/"'.preg_quote($field, '/').'":(?:\{"value":)?"'.preg_quote(self::TEST_MARKER, '/').'/';
+
+        return preg_match($pattern, (string) json_encode($value, JSON_UNESCAPED_SLASHES)) === 1;
     }
 
     /**

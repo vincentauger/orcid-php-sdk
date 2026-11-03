@@ -69,7 +69,9 @@ Run these commands before committing:
   department name for affiliations, the review identifier's value for peer reviews, the title otherwise (the
   proposal's for research resources). List and activities fixtures only keep those items (a group holding one is
   kept whole), so the record's real items never end up in fixtures, apart from the hand-added work grouped with a
-  test work on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`). A new section adds its summary key and marker field to `OrcidFixture::TEST_MARKER_FIELDS`.
+  test work on purpose (`HAND_ADDED_DOI` in `tests/Pest.php`). A new section adds its summary key and marker field to `OrcidFixture::TEST_MARKER_FIELDS`;
+  a person section, whose items are filtered one by one (in its list and in the person section), its item key to
+  `OrcidFixture::TEST_MARKER_ITEMS`.
 - Each test item has its own `self` external identifier (`testAffiliation()` in `tests/Pest.php`), so ORCID never
   groups test items together. Only the works list tests share one, `HAND_ADDED_DOI`, to join the hand-added work.
 - While recording, responses are live and carry real ids; once replayed, the placeholders. Assertions that run
@@ -266,6 +268,28 @@ above holds for research resources too.
   (`s01-get`), but a PUT's response has none (`s39`).
 - **Test marker:** test research resources start their proposal title with `OrcidFixture::TEST_MARKER`
   (`testResearchResource()`), and have their own `self` proposal id.
+
+## Keywords (verified against the sandbox, 2026-11-03)
+
+Evidence: `tests/Fixtures/Saloon/c5/` (no test replays these either). Everything under "ORCID API behaviour"
+above holds for keywords too. Writes need `/person/update`.
+
+- **Body:** `{"content": "..."}` (a plain string: `{"value"}` is 400, 9047, `k12`). A missing or `null` content is 9047
+  (`k23`, `k04`), a blank one 400, error 9020 ("Keyword cannot be null", `k03`, on a PUT too `k18`). At most 255
+  characters (`k24`; 256 is 9047, `k07`).
+- **Stored as sent:** not trimmed (`k25-get`), so `"x "` is not a duplicate of `"x"` (`k28`).
+- **Duplicates:** a POST whose content this client already used is 409, error **9030** (not 9021), and so is a PUT
+  taking another keyword's content (`k08`, `k27`). The message names the content, not the put-code. Compared
+  case-sensitively: the uppercase content is a new keyword (`k09`).
+- **Ignored on a POST:** `visibility` (`private` sent, `public` stored, `k10`) and `display-index` (`5` sent, `1`
+  stored, `k11`). A PUT changing the visibility is 403, 9035 (`k17`).
+- **PUT** needs the put-code in the body (400, error 9019, `k14`, a different one `k15`) and returns the item
+  (`k13`); an unknown put-code is 404, 9016 (`k16`, a GET `k20`). DELETE returns 204; afterwards GET and DELETE are
+  404, 9016 (`k21`, `k22`).
+- **Lists** (`k19`): `{"last-modified-date", "keyword": [...], "path"}`, not grouped; the person section holds the same
+  list under `keywords`. A client's keyword gets display index `"1"`.
+- **Test marker:** test keywords start their content with `OrcidFixture::TEST_MARKER` (case-sensitive): the
+  researcher's own keywords never end up in fixtures, even in the person section's.
 
 ## Agent skills
 

@@ -42,6 +42,11 @@ final readonly class RecordResource
         return $request->createDtoFromResponse($this->connector->sendOrFail($request));
     }
 
+    public function keywords(): ReadOnlyKeywordsResource
+    {
+        return new ReadOnlyKeywordsResource($this->connector, $this->orcid);
+    }
+
     public function affiliations(): ReadOnlyAffiliationsResource
     {
         return new ReadOnlyAffiliationsResource($this->connector, $this->orcid);

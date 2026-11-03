@@ -1,0 +1,26 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 15:08:24 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "vary": "accept-encoding",
+        "set-cookie": "Redacted",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "CF-RAY": "a54c4b4bbbd7a314-YUL"
+    },
+    "data": "{\"last-modified-date\":{\"value\":1793718503704},\"keyword\":[{\"created-date\":{\"value\":1793718502107},\"last-modified-date\":{\"value\":1793718503704},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"content\":\"orcid-php-sdk k01 updated\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/keywords\/8496\",\"put-code\":8496,\"display-index\":1},{\"created-date\":{\"value\":1793718502738},\"last-modified-date\":{\"value\":1793718502738},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"content\":\"orcid-php-sdk k05 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/keywords\/8497\",\"put-code\":8497,\"display-index\":1},{\"created-date\":{\"value\":1793718502868},\"last-modified-date\":{\"value\":1793718502868},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"content\":\"orcid-php-sdk k06 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/keywords\/8498\",\"put-code\":8498,\"display-index\":1},{\"created-date\":{\"value\":1793718503331},\"last-modified-date\":{\"value\":1793718503331},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"content\":\"orcid-php-sdk k10\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/keywords\/8500\",\"put-code\":8500,\"display-index\":1},{\"created-date\":{\"value\":1793718503448},\"last-modified-date\":{\"value\":1793718503448},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"content\":\"orcid-php-sdk k11\",\"visibility\":\"public\",\"path\":\"\/0000-0002-1825-0097\/keywords\/8501\",\"put-code\":8501,\"display-index\":1}],\"path\":\"\/0000-0002-1825-0097\/keywords\"}",
+    "context": []
+}
