@@ -37,7 +37,7 @@ final readonly class WorkSummary
         public ?\DateTimeImmutable $createdAt = null,
         public ?\DateTimeImmutable $lastModifiedAt = null,
         public ?string $path = null,
-        /** The highest display index in a group marks the preferred summary */
+        /** The highest display index in a group marks the preferred summary (WorkGroup::preferred()) */
         public ?int $displayIndex = null,
     ) {}
 

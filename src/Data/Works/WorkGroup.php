@@ -41,8 +41,8 @@ final readonly class WorkGroup
     }
 
     /**
-     * The summary ORCID displays: the highest display index (a new work gets the highest one), the first one listed
-     * on a tie
+     * The summary ORCID displays: the highest display index (the one the researcher chose, else a client's work over
+     * the researcher's own), the first one listed on a tie
      */
     public function preferred(): WorkSummary
     {

@@ -61,5 +61,7 @@ it('groups a work with the hand-added work sharing its DOI on the sandbox', func
 
     expect($group->summaries)->toHaveCount(2)
         ->and($group->externalIds[0]->normalizedValue)->toBe(HAND_ADDED_DOI)
-        ->and($group->preferred()->putCode)->toBe($putCode);
+        // the researcher chose the hand-added work as preferred (works/preferred): a new work doesn't take over
+        ->and($group->preferred()->source?->isRecordOwner())->toBeTrue()
+        ->and($group->preferred()->putCode)->not->toBe($putCode);
 })->group('live');

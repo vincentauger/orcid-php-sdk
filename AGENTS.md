@@ -149,12 +149,14 @@ above holds for works too.
 - **PUT** needs the put-code in the body as well: missing or different, 400, error 9019 (`q11`, `q12`); an
   unknown put-code is 404, 9016 (`q10`). A contributor iD sent as `{"path"}` alone is enough: ORCID adds the
   `uri` and `host` (`works/lifecycle/get`).
-- **Groups** (verified 2026-11-03, `works/list/list`): a test work whose DOI is
-  `https://doi.org/10.1016/J.POCEAN.2016.07.005` joins the hand-added work's group (`10.1016/j.pocean.2016.07.005`):
-  both normalize to the lowercase bare DOI. The work added last gets the highest display index (`"1"`, the
-  hand-added one keeps `"0"`) and is listed first; the group's external ids are the `self` ones of that summary,
-  as sent (`part-of` ids are left out). The SDK prefers the highest display index, the first listed on a tie. A
-  researcher choosing another preferred source on the website was not recorded.
+- **Groups** (verified 2026-11-03): a test work whose DOI is `https://doi.org/10.1016/J.POCEAN.2016.07.005` joins
+  the hand-added work's group (`10.1016/j.pocean.2016.07.005`): both normalize to the lowercase bare DOI.
+- **Preferred summary = highest display index**, listed first; the group's external ids are its `self` ones, as
+  sent (`part-of` ids are left out). A work added by a client gets `"1"`, one added by the researcher `"0"`, so
+  the client's work is preferred (`works/list/list`). Choosing a preferred source on the website gives that
+  summary the highest index (`"2"`), and it stays preferred when a client adds another work to the group
+  (`works/preferred/list`, `WorksLiveTest`). The SDK breaks a tie with the first summary listed (never seen).
+- **Sandbox state:** the hand-added work is the researcher's preferred source in its group since 2026-11-03.
 
 ## Agent skills
 

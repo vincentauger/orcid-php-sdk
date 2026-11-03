@@ -178,14 +178,15 @@ it('lists works as groups, with the preferred summary and every summary', functi
     expect($list->groups)->toHaveCount(1);
 
     $group = $list->groups[0];
-    $ours = $group->summaries[0];
-    $handAdded = $group->summaries[1];
+    [$ours, $handAdded] = $this->isOurs($group->summaries[0]->source) ? $group->summaries : array_reverse($group->summaries);
+    // recorded before the researcher chose the hand-added work as preferred on the website (works/preferred): until
+    // then it keeps display index 0, and a client's work (1) is the preferred one; afterwards it holds 2
+    $preferred = ($handAdded->displayIndex ?? 0) > 1 ? $handAdded : $ours;
 
     expect($group->summaries)->toHaveCount(2)
         ->and($group->externalIds)->toHaveCount(1)
         ->and($group->externalIds[0]->type)->toBe('doi')
         ->and($group->externalIds[0]->normalizedValue)->toBe(HAND_ADDED_DOI)
-        // the work added last gets the highest display index: ORCID lists it first and displays it
         ->and($ours->putCode)->toBe($putCode)
         ->and($this->isOurs($ours->source))->toBeTrue()
         ->and($ours->displayIndex)->toBe(1)
@@ -195,16 +196,52 @@ it('lists works as groups, with the preferred summary and every summary', functi
         ->and($ours->externalIds[0]->normalizedValue)->toBe(HAND_ADDED_DOI)
         ->and($ours->visibility)->toBe(Visibility::Public)
         ->and($handAdded->source?->isRecordOwner())->toBeTrue()
-        ->and($handAdded->displayIndex)->toBe(0)
+        ->and($handAdded->displayIndex)->toBeIn([0, 2])
         ->and($handAdded->title?->title)->toBe('Current and future trends in marine image annotation software')
         ->and($handAdded->journalTitle)->toBe('Progress in Oceanography')
         ->and((string) $handAdded->publicationDate)->toBe('2016-12')
         ->and(array_map(fn (ExternalId $id): ?string => $id->normalizedValue, $handAdded->externalIds))->toBe([HAND_ADDED_DOI, '0079-6611'])
-        ->and($group->preferred())->toBe($ours)
-        ->and($list->preferred())->toBe([$ours])
-        ->and($list->summaries())->toBe([$ours, $handAdded])
+        // ORCID lists the preferred summary first
+        ->and($group->preferred())->toBe($preferred)
+        ->and($group->summaries[0])->toBe($preferred)
+        ->and($list->preferred())->toBe([$preferred])
+        ->and($list->summaries())->toBe($group->summaries)
         ->and(array_map(fn (WorkSummary $summary): int => $summary->putCode, $public->summaries()))
-        ->toBe([$putCode, $handAdded->putCode]);
+        ->toBe(array_map(fn (WorkSummary $summary): int => $summary->putCode, $group->summaries));
+});
+
+/*
+ * The researcher's choice can only be made on the ORCID website. To re-record: delete the folder, add a work titled
+ * "orcid-php-sdk preferred" with the DOI HAND_ADDED_DOI through the API, choose the hand-added work as preferred
+ * on the sandbox website, then run this test: it deletes the test work.
+ */
+it('prefers the summary the researcher chose', function (): void {
+    $folder = 'works/preferred';
+    $mockClient = new MockClient([
+        new OrcidFixture("{$folder}/list"),
+        new OrcidFixture("{$folder}/delete"),
+    ]);
+
+    $works = $this->getMemberApiClient()->withMockClient($mockClient)->works();
+
+    $list = $works->list();
+    $ours = array_values(array_filter($list->summaries(), fn (WorkSummary $summary): bool => $this->isOurs($summary->source)));
+
+    if ($ours !== []) {
+        $works->delete($ours[0]->putCode);
+    }
+
+    $group = $list->groups[0];
+
+    expect($ours)->toHaveCount(1)
+        ->and($ours[0]->title?->title)->toBe('orcid-php-sdk preferred')
+        ->and($group->summaries)->toHaveCount(2)
+        // choosing a summary gives it the highest display index: ORCID lists it first and takes the group's ids from it
+        ->and($group->preferred()->source?->isRecordOwner())->toBeTrue()
+        ->and($group->preferred()->displayIndex)->toBe(2)
+        ->and($group->preferred())->toBe($group->summaries[0])
+        ->and($ours[0]->displayIndex)->toBe(1)
+        ->and($group->externalIds[0]->value)->toBe(HAND_ADDED_DOI);
 });
 
 it('checks the token scopes and the API before sending', function (): void {
