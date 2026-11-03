@@ -383,6 +383,50 @@ Evidence: `tests/Fixtures/Saloon/c8/` (no test replays these either).
   the plain strings of an expanded result's `other-name` (person items there are objects); `c8/e01`, `e02` and `p02`
   were recorded before that, with `other-name` emptied.
 
+## Error codes (verified against the sandbox, 2026-11-03)
+
+Every error code met on the sandbox so far.
+
+The exception follows the status (`OrcidRequestException::fromResponse()`); the code is in `errorCode`. A bulk call's
+item errors are `OrcidError`s in its result, never thrown. "SDK refuses" means the input or request throws an
+`InvalidArgumentException` (or `LogicException`) before sending, so ORCID's error is only met by a raw `send()`.
+
+| Code | Status | Exception | Meaning (evidence) |
+|------|--------|-----------|--------------------|
+| 9001 | 404 | `OrcidNotFoundException` | unknown endpoint: `/summary` on the Public API (`c7/p01`, SDK refuses), `/addresses` (`c6/a15`) |
+| 9006 | 400 | `OrcidValidationException` | bulk create above 100 works (`c1/b08`, SDK refuses) |
+| 9008 | 500 | `OrcidServerException` | internal error: a Solr query ORCID can't parse (`c8/q13`), a negative `start` (`c8/q08`, SDK refuses), a group-id sequence collision (seen once, not recorded; see Peer reviews) |
+| 9010 | 403 | `OrcidForbiddenException::isNotSource()` | the client is not the item's source (`a1/e7-*`) |
+| 9012 | 400 | `OrcidValidationException` | search `rows` outside 0 to 1000 (`c8/q05`, SDK refuses) |
+| 9016 | 404 | `OrcidNotFoundException` | unknown put-code (`a1/e6`) |
+| 9019 | 400 | `OrcidValidationException` | PUT body without the put-code, or another one (`c1/q11`, `q12`; SDK always sends it) |
+| 9020 | 400 | `OrcidValidationException` | invalid value: unknown peer review group (`c3/r13`), blank keyword (`c5/k03`), blank citation (`c1/p22`), currency without a value (`c2/f24`), person identifier URL (`c6/x05`) |
+| 9021 | 409 | `OrcidConflictException::isDuplicate()` | duplicate `self` id, `existingPutCode()` from the message (`c1/p08`); a bulk item error too (`c1/b01`) |
+| 9022 | 400 | `OrcidValidationException` | funding without a title (`c2/f05`) |
+| 9023 | 400 | `OrcidValidationException` | external ids: none `self` on a work (`c1/p02`), an unknown type (`c1/p10`), a subject id without a relationship (`c3/r31`) |
+| 9030 | 409 | `OrcidConflictException::isDuplicate()` | duplicate person item content, no put-code (`c5/k08`, `c6/o07`, `u10`, `x08`) |
+| 9034 | 400 | `OrcidError` in `BulkRead::$failed` | unknown put-code on a bulk read, an item error (`c1/b06`) |
+| 9035 | 403 | `OrcidForbiddenException` | a PUT changing the visibility (`a1/e20`; the SDK never sends one) |
+| 9038 | 403 | `OrcidForbiddenException::isMissingScope()` | the token lacks the scope (`a1/e9`; `MissingScopeException` before sending when the scopes are known) |
+| 9042 | 400 | `OrcidValidationException` | bulk read above 100 put-codes (`c1/b07`, SDK refuses) |
+| 9045 | 400 | `OrcidValidationException` | missing or invalid disambiguated organization (`a1/e4`, `c2/f09`, `c4/s14`) |
+| 9046 | 400 | `OrcidValidationException` | missing organization (`a1/e15`) |
+| 9047 | 400 | `OrcidValidationException` | schema error: missing required field, unknown enum value, blank or too long string (`a1/e11`, and most `c*/` probes) |
+| 9050 | 400 | `OrcidValidationException` | end date without a start date (`c2/f12`, `c4/s17`) |
+| 9053 | 400 | `OrcidValidationException` | ISSN group id with a bad check digit (`c3/r12`) |
+| 9054 | 400 | `OrcidValidationException` | amount ORCID can't parse as a decimal (`c2/f22`) |
+| 9058 | 400 | `OrcidValidationException` | unknown contributor role (`c1/p11`, `c2/f16`) |
+| 9060 | 400 | `OrcidValidationException` | education or employment without a city or country (`a1/e5`) |
+
+Not ORCID error codes, but met too:
+
+- `external-id-normalized-error` 8001 on a stored external id ORCID can't normalize (`c1/q04`): read, not an error.
+- OAuth errors, `oauthError`: `invalid_token` 401 → `OrcidAuthException` (`a1/e8`); `access_denied` 403 →
+  `OrcidForbiddenException` (`oauth/userinfo-without-openid`); `invalid_grant` 400 → `OrcidValidationException`
+  (`oauth/exchange-invalid-code`).
+- 406 on a CSV search without `Accept: text/csv` (`c8/x06`) → plain `OrcidRequestException`; `CsvSearch` always
+  sends it. A 500 HTML page on a CSV search above 1000 rows (`c8/x05`) → `OrcidServerException`, SDK refuses.
+
 ## Agent skills
 
 ### Issue tracker

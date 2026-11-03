@@ -86,10 +86,12 @@ it('creates, reads, updates, lists and deletes an employment', function (): void
         ->toThrow(OrcidNotFoundException::class);
 });
 
-it('creates, lists and deletes every affiliation type', function (AffiliationType $type): void {
+it('creates, reads, updates, lists and deletes every affiliation type', function (AffiliationType $type): void {
     $folder = 'affiliations/'.$type->value;
     $mockClient = new MockClient([
         new OrcidFixture("{$folder}/create"),
+        new OrcidFixture("{$folder}/get"),
+        new OrcidFixture("{$folder}/update"),
         new OrcidFixture("{$folder}/list"),
         new OrcidFixture("{$folder}/delete"),
     ]);
@@ -97,12 +99,19 @@ it('creates, lists and deletes every affiliation type', function (AffiliationTyp
     $affiliations = $this->getMemberApiClient()->withMockClient($mockClient)->affiliations();
 
     $putCode = $affiliations->create($type, testAffiliation($type->value));
+    $created = $affiliations->get($type, $putCode);
+    $updated = $affiliations->update($type, $putCode, testAffiliation($type->value, roleTitle: 'Updated tester'));
     $listed = $affiliations->list($type);
     $affiliations->delete($type, $putCode);
 
     $ours = array_values(array_filter($listed, fn (Affiliation $affiliation): bool => $affiliation->putCode === $putCode));
 
-    expect($ours)->toHaveCount(1)
+    expect($created->type)->toBe($type)
+        ->and($created->roleTitle)->toBe('Tester')
+        ->and($this->isOurs($created->source))->toBeTrue()
+        ->and($updated->type)->toBe($type)
+        ->and($updated->roleTitle)->toBe('Updated tester')
+        ->and($ours)->toHaveCount(1)
         ->and($ours[0]->type)->toBe($type)
         ->and($ours[0]->departmentName)->toBe(OrcidFixture::TEST_MARKER.' '.$type->value);
 })->with(AffiliationType::cases());

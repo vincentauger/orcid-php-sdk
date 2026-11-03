@@ -41,6 +41,44 @@ $orcid = Orcid::public($readPublicToken);
 $oauth = new OrcidOAuth($clientId, $clientSecret, Environment::Sandbox);
 ```
 
+### OAuth
+
+`OrcidOAuth` wraps ORCID's token endpoints. It never stores tokens: keep the ones it returns wherever your
+application keeps secrets, and pass them to `Orcid::member()`.
+
+```php
+use VincentAuger\OrcidSdk\Enums\Scope;
+
+// 1. send the researcher to ORCID; generating and checking `state` is up to you
+$url = $oauth->authorizationUrl(Scope::completeAccess(), 'https://example.org/orcid/callback', state: $state);
+
+// 2. back on your redirect URI: exchange the code for a 3-legged token
+$token = $oauth->exchangeCode($_GET['code'], 'https://example.org/orcid/callback');
+// store all four
+$token->accessToken;
+$token->orcid;         // the record the researcher granted access to
+$token->scopes;        // list<Scope>: pass them to Orcid::member(scopes:) to check them before sending
+$token->refreshToken;
+$token->expiresIn;     // seconds (about 20 years for a 3-legged token)
+
+$orcid = Orcid::member(accessToken: $token->accessToken, orcid: $token->orcid, scopes: $token->scopes);
+
+// a 2-legged token for this client, e.g. /read-public for the Member API's higher limits (no refresh token)
+$readPublic = $oauth->clientCredentials([Scope::ReadPublic]);
+
+// a new token from a refresh token: same or fewer scopes, optionally revoking the old access token
+$narrowed = $oauth->refresh($token->refreshToken, scopes: [Scope::ReadLimited], revokeOld: true);
+
+// the researcher disconnects: revoke the access token (and its refresh token)
+$oauth->revoke($token->accessToken);
+
+// OpenID Connect: who granted an `openid` token, without a call to the record API
+$userInfo = $oauth->userInfo($openIdToken); // ->orcid, ->givenName, ->familyName
+```
+
+A bad, revoked or expired token makes record calls throw an `OrcidAuthException` (401); a token missing the scope a
+call needs, an `OrcidForbiddenException` whose `isMissingScope()` is true (403, error 9038).
+
 ### Affiliations
 
 Employments, educations, qualifications, invited positions, distinctions, memberships and services all work
@@ -541,6 +579,24 @@ try {
     }
 }
 ```
+
+Each `OrcidRequestException` carries ORCID's `errorCode`, `developerMessage` and `userMessage` (or `oauthError` and
+`oauthErrorDescription` for the OAuth endpoints), and the raw `Response`:
+
+| Status | Exception                   | ORCID errors met on the sandbox                                                       |
+|--------|-----------------------------|---------------------------------------------------------------------------------------|
+| 400    | `OrcidValidationException`  | 9047 (schema), 9020, 9023 (external ids), 9045/9046/9060 (organization), 9050, ...    |
+| 401    | `OrcidAuthException`        | `invalid_token`: bad, revoked or expired token                                        |
+| 403    | `OrcidForbiddenException`   | 9010 `isNotSource()`, 9038 `isMissingScope()`, 9035 (visibility change)               |
+| 404    | `OrcidNotFoundException`    | 9016 (unknown put-code), 9001 (unknown endpoint)                                      |
+| 409    | `OrcidConflictException`    | 9021 and 9030 `isDuplicate()`; `existingPutCode()` for 9021                           |
+| 429    | `OrcidRateLimitException`   | retryable                                                                             |
+| 5xx    | `OrcidServerException`      | retryable; 9008 (e.g. a Solr query ORCID can't parse)                                 |
+| none   | `OrcidConnectionException`  | retryable: ORCID could not be reached                                                 |
+
+Any other status is a plain `OrcidRequestException`. Many 400s never reach ORCID: the input classes refuse what
+ORCID would reject, with an `InvalidArgumentException`, before sending (and a call ORCID only serves on the Member
+API throws a `LogicException` on a Public API connector).
 
 The SDK is stateless: it never stores or refreshes tokens, and it never retries failed requests. Your
 application decides where tokens live and when a failed call should be retried (for example, in a queued job).

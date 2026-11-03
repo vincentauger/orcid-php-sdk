@@ -15,7 +15,7 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
   Record the first fixtures through `Tests\Fixtures\OrcidFixture` (redacts iDs, tokens, personal data).
   Write the results in `AGENTS.md`, citing the fixtures. If OSP's current date format turns out to be
   ignored, note it for OSP's release notes.
-- [ ] **A2. Connectors and authentication**
+- [x] **A2. Connectors and authentication**
   - [x] `Environment` (Production/Sandbox → OAuth, Member and Public hosts), `ApiAccess`, `ApiVersion`
   - [x] `Orcid` connector (`member()` / `public()`), bearer token, 10 s / 30 s timeouts, no retries.
     The base URL is the host only; record requests add `/v3.0` through a shared trait (`ApiVersion::V3_0`)
@@ -47,8 +47,8 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
   (wraps `FatalRequestException`). `isRetryable()` is true for 429, 5xx and connection errors. Connectors return
   them from `getRequestException()`, so `$response->throw()` raises them too; convenience methods use
   `sendOrFail()`, and `send()` still returns the raw response.
-- [ ] **A6. Tests and docs** — fixture-based tests in CI, `live` Pest group against the sandbox (only runs
-  when credentials are present), README with examples.
+- [x] **A6. Tests and docs** — fixture-based tests in CI, `live` Pest group against the sandbox (only runs
+  when credentials are present), README with examples. `refresh()` is still mocked: recording it is #18.
   - [x] `bin/sandbox-token.sh`: one-off shell script that gets a 3-legged sandbox
     token for the test record and writes it to `.env`
   - [x] Recorded: client credentials, revoke, userinfo without `openid`. Mocked from ORCID's docs:
@@ -57,8 +57,8 @@ framework-agnostic package, modelled on `vincentauger/datacite-php-sdk`.
   - [x] Affiliation calls recorded through the typed requests. The `a1/` fixtures stay as evidence: they cover
     payloads the SDK deliberately never sends (nulls, plain dates, blank strings, missing ROR)
 - [x] **Release `0.1.0`** on Packagist (tagged 2026-10-22; bug fixes go in patches, breaking changes in minors while `0.x`).
-- [ ] **Later 0.x: webhooks** (premium members only, not used by OSP) — `Scope::Webhook` (obtained via
-  `clientCredentials()`), `$orcid->record($id)->webhooks()->register($callbackUrl)` / `->unregister()`:
+- [ ] **Later: webhooks** (#17; premium members only, not used by OSP, not needed for `1.0`) — `Scope::Webhook`
+  (obtained via `clientCredentials()`), `$orcid->record($id)->webhooks()->register($callbackUrl)` / `->unregister()`:
   PUT/DELETE with an empty body on the unversioned `/{orcid}/webhook/{url-encoded callback}`; 201 created,
   204 already registered or deleted. Callbacks are empty POSTs batched every 5 minutes, and only cover public data.
   The live test needs a premium sandbox client.
@@ -178,8 +178,45 @@ uses affiliations and OAuth). `1.0` = C8.
   record by its iD.
 - [ ] **C8. `1.0`** — README section per resource, every call covered by a fixture test and a `live` test,
   OSP has run `0.x` in production, public API frozen.
+  - [x] Readiness audit (#15): every call in the guide maps to an SDK method (below) or is out of scope; gaps are
+    #17 (webhooks) and #18 (record `refresh()`), neither blocking `1.0`
+  - [x] Every call has a fixture test and a `live` test, apart from the OAuth calls the sandbox can't produce on demand
+    (`exchangeCode()`, a successful `userInfo()`) and `refresh()`
+  - [ ] `refresh()` recorded, with a `live` test (#18)
+  - [x] Every ORCID error code met on the sandbox is in `AGENTS.md` ("Error codes"), with its exception
+  - [x] README section per resource, OAuth included, with a working example
+  - [ ] OSP has run `0.x` in production (maintainer)
+  - [ ] Freeze the public API and release `1.0` (maintainer)
 
-Not planned: XML, API v2.x, token delegation (needs ORCID to enable it on the client), member-only reporting.
+Not planned: XML, API v2.x, token delegation (needs ORCID to enable it on the client), member-only reporting, and,
+for `1.0`, webhooks (#17).
+
+### Coverage of ORCID's v3.0 guide (audit, 2026-11-03)
+
+Each row of the [guide](https://github.com/ORCID/orcid-model/blob/master/src/main/resources/record_3.0/README.md),
+JSON only. Bound: `Orcid::member(accessToken:, orcid:)`; any: `$orcid->record($id)` on every connector (reads only).
+Fixture tests are in `tests/Resources/` (and `tests/OAuth/`), live tests in `tests/Live/`.
+
+| Guide call | SDK | Fixture test | Live test |
+|---|---|---|---|
+| `GET /record` | bound/any `wholeRecord()` | `RecordResourceTest` | `RecordLiveTest` |
+| `GET /summary` (Member API only, `c7/`) | bound/any `recordSummary()` | `RecordResourceTest` | `RecordLiveTest` (bound) |
+| `GET /activities` | bound/any `activities()` | `RecordResourceTest` | `RecordLiveTest` |
+| `GET /person`, `/biography`, `/email`, `/personal-details` | bound/any `person()`, `biography()`, `emails()`, `personalDetails()` | `RecordResourceTest` | `RecordLiveTest` |
+| `GET\|POST\|PUT\|DELETE` the 7 affiliation types (`/employment`, `/education`, `/qualification`, `/invited-position`, `/distinction`, `/membership`, `/service`, and their lists) | `affiliations()->list\|get\|create\|update\|delete(AffiliationType, …)`, any `affiliations()->list\|get` | `AffiliationsResourceTest` | `AffiliationsLiveTest` |
+| `GET\|POST\|PUT\|DELETE /work`, `GET /works` | `works()->list\|get\|create\|update\|delete`, any `works()->list\|get` | `WorksResourceTest` | `WorksLiveTest` |
+| `POST /works`, `GET /works/{a,b,...}` (bulk) | `works()->createMany()`, `getMany()` (any too) | `WorksResourceTest` | `WorksLiveTest` |
+| `GET\|POST\|PUT\|DELETE /funding`, `GET /fundings` | `fundings()->…` | `FundingsResourceTest` | `FundingsLiveTest` |
+| `GET\|POST\|PUT\|DELETE /peer-review`, `GET /peer-reviews` | `peerReviews()->…` | `PeerReviewsResourceTest` | `PeerReviewsLiveTest` |
+| `GET\|POST\|PUT\|DELETE /research-resource`, `GET /research-resources` | `researchResources()->…` | `ResearchResourcesResourceTest` | `ResearchResourcesLiveTest` |
+| `GET\|POST\|PUT\|DELETE /keywords` | `keywords()->…` | `KeywordsResourceTest` | `KeywordsLiveTest` |
+| `GET\|POST\|PUT\|DELETE /other-names` | `otherNames()->…` | `OtherNamesResourceTest` | `PersonSectionsLiveTest` |
+| `GET\|POST\|PUT\|DELETE /researcher-urls` | `researcherUrls()->…` | `ResearcherUrlsResourceTest` | `PersonSectionsLiveTest` |
+| `GET\|POST\|PUT\|DELETE /external-identifiers` | `externalIdentifiers()->…` | `ExternalIdentifiersResourceTest` | `PersonSectionsLiveTest` |
+| `GET\|POST\|PUT\|DELETE /address` | `addresses()->…` | `AddressesResourceTest` | `PersonSectionsLiveTest` |
+| `GET /search` (and `/expanded-search`, `/csv-search`, not in the guide) | `search()`, `expandedSearch()`, `csvSearch()` on every connector | `SearchResourceTest` | `SearchLiveTest` |
+| OAuth: authorize, token (code, client credentials, refresh), revoke, userinfo (`/authenticate`, `openid` scopes) | `OrcidOAuth::authorizationUrl()`, `exchangeCode()`, `clientCredentials()`, `refresh()`, `revoke()`, `userInfo()` | `OrcidOAuthTest`, `OAuthTokenLifecycleTest`: `exchangeCode()` and a successful `userInfo()` mocked (a browser code, an `openid` token), `refresh()` mocked until #18 | `OAuthLiveTest`: client credentials, revoke, userinfo without `openid` |
+| `PUT\|DELETE /{orcid}/webhook/{callback}` (premium) | none: #17 | | |
 
 ## Follow-ups (not in this work)
 
