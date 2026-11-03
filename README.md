@@ -3,7 +3,7 @@
 A modern, framework-agnostic PHP SDK for the [ORCID API](https://info.orcid.org/documentation/) v3.0, built on
 [Saloon](https://docs.saloon.dev).
 
-> **Work in progress.** The API is not stable until `1.0`; see [PLAN.md](PLAN.md) for the roadmap.
+> **Before `1.0`**, a minor release may break the API: see the [changelog](CHANGELOG.md) when upgrading.
 
 ## Requirements
 
@@ -600,6 +600,29 @@ API throws a `LogicException` on a Public API connector).
 
 The SDK is stateless: it never stores or refreshes tokens, and it never retries failed requests. Your
 application decides where tokens live and when a failed call should be retried (for example, in a queued job).
+
+## API coverage
+
+Every call in ORCID's [v3.0 guide](https://github.com/ORCID/orcid-model/blob/master/src/main/resources/record_3.0/README.md)
+(JSON), apart from webhooks for premium members ([#17](https://github.com/vincentauger/orcid-php-sdk/issues/17)).
+"Bound" is a member connector bound to its record, `Orcid::member(accessToken:, orcid:)`; "any" is
+`$orcid->record($id)` on every connector, which only reads.
+
+| ORCID call | SDK |
+|---|---|
+| `GET /record` | bound or any: `wholeRecord()` |
+| `GET /summary` (Member API only) | bound or any: `recordSummary()` |
+| `GET /activities` | bound or any: `activities()` |
+| `GET /person`, `/biography`, `/email`, `/personal-details` | bound or any: `person()`, `biography()`, `emails()`, `personalDetails()` |
+| `/employment`, `/education`, `/qualification`, `/invited-position`, `/distinction`, `/membership`, `/service` | bound: `affiliations()->list\|get\|create\|update\|delete(AffiliationType, ...)`; any: `list\|get` |
+| `/work`, `/works` | bound: `works()->list\|get\|create\|update\|delete`; any: `list\|get` |
+| `POST /works`, `GET /works/{a,b,...}` (bulk) | bound: `works()->createMany()`, `getMany()`; any: `getMany()` |
+| `/funding`, `/fundings` | `fundings()`, as for works |
+| `/peer-review`, `/peer-reviews` | `peerReviews()`, as for works |
+| `/research-resource`, `/research-resources` | `researchResources()`, as for works |
+| `/keywords`, `/other-names`, `/researcher-urls`, `/external-identifiers`, `/address` | bound: `keywords()`, `otherNames()`, `researcherUrls()`, `externalIdentifiers()`, `addresses()` with `list\|get\|create\|update\|delete`; any: `list\|get` |
+| `GET /search` (and `/expanded-search`, `/csv-search`) | every connector: `search()`, `expandedSearch()`, `csvSearch()` |
+| OAuth: authorize, token, revoke, userinfo | `OrcidOAuth`: `authorizationUrl()`, `exchangeCode()`, `clientCredentials()`, `refresh()`, `revoke()`, `userInfo()` |
 
 ## Testing
 

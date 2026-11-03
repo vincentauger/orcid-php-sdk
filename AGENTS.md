@@ -3,7 +3,10 @@
 ## Project Overview
 
 A modern, framework-agnostic PHP SDK for the ORCID API v3.0 (Public and Member APIs, plus the OAuth token
-endpoints), built on Saloon. See `PLAN.md` for the roadmap and the decisions behind it.
+endpoints), built on Saloon. It covers every call in ORCID's v3.0 guide but webhooks (README, "API coverage"). Open
+work is in GitHub Issues; decisions are in `docs/adr/` and under "Architecture" below; vocabulary in `GLOSSARY.md`.
+
+Not planned: XML, API v2.x, token delegation (needs ORCID to enable it on the client), member-only reporting.
 
 ## Core Rules
 
@@ -36,6 +39,21 @@ endpoints), built on Saloon. See `PLAN.md` for the roadmap and the decisions beh
 - The SDK is stateless: it never stores, refreshes or looks up tokens on its own
 - Saloon retries stay disabled; callers (e.g. queues) decide when to retry
 - DTOs are `final readonly` with hand-written `fromArray()`/`toArray()` mapping ORCID's hyphenated keys
+- Classes per section: `X` (read: tolerant, never fails on what ORCID returns), `XInput` (write: validated in its
+  constructor, ORCID's rules checked before sending, `toArray()` leaves out nulls), `XSummary` where list items
+  differ from the full item. Input classes have no visibility (ORCID applies the researcher's default and refuses
+  changes, `a1/e19`, `e20`); read classes expose a `Visibility` enum
+- Enums ORCID can extend (types, roles, ...): read classes hold `?Enum $x` plus `string $rawX`, so an unknown value
+  loses nothing; input classes only take the enum
+- Works, fundings, peer reviews and research resources: `list()` returns groups, with `preferred()` and `summaries()`;
+  affiliations stay flat, with `displayIndex` (ADR 0001). One method call sends one HTTP request: bulk calls throw
+  above `Orcid::BULK_LIMIT` (ADR 0002)
+- A typed resource per section, sharing request traits (`HasRecordEndpoint`, `ReadsPutCodeFromLocation`); no generic
+  section class, because the payloads differ. Write requests declare `RequiresMemberApi` and `RequiresScopes`
+- Finding a client's own items: `Source::isClient($clientId)`; the connector never knows the client id
+- A new section starts with a sandbox check (required fields, error codes, edge cases), written below with its
+  fixtures as evidence, before its classes; every call then gets a fixture test (`tests/Resources/`) and a `live`
+  test (`tests/Live/`)
 
 ## ORCID credentials
 
