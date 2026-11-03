@@ -157,6 +157,13 @@ above holds for works too.
   summary the highest index (`"2"`), and it stays preferred when a client adds another work to the group
   (`works/preferred/list`, `WorksLiveTest`). The SDK breaks a tie with the first summary listed (never seen).
 - **Sandbox state:** the hand-added work is the researcher's preferred source in its group since 2026-11-03.
+- **Bulk** (verified 2026-11-03, `c1/b*`): `POST /works` (`{"bulk": [{"work": ...}]}`) and `GET /works/{a,b,...}`
+  answer 200 with `{"bulk": [...]}`, one `{"work"}` or `{"error"}` per item in the order sent; the error has the
+  ORCID error body. A created work comes back in full, with its put-code. Each work is checked on its own: a
+  duplicate of a work already on the record or earlier in the same batch is 409, 9021 (`b04`, `b01`), no `self`
+  id is 400, 9023 (`b02`), and the others are created. A body ORCID can't deserialize (e.g. an unknown type) fails
+  the whole request, 400, 9047, and creates nothing (`b03`). An unknown put-code on a bulk read is an item error
+  400, 9034, not a 404 (`b06`). Above 100 items: 400, error 9042 on a read (`b07`), 9006 on a create (`b08`).
 
 ## Agent skills
 

@@ -11,8 +11,11 @@ use VincentAuger\OrcidSdk\Data\Common\FuzzyDate;
 use VincentAuger\OrcidSdk\Data\Common\Title;
 use VincentAuger\OrcidSdk\Data\Common\TranslatedTitle;
 use VincentAuger\OrcidSdk\Data\Common\Url;
+use VincentAuger\OrcidSdk\Data\Works\BulkRead;
+use VincentAuger\OrcidSdk\Data\Works\BulkResult;
 use VincentAuger\OrcidSdk\Data\Works\Citation;
 use VincentAuger\OrcidSdk\Data\Works\Work;
+use VincentAuger\OrcidSdk\Data\Works\WorkInput;
 use VincentAuger\OrcidSdk\Data\Works\WorkSummary;
 use VincentAuger\OrcidSdk\Enums\CitationType;
 use VincentAuger\OrcidSdk\Enums\ContributorRole;
@@ -244,12 +247,79 @@ it('prefers the summary the researcher chose', function (): void {
         ->and($group->externalIds[0]->value)->toBe(HAND_ADDED_DOI);
 });
 
+it('creates and reads works in bulk, each succeeding or failing on its own', function (): void {
+    $folder = 'works/bulk';
+    $mockClient = new MockClient([
+        new OrcidFixture("{$folder}/create-many"),
+        new OrcidFixture("{$folder}/get-many"),
+        new OrcidFixture("{$folder}/delete-first"),
+        new OrcidFixture("{$folder}/delete-second"),
+    ]);
+
+    $works = $this->getMemberApiClient()->withMockClient($mockClient)->works();
+
+    // the second input repeats the first one's self identifier: ORCID refuses it alone
+    $result = $works->createMany([
+        testWork('bulk first'),
+        testWork('bulk first', type: WorkType::Preprint),
+        testWork('bulk second'),
+    ]);
+
+    // read before the cleanup, asserted after it, so a failure never leaves the works behind
+    try {
+        $read = $works->getMany([...array_values($result->created), 999999999]);
+    } finally {
+        foreach ($result->created as $putCode) {
+            $works->delete($putCode);
+        }
+    }
+
+    expect(array_keys($result->created))->toBe([0, 2])
+        ->and(array_keys($result->failed))->toBe([1])
+        ->and($result->hasFailures())->toBeTrue()
+        ->and($result->failed[1]->responseCode)->toBe(409)
+        ->and($result->failed[1]->isDuplicate())->toBeTrue()
+        ->and($result->failed[1]->existingPutCode())->toBe($result->created[0])
+        ->and($read->works)->toHaveCount(2)
+        ->and(array_keys($read->works))->toBe(array_values($result->created))
+        ->and($read->works[$result->created[0]]->title?->title)->toBe('orcid-php-sdk bulk first')
+        ->and($read->works[$result->created[0]]->type)->toBe(WorkType::JournalArticle)
+        ->and($read->works[$result->created[2]]->title?->title)->toBe('orcid-php-sdk bulk second')
+        ->and($read->works[$result->created[2]]->externalIds[0]->value)->toBe('orcid-php-sdk-bulk-second')
+        ->and($this->isOurs($read->works[$result->created[2]]->source))->toBeTrue()
+        // an unknown put-code is a failure of its own (400, error 9034), not a 404 for the whole request
+        ->and($read->hasFailures())->toBeTrue()
+        ->and(array_keys($read->failed))->toBe([999999999])
+        ->and($read->failed[999999999]->responseCode)->toBe(400)
+        ->and($read->failed[999999999]->errorCode)->toBe(9034)
+        ->and($read->failed[999999999]->isDuplicate())->toBeFalse();
+});
+
+it('refuses more than 100 works or put-codes in one bulk call, before sending', function (): void {
+    $mockClient = new MockClient([]);
+    $works = Orcid::member(accessToken: 'token', orcid: '0000-0002-1825-0097')->withMockClient($mockClient)->works();
+    $public = Orcid::public()->withMockClient($mockClient)->record('0000-0002-1825-0097')->works();
+
+    $inputs = array_map(fn (int $i): WorkInput => testWork("bulk {$i}"), range(1, Orcid::BULK_LIMIT + 1));
+
+    expect(Orcid::BULK_LIMIT)->toBe(100)
+        ->and(fn (): BulkResult => $works->createMany($inputs))->toThrow(InvalidArgumentException::class, 'at most 100')
+        ->and(fn (): BulkResult => $works->createMany([]))->toThrow(InvalidArgumentException::class)
+        ->and(fn (): BulkRead => $works->getMany(range(1, 101)))->toThrow(InvalidArgumentException::class, 'at most 100')
+        ->and(fn (): BulkRead => $public->getMany(range(1, 101)))->toThrow(InvalidArgumentException::class, 'at most 100')
+        ->and(fn (): BulkRead => $works->getMany([]))->toThrow(InvalidArgumentException::class);
+
+    $mockClient->assertNothingSent();
+});
+
 it('checks the token scopes and the API before sending', function (): void {
     $mockClient = new MockClient([]);
 
     $readOnly = Orcid::member(accessToken: 'token', orcid: '0000-0002-1825-0097', scopes: [Scope::ReadLimited])->withMockClient($mockClient);
 
     expect(fn (): int => $readOnly->works()->create(testWork('scope')))
+        ->toThrow(MissingScopeException::class)
+        ->and(fn (): BulkResult => $readOnly->works()->createMany([testWork('scope')]))
         ->toThrow(MissingScopeException::class)
         ->and(fn (): Response => Orcid::public()->withMockClient($mockClient)->send(new CreateWork('0000-0002-1825-0097', testWork('public'))))
         ->toThrow(LogicException::class, 'requires the Member API')

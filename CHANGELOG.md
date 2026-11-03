@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Works lists: `$orcid->works()->list()` and `record($id)->works()->list()` return `WorkGroups`, ORCID's groups
   (`WorkGroup`: external ids and `WorkSummary` items), with `preferred()` (one summary per group, what ORCID
   displays) and `summaries()` (every summary, for syncing) (ADR 0001)
+- Works in bulk, at most `Orcid::BULK_LIMIT` (100) per call, above which an `InvalidArgumentException` is thrown
+  before sending (ADR 0002): `getMany(putCodes)` returns a `BulkRead` (works and failures keyed by put-code), also
+  on `record($id)->works()`; `createMany(inputs)` returns a `BulkResult` (put-codes and failures keyed by input
+  position, `hasFailures()`). Item failures are `OrcidError`s (`isDuplicate()`, `existingPutCode()`)
 - Shared `Title`, `TranslatedTitle`, `Contributor` and `Url` classes
 - `OrcidConflictException::isDuplicate()` (error 9021) and `existingPutCode()`
 - `Visibility` enum, `Source` assertion-origin fields, `ExternalId::$normalizedValue`, `Affiliation::$displayIndex`,

@@ -42,6 +42,12 @@ final class Orcid extends Connector
     use HasTimeout;
     use ThrowsOrcidExceptions;
 
+    /**
+     * The most items ORCID takes in one bulk call (works: getMany(), createMany()). Above it, the SDK throws
+     * instead of splitting the call into several requests (ADR 0002)
+     */
+    public const int BULK_LIMIT = 100;
+
     protected int $connectTimeout = 10;
 
     protected int $requestTimeout = 30;

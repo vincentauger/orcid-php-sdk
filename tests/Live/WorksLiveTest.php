@@ -42,6 +42,26 @@ it('creates, reads, updates and deletes a work on the sandbox', function (): voi
         ->and(fn (): Work => $works->get($putCode))->toThrow(OrcidNotFoundException::class);
 })->group('live');
 
+it('creates and reads works in bulk on the sandbox', function (): void {
+    $this->requiresSandbox();
+
+    $works = $this->getMemberApiClient()->works();
+    $result = $works->createMany([testWork('live bulk'), testWork('live bulk'), testWork('live bulk second')]);
+
+    try {
+        $read = $works->getMany([...array_values($result->created), 999999999]);
+    } finally {
+        foreach ($result->created as $putCode) {
+            $works->delete($putCode);
+        }
+    }
+
+    expect(array_keys($result->created))->toBe([0, 2])
+        ->and($result->failed[1]->existingPutCode())->toBe($result->created[0])
+        ->and(array_keys($read->works))->toBe(array_values($result->created))
+        ->and($read->failed[999999999]->errorCode)->toBe(9034);
+})->group('live');
+
 it('groups a work with the hand-added work sharing its DOI on the sandbox', function (): void {
     $this->requiresSandbox();
 

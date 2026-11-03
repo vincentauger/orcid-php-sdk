@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace VincentAuger\OrcidSdk\Exceptions;
 
+use VincentAuger\OrcidSdk\Data\OrcidError;
+
 /**
  * 409: the item conflicts with an existing one. Check `errorCode`:
  *
@@ -12,7 +14,7 @@ namespace VincentAuger\OrcidSdk\Exceptions;
  */
 final class OrcidConflictException extends OrcidRequestException
 {
-    public const int DUPLICATE = 9021;
+    public const int DUPLICATE = OrcidError::DUPLICATE;
 
     public function isDuplicate(): bool
     {
@@ -25,10 +27,6 @@ final class OrcidConflictException extends OrcidRequestException
      */
     public function existingPutCode(): ?int
     {
-        if (! $this->isDuplicate() || preg_match('/put-code (\d+)/', $this->developerMessage ?? '', $matches) !== 1) {
-            return null;
-        }
-
-        return (int) $matches[1];
+        return new OrcidError(errorCode: $this->errorCode, developerMessage: $this->developerMessage)->existingPutCode();
     }
 }

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace VincentAuger\OrcidSdk\Resources;
 
+use VincentAuger\OrcidSdk\Data\Works\BulkRead;
 use VincentAuger\OrcidSdk\Data\Works\Work;
 use VincentAuger\OrcidSdk\Data\Works\WorkGroups;
 use VincentAuger\OrcidSdk\Orcid;
 use VincentAuger\OrcidSdk\Requests\Works\GetWork;
+use VincentAuger\OrcidSdk\Requests\Works\GetWorks;
 use VincentAuger\OrcidSdk\Requests\Works\ListWorks;
 
 /**
@@ -37,6 +39,20 @@ final readonly class ReadOnlyWorksResource
     public function get(int $putCode): Work
     {
         $request = new GetWork($this->orcid, $putCode);
+
+        return $request->createDtoFromResponse($this->connector->sendOrFail($request));
+    }
+
+    /**
+     * Up to 100 works in full, in one request, keyed by put-code. An unknown put-code is a failure in the result.
+     *
+     * @param  list<int>  $putCodes
+     *
+     * @throws \InvalidArgumentException with no put-code or more than Orcid::BULK_LIMIT: split them (ADR 0002)
+     */
+    public function getMany(array $putCodes): BulkRead
+    {
+        $request = new GetWorks($this->orcid, $putCodes);
 
         return $request->createDtoFromResponse($this->connector->sendOrFail($request));
     }

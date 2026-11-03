@@ -151,6 +151,33 @@ foreach ($list->groups as $group) {        // is this DOI already on the record,
 }
 ```
 
+`createMany()` and `getMany()` send up to 100 works or put-codes in one request (`Orcid::BULK_LIMIT`). Each item
+succeeds or fails on its own, so a duplicate doesn't stop the others: the failures are in the result, as
+`OrcidError`s, not thrown. Above 100 items they throw an `InvalidArgumentException` before sending anything: one
+call is one request, so split the batch yourself (e.g. one queue job per 100).
+
+```php
+foreach (array_chunk($inputs, Orcid::BULK_LIMIT) as $chunk) {
+    $result = $works->createMany($chunk);
+
+    foreach ($result->created as $position => $putCode) { // keyed by position in $chunk
+        // store $putCode for $chunk[$position]
+    }
+
+    foreach ($result->failed as $position => $error) {
+        if ($error->isDuplicate()) {
+            $putCode = $error->existingPutCode();         // already there, as with create()
+        } else {
+            // $error->errorCode, $error->developerMessage
+        }
+    }
+}
+
+$read = $works->getMany([123, 456]);                  // or record($orcidId)->works()->getMany(...)
+$read->works[123]->title?->title;                      // keyed by put-code
+$read->failed[456] ?? null;                            // an unknown put-code (error 9034), not a 404
+```
+
 ### Person and activities
 
 The bound member connector reads its own record (`$orcid->person()`, `$orcid->activities()`, including limited

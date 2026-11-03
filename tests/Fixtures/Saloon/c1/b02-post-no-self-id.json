@@ -1,0 +1,25 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 12:55:29 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "1960",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a54b88995b2c79aa-YUL"
+    },
+    "data": "{\"bulk\":[{\"work\":{\"created-date\":{\"value\":1793710529597},\"last-modified-date\":{\"value\":1793710529597},\"source\":{\"source-orcid\":null,\"source-client-id\":{\"uri\":\"https:\/\/sandbox.orcid.org\/client\/APP-0000000000000000\",\"path\":\"APP-0000000000000000\",\"host\":\"sandbox.orcid.org\"},\"source-name\":{\"value\":\"EOS Open Science Portal\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"put-code\":2557338,\"path\":null,\"title\":{\"title\":{\"value\":\"orcid-php-sdk bulk c\"},\"subtitle\":null,\"translated-title\":null},\"journal-title\":null,\"short-description\":null,\"citation\":null,\"type\":\"journal-article\",\"publication-date\":null,\"external-ids\":{\"external-id\":[{\"external-id-type\":\"other-id\",\"external-id-value\":\"orcid-php-sdk-bulk-c\",\"external-id-normalized\":{\"value\":\"orcid-php-sdk-bulk-c\",\"transient\":true},\"external-id-normalized-error\":null,\"external-id-url\":null,\"external-id-relationship\":\"self\"}]},\"url\":null,\"contributors\":{\"contributor\":[]},\"language-code\":null,\"country\":null,\"visibility\":\"public\"}},{\"error\":{\"response-code\":400,\"developer-message\":\"400 Bad Request: Invalid activity, an external identifier is required.\",\"user-message\":\"Invalid activity: an external identifier is required.\",\"error-code\":9023,\"more-info\":\"https:\/\/members.orcid.org\/api\/resources\/troubleshooting\"}}]}",
+    "context": []
+}
