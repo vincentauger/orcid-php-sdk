@@ -98,6 +98,16 @@ An identifier from another system attached to an item or a record, e.g. a DOI or
 relationship `self`, it identifies the item itself.
 _Avoid_: External id (in prose), PID
 
+**Identifier type**:
+The kind of an external identifier, e.g. `doi`, `isbn` or `grant_number`, from ORCID's list of types. ORCID knows
+each type's resolver, the URL prefix that turns a value into a link.
+_Avoid_: Scheme, id kind
+
+**Relationship**:
+How an external identifier relates to its item: `self` identifies the item itself, `part-of` a larger thing it
+belongs to (a journal's ISSN for an article), `version-of` another version of it, `funded-by` a funding behind it.
+_Avoid_: Role, link type
+
 **Group**:
 Items from different sources that ORCID considers the same thing, because they share a `self` external
 identifier.
