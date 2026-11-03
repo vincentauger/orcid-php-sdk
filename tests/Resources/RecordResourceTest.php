@@ -6,9 +6,13 @@ use Saloon\Http\Faking\MockClient;
 use Tests\Fixtures\OrcidFixture;
 use VincentAuger\OrcidSdk\Data\Affiliations\Affiliation;
 use VincentAuger\OrcidSdk\Data\Person\Address;
+use VincentAuger\OrcidSdk\Data\Person\Biography;
+use VincentAuger\OrcidSdk\Data\Person\Email;
 use VincentAuger\OrcidSdk\Data\Person\Keyword;
 use VincentAuger\OrcidSdk\Data\Person\OtherName;
+use VincentAuger\OrcidSdk\Data\Person\PersonalDetails;
 use VincentAuger\OrcidSdk\Data\Person\PersonExternalIdentifier;
+use VincentAuger\OrcidSdk\Data\Person\PersonName;
 use VincentAuger\OrcidSdk\Data\Person\ResearcherUrl;
 use VincentAuger\OrcidSdk\Enums\AffiliationType;
 use VincentAuger\OrcidSdk\Enums\Environment;
@@ -74,6 +78,64 @@ it('reads the person section through the Public API without a token', function (
         ->and($identifiers)->toContain($putCodes['externalIdentifier'])
         ->and($person->addresses[0]->visibility)->toBe(Visibility::Public)
         ->and($person->emails)->toBeEmpty();
+});
+
+it('reads the biography alone, as the same class as person()', function (): void {
+    $mockClient = new MockClient([
+        new OrcidFixture('record/biography/member'),
+        new OrcidFixture('record/biography/public'),
+    ]);
+
+    $own = $this->getMemberApiClient()->withMockClient($mockClient)->biography();
+    $public = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId())->biography();
+
+    // the hand-made biography (issue #3) is public: both APIs return it
+    expect($own)->toBeInstanceOf(Biography::class)
+        ->and($own?->content)->toBe('A test bio.')
+        ->and($own?->visibility)->toBe(Visibility::Public)
+        ->and($public?->content)->toBe('A test bio.');
+});
+
+it('reads the emails alone, as the same class as person()', function (): void {
+    $mockClient = new MockClient([
+        new OrcidFixture('record/emails/member'),
+        new OrcidFixture('record/emails/public'),
+    ]);
+
+    $own = $this->getMemberApiClient()->withMockClient($mockClient)->emails();
+    $public = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId())->emails();
+
+    // the researcher's email is limited: /read-limited returns it, the Public API doesn't
+    expect($own)->toHaveCount(1)
+        ->and($own[0])->toBeInstanceOf(Email::class)
+        ->and($own[0]->email)->toBe('vincentauger@mailinator.com')
+        ->and($own[0]->primary)->toBeTrue()
+        ->and($own[0]->visibility)->toBe(Visibility::Limited)
+        ->and($own[0]->source?->isRecordOwner())->toBeTrue()
+        ->and($public)->toBe([]);
+});
+
+it('reads the personal details: the name, other names and biography, as the same classes as person()', function (): void {
+    $mockClient = new MockClient([
+        new OrcidFixture('record/personal-details/member'),
+        new OrcidFixture('record/personal-details/public'),
+    ]);
+
+    $own = $this->getMemberApiClient()->withMockClient($mockClient)->personalDetails();
+    $public = $this->getPublicApiClient()->withMockClient($mockClient)->record($this->orcidId())->personalDetails();
+
+    // the hand-made content (issue #3), all public: both APIs return it
+    foreach ([$own, $public] as $details) {
+        expect($details)->toBeInstanceOf(PersonalDetails::class)
+            ->and($details->name)->toBeInstanceOf(PersonName::class)
+            ->and($details->name?->displayName())->toBe('V JP Auger')
+            ->and($details->otherNames[0])->toBeInstanceOf(OtherName::class)
+            ->and($details->otherNames[0]->content)->toBe('JP Auger')
+            ->and($details->otherNames[0]->source?->isRecordOwner())->toBeTrue()
+            ->and($details->biography)->toBeInstanceOf(Biography::class)
+            ->and($details->biography?->content)->toBe('A test bio.')
+            ->and($details->lastModifiedAt)->toBeInstanceOf(DateTimeImmutable::class);
+    }
 });
 
 it('summarises the activities of its own record', function (): void {

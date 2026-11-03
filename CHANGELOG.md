@@ -49,6 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (non-blank, at most 255 characters, trimmed), `ResearcherUrlInput` (URL non-blank, at most 2000 characters; name
   optional, at most 350), `PersonExternalIdentifierInput` (type, value and URL required, at most 255 characters, always
   `self`), `AddressInput` (ISO 3166-1 alpha-2 country, uppercased)
+- Read-only person sections, on a bound member connector and on `record($id)`: `biography()` (`?Biography`),
+  `emails()` (`list<Email>`, limited ones with `/read-limited`) and `personalDetails()` (`PersonalDetails`: name,
+  other names and biography), returning the same classes as `person()`
 - Typed person items, each with its put-code, visibility, source and display index: `Keyword`, `OtherName`,
   `ResearcherUrl`, `Address`, `PersonExternalIdentifier`; and `Biography`
 - `OrcidConflictException::DUPLICATE_CONTENT` (error 9030, a person item with the same content: a keyword

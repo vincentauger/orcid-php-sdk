@@ -19,6 +19,11 @@ countries, external identifiers); an **activity section** lists what they did (w
 research resources and the seven affiliation sections).
 _Avoid_: Category, field, endpoint
 
+**Personal details**:
+The researcher's name, other names and biography, read in one call: the part of the person section without
+websites, emails, countries, keywords or external identifiers.
+_Avoid_: Profile, bio (for the whole)
+
 **Item**:
 One entry in a section, identified by its put-code and added by exactly one source.
 _Avoid_: Entry, activity, record (for a single item)

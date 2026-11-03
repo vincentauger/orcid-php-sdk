@@ -40,4 +40,15 @@ final readonly class Email
             source: Source::fromArray(Json::object($data, 'source')),
         );
     }
+
+    /**
+     * Read the {"email": [...]} list (GET /{orcid}/email, the person section's "emails")
+     *
+     * @param  array<array-key, mixed>|null  $data
+     * @return list<self>
+     */
+    public static function listFromArray(?array $data): array
+    {
+        return array_values(array_filter(array_map(self::fromArray(...), Json::list($data ?? [], 'email'))));
+    }
 }

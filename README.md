@@ -368,6 +368,13 @@ $person->addresses;           // Address (country)
 $person->externalIdentifiers; // PersonExternalIdentifier (externalId: type, value, url)
 $person->emails;              // Email (email, primary, verified)
 
+// fetch only what you show, as the same classes
+$record->biography();         // ?Biography
+$record->emails();            // list<Email>: public ones only
+$orcid->emails();             // own record (bound member connector): limited ones too, with /read-limited
+$details = $record->personalDetails(); // PersonalDetails: name, otherNames, biography
+$details->name?->displayName();
+
 $activities = $record->activities();
 $activities->affiliations(AffiliationType::Education);
 $activities->workCount;
@@ -376,7 +383,8 @@ $record->affiliations()->list(AffiliationType::Employment); // reads only: no cr
 ```
 
 Own-record calls (`affiliations()`, `works()`, `fundings()`, `peerReviews()`, `researchResources()`, `keywords()`,
-`otherNames()`, `researcherUrls()`, `externalIdentifiers()`, `addresses()`, `person()`, `activities()`) on a connector without an `orcid` throw a `LogicException` before anything is sent.
+`otherNames()`, `researcherUrls()`, `externalIdentifiers()`, `addresses()`, `person()`, `biography()`, `emails()`,
+`personalDetails()`, `activities()`) on a connector without an `orcid` throw a `LogicException` before anything is sent.
 
 ### Keywords
 

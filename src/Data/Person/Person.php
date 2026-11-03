@@ -47,10 +47,7 @@ final readonly class Person
             otherNames: OtherName::listFromArray(Json::object($data, 'other-names')),
             biography: Biography::fromArray(Json::object($data, 'biography')),
             researcherUrls: ResearcherUrl::listFromArray(Json::object($data, 'researcher-urls')),
-            emails: array_values(array_filter(array_map(
-                Email::fromArray(...),
-                Json::list(Json::object($data, 'emails') ?? [], 'email'),
-            ))),
+            emails: Email::listFromArray(Json::object($data, 'emails')),
             addresses: Address::listFromArray(Json::object($data, 'addresses')),
             keywords: Keyword::listFromArray(Json::object($data, 'keywords')),
             externalIdentifiers: PersonExternalIdentifier::listFromArray(Json::object($data, 'external-identifiers')),

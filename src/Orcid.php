@@ -13,7 +13,10 @@ use VincentAuger\OrcidSdk\Concerns\ThrowsOrcidExceptions;
 use VincentAuger\OrcidSdk\Contracts\RequiresMemberApi;
 use VincentAuger\OrcidSdk\Contracts\RequiresScopes;
 use VincentAuger\OrcidSdk\Data\Activities\ActivitiesSummary;
+use VincentAuger\OrcidSdk\Data\Person\Biography;
+use VincentAuger\OrcidSdk\Data\Person\Email;
 use VincentAuger\OrcidSdk\Data\Person\Person;
+use VincentAuger\OrcidSdk\Data\Person\PersonalDetails;
 use VincentAuger\OrcidSdk\Enums\ApiAccess;
 use VincentAuger\OrcidSdk\Enums\Environment;
 use VincentAuger\OrcidSdk\Enums\Scope;
@@ -237,6 +240,38 @@ final class Orcid extends Connector
     public function person(): Person
     {
         return $this->record($this->boundOrcid(__FUNCTION__))->person();
+    }
+
+    /**
+     * The biography of the record this connector is bound to (only the researcher can change it)
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function biography(): ?Biography
+    {
+        return $this->record($this->boundOrcid(__FUNCTION__))->biography();
+    }
+
+    /**
+     * The emails of the record this connector is bound to: limited ones too with /read-limited
+     *
+     * @return list<Email>
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function emails(): array
+    {
+        return $this->record($this->boundOrcid(__FUNCTION__))->emails();
+    }
+
+    /**
+     * The name, other names and biography of the record this connector is bound to
+     *
+     * @throws \LogicException when the connector is not bound to a record
+     */
+    public function personalDetails(): PersonalDetails
+    {
+        return $this->record($this->boundOrcid(__FUNCTION__))->personalDetails();
     }
 
     /**

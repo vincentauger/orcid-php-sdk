@@ -156,13 +156,14 @@ uses affiliations and OAuth). `1.0` = C8.
   external ids, dates, URL) and `ResearchResourceItem`s (name, `ResearchResourceType`, hosts, ids);
   `ResearchResourceInput` nests `ResearchResourceProposalInput` and `ResearchResourceItemInput`, as ORCID does.
   `ResearchResourceSummary` (the proposal only) / `ResearchResourceGroup`.
-- [ ] **C5. Person sections** (`/person/update`, Member API). Typed items and keywords done (#10; sandbox check in
+- [x] **C5. Person sections** (`/person/update`, Member API). Typed items and keywords done (#10; sandbox check in
   `c5/`, in `AGENTS.md`: a duplicate keyword is 409, error 9030, without the existing put-code). Other names,
   researcher URLs, external identifiers and addresses done (#11; sandbox check in `c6/`: a blank other name is
-  stored, addresses have no duplicate check, a person identifier's URL is required)
+  stored, addresses have no duplicate check, a person identifier's URL is required). Read-only sections done (#12)
   - [x] Writable: other names, keywords, researcher URLs, external identifiers, addresses:
     `$orcid->keywords()->list|get|create|update|delete`, etc.
-  - Read only: `$orcid->biography()`, `->emails()`, `->personalDetails()`
+  - [x] Read only: `$orcid->biography()`, `->emails()`, `->personalDetails()` (`PersonalDetails`: name, other names,
+    biography), also on `record($id)`, returning the same classes as `person()`
   - [x] `Person` exposes typed items (with put-codes and visibility) instead of plain strings (breaking); the same
     item classes (`Keyword`, ...) are returned by `person()` and by `->keywords()->list()`
 - [ ] **C6. Whole record and summary**

@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace VincentAuger\OrcidSdk\Resources;
 
 use VincentAuger\OrcidSdk\Data\Activities\ActivitiesSummary;
+use VincentAuger\OrcidSdk\Data\Person\Biography;
+use VincentAuger\OrcidSdk\Data\Person\Email;
 use VincentAuger\OrcidSdk\Data\Person\Person;
+use VincentAuger\OrcidSdk\Data\Person\PersonalDetails;
 use VincentAuger\OrcidSdk\Orcid;
 use VincentAuger\OrcidSdk\Requests\Activities\GetActivitiesSummary;
+use VincentAuger\OrcidSdk\Requests\Person\GetBiography;
 use VincentAuger\OrcidSdk\Requests\Person\GetPerson;
+use VincentAuger\OrcidSdk\Requests\Person\GetPersonalDetails;
+use VincentAuger\OrcidSdk\Requests\Person\ListEmails;
 
 /**
  * Reads on any ORCID record: $orcid->record('0000-0002-1825-0097')->... Writes go
@@ -28,6 +34,38 @@ final readonly class RecordResource
     public function person(): Person
     {
         $request = new GetPerson($this->orcid);
+
+        return $request->createDtoFromResponse($this->connector->sendOrFail($request));
+    }
+
+    /**
+     * The biography alone: the same Biography as person()->biography
+     */
+    public function biography(): ?Biography
+    {
+        $request = new GetBiography($this->orcid);
+
+        return $request->createDtoFromResponse($this->connector->sendOrFail($request));
+    }
+
+    /**
+     * The emails visible to the token (limited ones need /read-limited): the same Email items as person()->emails
+     *
+     * @return list<Email>
+     */
+    public function emails(): array
+    {
+        $request = new ListEmails($this->orcid);
+
+        return $request->createDtoFromResponse($this->connector->sendOrFail($request));
+    }
+
+    /**
+     * The name, other names and biography only: the same classes as person()
+     */
+    public function personalDetails(): PersonalDetails
+    {
+        $request = new GetPersonalDetails($this->orcid);
 
         return $request->createDtoFromResponse($this->connector->sendOrFail($request));
     }

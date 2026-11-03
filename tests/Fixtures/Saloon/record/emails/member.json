@@ -1,0 +1,25 @@
+{
+    "statusCode": 200,
+    "headers": {
+        "Date": "Tue, 03 Nov 2026 17:42:57 GMT",
+        "Content-Type": "application\/vnd.orcid+json;charset=UTF-8",
+        "Content-Length": "829",
+        "Connection": "keep-alive",
+        "Server": "cloudflare",
+        "access-control-allow-origin": "*",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "strict-transport-security": "max-age=31536000 ; includeSubDomains",
+        "x-xss-protection": "0",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff",
+        "x-target": "reg-sbox-mapi-use2-a1",
+        "x-via": "b1",
+        "cf-cache-status": "DYNAMIC",
+        "set-cookie": "Redacted",
+        "CF-RAY": "a54d2db31f8683c2-YUL"
+    },
+    "data": "{\"last-modified-date\":{\"value\":1710875441003},\"email\":[{\"created-date\":{\"value\":1709823581032},\"last-modified-date\":{\"value\":1710875441003},\"source\":{\"source-orcid\":{\"uri\":\"https:\/\/sandbox.orcid.org\/0000-0002-1825-0097\",\"path\":\"0000-0002-1825-0097\",\"host\":\"sandbox.orcid.org\"},\"source-client-id\":null,\"source-name\":{\"value\":\"V JP Auger\"},\"assertion-origin-orcid\":null,\"assertion-origin-client-id\":null,\"assertion-origin-name\":null},\"email\":\"vincentauger@mailinator.com\",\"path\":null,\"visibility\":\"limited\",\"verified\":true,\"primary\":true,\"put-code\":null}],\"path\":\"\/0000-0002-1825-0097\/email\"}",
+    "context": []
+}
